@@ -11,8 +11,6 @@
     <style>
         body { font-family: 'Prompt', sans-serif; background-color: #e5e7eb; display: flex; justify-content: center; margin: 0; }
         .app-container { width: 100%; max-width: 414px; height: 100dvh; background-color: #f8fafc; position: relative; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.15); }
-        
-        /* Layout Fix: ให้ Page เป็น flex-col และ Content scroll ได้ */
         .page { position: absolute; inset: 0; display: none; flex-direction: column; background-color: #f8fafc; z-index: 10; animation: fadeSlide 0.3s ease-out; }
         .page.active { display: flex; }
         .page-content { flex: 1; overflow-y: auto; overflow-x: hidden; padding-bottom: 20px; }
@@ -23,31 +21,44 @@
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .staff-card.active { border-color: #10b981; background-color: #ecfdf5; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.1); transform: translateY(-2px); }
         
-        /* 3D SweetAlert */
-        .swal-3d-popup { border-radius: 24px !important; box-shadow: 0 20px 40px rgba(0,0,0,0.2) !important; border: 1px solid rgba(255,255,255,0.8) !important; background: rgba(255,255,255,0.95) !important; backdrop-filter: blur(10px); font-family: 'Prompt', sans-serif !important; }
-        .swal-3d-btn { border-radius: 999px !important; font-weight: 800 !important; padding: 12px 24px !important; box-shadow: 0 8px 15px rgba(0,0,0,0.1) !important; }
-        
-        /* Loader 3D */
-        .loader-3d-container { perspective: 1000px; width: 80px; height: 80px; position: relative; margin: 0 auto 20px; }
-        .loader-cube { width: 100%; height: 100%; position: absolute; transform-style: preserve-3d; animation: rotateCube 3s infinite linear; }
-        .loader-face { position: absolute; width: 80px; height: 80px; background: rgba(255, 255, 255, 0.9); border: 2px solid #10b981; border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 2rem; box-shadow: 0 0 20px rgba(16,185,129,0.2); }
-        .loader-face:nth-child(1) { transform: translateZ(40px); color: #10b981; }
-        .loader-face:nth-child(2) { transform: rotateY(90deg) translateZ(40px); color: #ef4444; }
-        .loader-face:nth-child(3) { transform: rotateY(180deg) translateZ(40px); color: #0ea5e9; }
-        .loader-face:nth-child(4) { transform: rotateY(-90deg) translateZ(40px); color: #f59e0b; }
-        @keyframes rotateCube { from { transform: rotateX(-10deg) rotateY(0deg); } to { transform: rotateX(-10deg) rotateY(360deg); } }
-        
-        /* Floating Logo */
-        @keyframes float3D { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-10px) scale(1.05); } }
-        .animate-float-3d { animation: float3D 3s ease-in-out infinite; }
-        
+        /* 3D Loader Animation */
+        .loader-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.92); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(8px); animation: fadeIn 0.3s; }
+        .loader-cube-wrap { width: 80px; height: 80px; perspective: 1000px; margin-bottom: 20px; }
+        .loader-cube { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; animation: spinCube 2.5s infinite linear; }
+        .loader-face { position: absolute; width: 80px; height: 80px; background: rgba(255,255,255,0.9); border: 2px solid #10b981; border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 2.2rem; box-shadow: inset 0 0 15px rgba(16,185,129,0.1), 0 5px 15px rgba(0,0,0,0.1); }
+        .loader-face:nth-child(1) { transform: translateZ(40px); color: #10b981; } /* แผนไทย */
+        .loader-face:nth-child(2) { transform: rotateY(90deg) translateZ(40px); color: #ef4444; } /* แผนจีน */
+        .loader-face:nth-child(3) { transform: rotateY(180deg) translateZ(40px); color: #0ea5e9; } /* อบไอน้ำ */
+        .loader-face:nth-child(4) { transform: rotateY(-90deg) translateZ(40px); color: #ec4899; } /* หลังคลอด */
+        @keyframes spinCube { 0% { transform: rotateX(-15deg) rotateY(0deg); } 100% { transform: rotateX(-15deg) rotateY(360deg); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
         /* Step Animation */
         .step-section { display: none; animation: slideDown 0.4s ease-out forwards; }
         .step-section.show { display: block; }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Receipt Style */
+        .receipt-card { background: #fff; border-radius: 16px; padding: 20px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #f1f5f9; }
+        .receipt-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: repeating-linear-gradient(45deg, #10b981, #10b981 10px, #34d399 10px, #34d399 20px); border-radius: 16px 16px 0 0; }
+        .dashed-line { border-bottom: 2px dashed #cbd5e1; margin: 15px 0; }
     </style>
 </head>
 <body>
+
+<!-- 3D Loader -->
+<div id="global-loader" class="loader-overlay hidden">
+    <div class="loader-cube-wrap">
+        <div class="loader-cube">
+            <div class="loader-face"><i class="fa-solid fa-leaf"></i></div>
+            <div class="loader-face"><i class="fa-solid fa-yin-yang"></i></div>
+            <div class="loader-face"><i class="fa-solid fa-hot-tub-person"></i></div>
+            <div class="loader-face"><i class="fa-solid fa-person-breastfeeding"></i></div>
+        </div>
+    </div>
+    <h3 class="font-extrabold text-xl text-gray-800" id="loader-text">กำลังประมวลผล...</h3>
+    <p class="text-xs text-gray-500 mt-2 font-medium">Sadao Wellness Clinic</p>
+</div>
 
 <div class="app-container">
 
@@ -56,7 +67,7 @@
         <div class="page-content flex flex-col justify-center items-center p-6 bg-cover bg-center h-full relative" style="background-image: url('https://lh3.googleusercontent.com/d/1Jb91xkRQYkUlGKBQopCO4f_gfBPqpo5q');">
             <div class="absolute inset-0 bg-white/70 backdrop-blur-sm"></div>
             <div class="relative z-10 flex flex-col items-center justify-center w-full">
-                <img src="https://lh3.googleusercontent.com/d/1sxp0wrhV7MKhr2_6nOLQsj-jVddMmnzR" class="w-40 h-40 object-contain mb-4 filter drop-shadow-xl animate-float-3d">
+                <img src="https://lh3.googleusercontent.com/d/1sxp0wrhV7MKhr2_6nOLQsj-jVddMmnzR" class="w-40 h-40 object-contain mb-4 filter drop-shadow-xl" style="animation: float3D 3s ease-in-out infinite;">
                 <h1 class="text-2xl font-extrabold text-emerald-800 text-center">Sadao Wellness Clinic</h1>
                 <p class="text-sm text-emerald-700 font-bold text-center mt-2 mb-12">กลุ่มงานการแพทย์แผนไทย<br>และการแพทย์ทางเลือก โรงพยาบาลสะเดา</p>
                 <button onclick="navigate('page-login')" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-700 text-white rounded-full py-4 font-bold text-lg shadow-xl active:scale-95 transition-all flex justify-center items-center gap-2">
@@ -102,17 +113,18 @@
                 </div>
 
                 <label class="block text-gray-700 font-bold mb-1 text-xs">เบอร์โทรศัพท์ <span class="text-red-500">*</span></label>
-                <input type="tel" id="inputPhone" class="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-emerald-500 focus:outline-none font-medium text-sm" placeholder="08XXXXXXXX" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                <!-- PDPA Fix: ไม่ดึงเบอร์มาโชว์ ให้ผู้ใช้พิมพ์เองเพื่อยืนยัน -->
+                <input type="tel" id="inputPhone" class="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-emerald-500 focus:outline-none font-bold text-sm text-emerald-800" placeholder="08XXXXXXXX" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 
-                <div class="mt-4 flex items-center justify-center gap-2 bg-emerald-50 p-2 rounded-lg border border-emerald-100">
-                    <i class="fa-solid fa-shield-halved text-emerald-500"></i><span class="text-xs text-emerald-800 font-semibold">ปกป้องข้อมูลตามมาตรฐาน PDPA</span>
+                <div class="mt-4 flex flex-col items-center justify-center gap-1 bg-emerald-50 p-2 rounded-lg border border-emerald-100">
+                    <div class="flex items-center gap-2"><i class="fa-solid fa-shield-halved text-emerald-500"></i><span class="text-xs text-emerald-800 font-semibold">ระบบปกป้องข้อมูลส่วนบุคคล (PDPA)</span></div>
+                    <span class="text-[10px] text-gray-500">หากพบประวัติเดิม กรุณาพิมพ์เบอร์โทรเพื่อยืนยันตัวตน</span>
                 </div>
             </div>
 
             <!-- สิทธิการรักษา -->
             <h3 class="font-extrabold text-gray-800 mb-3 px-1">💳 สิทธิการรักษา <span class="text-red-500">*</span></h3>
             <div class="flex flex-col gap-2 mb-4">
-                <!-- ข้ามการเขียน HTML สิทธิซ้ำเพื่อให้สั้นลง ใช้รูปแบบเดิมครับ -->
                 <div class="right-option border-2 border-emerald-500 bg-emerald-50 p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer shadow-sm transition-all" onclick="selectRightUI(this, '1')">
                     <input type="radio" name="patient_right" value="บัตรทอง" class="hidden" checked>
                     <div class="w-10 h-10 rounded-full bg-emerald-100 flex justify-center items-center text-emerald-600"><i class="fa-solid fa-id-card"></i></div>
@@ -159,18 +171,16 @@
                         <p class="text-sm font-medium opacity-90">ยินดีต้อนรับ</p>
                         <h2 class="text-xl font-bold drop-shadow-md" id="displayUserName">คุณผู้รับบริการ</h2>
                     </div>
-                    <div class="w-11 h-11 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/40 cursor-pointer shadow-lg" onclick="navigate('page-login')">
+                    <div class="w-11 h-11 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/40 cursor-pointer shadow-lg active:scale-90 transition-transform" onclick="navigate('page-login')">
                         <i class="fa-solid fa-user-pen text-white"></i>
                     </div>
                 </div>
             </div>
 
             <div class="px-5 -mt-10 relative z-10 pb-10">
-                <!-- โชว์คิวอัจฉริยะ (ดึงจาก Firebase) -->
+                <!-- โชว์คิวอัจฉริยะ -->
                 <div class="bg-white rounded-2xl p-4 mb-5 shadow-lg border border-gray-100 flex flex-col justify-between" id="dash-history-card">
-                    <div class="flex items-center text-emerald-700 font-bold text-sm mb-3">
-                        <i class="fa-solid fa-spinner fa-spin mr-2"></i> กำลังตรวจสอบคิวนัดหมาย...
-                    </div>
+                    <!-- จะถูกเติมด้วย JS -->
                 </div>
 
                 <h3 class="text-gray-800 font-extrabold mb-3 text-lg px-1 flex items-center gap-2"><i class="fa-solid fa-notes-medical text-emerald-500"></i> เลือกบริการที่ต้องการ</h3>
@@ -200,7 +210,7 @@
     <div id="page-booking" class="page">
         <div class="bg-white p-4 shadow-sm flex items-center sticky top-0 z-20">
             <button onclick="navigate('page-home')" class="text-gray-500 hover:text-emerald-600 text-xl w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center transition-colors"><i class="fa-solid fa-arrow-left"></i></button>
-            <h2 class="text-lg font-extrabold text-gray-800 flex-1 text-center" id="booking-header-title">เลือกเวลา</h2>
+            <h2 class="text-lg font-extrabold text-gray-800 flex-1 text-center" id="booking-header-title">จองคิว</h2>
             <div class="w-8"></div>
         </div>
 
@@ -233,12 +243,12 @@
                 <div class="grid grid-cols-3 gap-3 mb-6" id="staff-grid"></div>
             </div>
 
-            <!-- Step 5: ตะกร้าบริการเสริม (ฉลาดโชว์เฉพาะคิวว่าง) -->
+            <!-- Step 5: ตะกร้าบริการเสริม (Dynamic) -->
             <div id="step-addon" class="step-section">
                 <div class="bg-gradient-to-br from-emerald-50 to-white border border-emerald-100 rounded-2xl p-4 mb-4 shadow-sm" id="addon-container">
                     <h4 class="font-bold text-emerald-800 text-sm mb-3 flex items-center gap-2"><i class="fa-solid fa-cart-plus text-amber-500"></i> 5. รับบริการต่อเนื่องไหมครับ?</h4>
                     <div id="addon-options-area" class="flex flex-col gap-2">
-                        <!-- ถูกเติมด้วย JS เมื่อเช็คคิวว่างแล้ว -->
+                        <!-- ถูกเติมด้วย JS เมื่อเช็คคิวว่าง -->
                     </div>
                 </div>
             </div>
@@ -249,8 +259,56 @@
                 <span class="text-emerald-800 text-xs font-bold"><i class="fa-solid fa-receipt"></i> ยอดชำระโดยประมาณ</span>
                 <span class="text-emerald-600 font-black text-xl" id="est-price">-</span>
             </div>
-            <button onclick="showCartSummary()" id="btn-submit-book" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-700 text-white rounded-full py-3.5 font-bold text-lg shadow-[0_8px_20px_rgba(5,150,105,0.3)] opacity-50 cursor-not-allowed transition-all" disabled>
+            <button onclick="navigate('page-summary')" id="btn-submit-book" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-700 text-white rounded-full py-3.5 font-bold text-lg shadow-lg opacity-50 cursor-not-allowed transition-all" disabled>
                 ตรวจสอบข้อมูล
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== หน้า 5: สรุปและยืนยันบิล (Summary) ==================== -->
+    <div id="page-summary" class="page">
+        <div class="bg-white p-4 shadow-sm flex items-center sticky top-0 z-20">
+            <button onclick="navigate('page-booking')" class="text-gray-500 hover:text-emerald-600 text-xl w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center transition-colors"><i class="fa-solid fa-arrow-left"></i></button>
+            <h2 class="text-lg font-extrabold text-gray-800 flex-1 text-center">ยืนยันการนัดหมาย</h2>
+            <div class="w-8"></div>
+        </div>
+
+        <div class="page-content p-5 pb-32">
+            <div class="receipt-card">
+                <div class="text-center mb-4">
+                    <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-2"><i class="fa-solid fa-calendar-check text-3xl text-emerald-600"></i></div>
+                    <h3 class="font-extrabold text-xl text-gray-800" id="sum-date-time">-</h3>
+                    <p class="text-sm text-gray-500 font-medium">กรุณาตรวจสอบข้อมูลก่อนกดยืนยัน</p>
+                </div>
+
+                <div class="bg-gray-50 rounded-xl p-3 mb-4 border border-gray-100 flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm text-emerald-600"><i class="fa-solid fa-user"></i></div>
+                    <div>
+                        <p class="font-bold text-gray-800 text-sm" id="sum-name">-</p>
+                        <p class="text-xs text-gray-500" id="sum-right">-</p>
+                    </div>
+                </div>
+
+                <div class="dashed-line"></div>
+
+                <div id="sum-items-container" class="mb-4">
+                    <!-- รายการจะถูกแทรกที่นี่ -->
+                </div>
+
+                <div class="dashed-line"></div>
+
+                <div class="flex justify-between items-end bg-emerald-50 p-3 rounded-xl border border-emerald-100">
+                    <span class="text-emerald-800 font-bold text-sm">ยอดชำระโดยประมาณ</span>
+                    <span class="text-emerald-600 font-black text-2xl" id="sum-total-price">0.-</span>
+                </div>
+            </div>
+            
+            <p class="text-xs text-center text-gray-400 mt-4 px-4">กรุณามาก่อนเวลานัดหมาย 15 นาที เพื่อเตรียมตัวเข้ารับบริการ หากไม่มาตามเวลาคลินิกขอสงวนสิทธิ์ยกเลิกคิว</p>
+        </div>
+
+        <div class="bottom-bar p-4">
+            <button onclick="submitBookingAPI()" class="w-full bg-emerald-600 text-white rounded-full py-4 font-bold text-lg shadow-[0_8px_20px_rgba(5,150,105,0.3)] active:scale-95 transition-transform flex justify-center items-center gap-2">
+                <i class="fa-solid fa-check-circle"></i> ยืนยันรับบริการ
             </button>
         </div>
     </div>
@@ -301,7 +359,6 @@
     let userProfile = { id: '', fname: '', lname: '', phone: '', right: '1', rightName: 'บัตรทอง' };
     let currentDept = ''; let fullFirebaseData = null; let fetchedData = []; 
     let selectedDateIdx = 0; let selectedTimeStr = ''; let selectedStaffObj = null; let totalFee = 0;
-    let addonCart = { ttm: null, tcm: null, steam: null }; 
 
     function navigate(pageId) {
         document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
@@ -309,6 +366,8 @@
         if(pageId === 'page-home') {
             document.getElementById('displayUserName').innerText = `คุณ${userProfile.fname}`;
             fetchDashboardHistory();
+        } else if(pageId === 'page-summary') {
+            buildSummaryPage();
         }
     }
 
@@ -320,7 +379,7 @@
             let phtml = '';
             saved.forEach(p => {
                 phtml += `<div class="flex flex-col items-center bg-white border border-emerald-100 p-2 rounded-xl min-w-[75px] shadow-sm cursor-pointer hover:bg-emerald-50" 
-                            onclick="fillProfile('${p.id}', '${p.f}', '${p.l}', '${p.p}', '${p.r}')">
+                            onclick="fillProfile('${p.id}', '${p.f}', '${p.l}', '', '${p.r}')">
                     <div class="w-11 h-11 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center font-black text-lg mb-1">${p.f.charAt(0)}</div>
                     <span class="text-[10px] font-bold text-gray-700 truncate w-full text-center">${p.f}</span>
                 </div>`;
@@ -339,10 +398,15 @@
                 .then(r => r.json()).then(data => {
                     if(data && data.fname) {
                         stat.innerHTML = '<span class="text-emerald-500"><i class="fa-solid fa-check-circle"></i> พบประวัติเดิม</span>';
-                        document.getElementById('inputFname').value = data.fname; document.getElementById('inputLname').value = data.lname || ""; document.getElementById('inputPhone').value = data.tel;
+                        // PDPA: Mask name and force empty phone
+                        let mName = data.fname.charAt(0) + "***" + (data.fname.length > 3 ? data.fname.slice(-1) : "");
+                        document.getElementById('inputFname').value = mName;
+                        document.getElementById('inputLname').value = "***";
+                        document.getElementById('inputPhone').value = ""; // บังคับกรอกใหม่
                         document.getElementById('inputFname').readOnly = true; document.getElementById('inputLname').readOnly = true;
                     } else {
-                        stat.innerHTML = '<span class="text-blue-500">ข้อมูลใหม่</span>';
+                        stat.innerHTML = '<span class="text-blue-500">ผู้รับบริการใหม่</span>';
+                        document.getElementById('inputFname').value = ''; document.getElementById('inputLname').value = ''; document.getElementById('inputPhone').value = '';
                         document.getElementById('inputFname').readOnly = false; document.getElementById('inputLname').readOnly = false;
                     }
                 }).catch(() => { stat.innerHTML = ''; });
@@ -364,19 +428,27 @@
 
     function loginUser() {
         const id = document.getElementById('inputIdCard').value; const f = document.getElementById('inputFname').value.trim(); const p = document.getElementById('inputPhone').value; const rVal = document.getElementById('selected-right-val').value;
-        if(id.length < 13 || f === '' || p.length < 10) { Swal.fire({ icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณากรอกข้อมูลให้ครบถ้วน', customClass: {popup: 'swal-3d-popup'} }); return; }
+        if(id.length < 13 || f === '' || p.length < 10) { Swal.fire({ icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณากรอกข้อมูลให้ครบถ้วน (เบอร์โทร 10 หลัก)', customClass: {popup: 'swal-3d-popup'} }); return; }
         
-        let rNames = { '1': 'บัตรทอง', '2': 'บัตรทอง (ฟรี)', '3': 'ข้าราชการ', '4': 'รัฐวิสาหกิจ', '5': 'ชำระเงินเอง/ประกันสังคม' };
-        userProfile = { id: id, fname: f, lname: document.getElementById('inputLname').value.trim(), phone: p, right: rVal, rightName: rNames[rVal] };
+        let rNames = { '1': 'บัตรทอง (ร่วมจ่าย 30 บาท)', '2': 'บัตรทอง (ยกเว้นร่วมจ่าย)', '3': 'ข้าราชการ / อปท.', '4': 'รัฐวิสาหกิจ', '5': 'ประกันสังคม / ชำระเงินเอง' };
+        userProfile = { id: id, fname: f.replace(/\*/g,''), lname: document.getElementById('inputLname').value.trim().replace(/\*/g,''), phone: p, right: rVal, rightName: rNames[rVal] };
         
-        let saved = JSON.parse(localStorage.getItem('swc_profiles') || '[]');
-        if(!saved.find(x => x.id === id)) { saved.push({id: id, f: f, l: userProfile.lname, p: p, r: rVal}); localStorage.setItem('swc_profiles', JSON.stringify(saved)); }
+        // Save Profile (ถ้าชื่อไม่ได้ถูก Mask)
+        if(!userProfile.fname.includes('***') && userProfile.fname !== '') {
+            let saved = JSON.parse(localStorage.getItem('swc_profiles') || '[]');
+            if(!saved.find(x => x.id === id)) { saved.push({id: id, f: userProfile.fname, l: userProfile.lname, p: '', r: rVal}); localStorage.setItem('swc_profiles', JSON.stringify(saved)); }
+        }
         
         show3DLoader('กำลังเข้าสู่ระบบ...');
         fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'check_user', patientIdCard: id, serviceCategory: 'ttm' }) }).then(r => r.json()).then(res => {
             if(res.isBanned) { Swal.fire({title:'ระงับการจอง', text:`บัญชีนี้ถูกระงับจนถึงวันที่ ${res.banUntil}`, icon:'error', customClass:{popup:'swal-3d-popup'}}); } 
-            else { Swal.close(); navigate('page-home'); }
-        }).catch(() => { Swal.close(); navigate('page-home'); });
+            else { 
+                // ถ้าดึงประวัติได้ ใช้ชื่อจริงแทน Mask
+                if(res.user && res.user.fname) userProfile.fname = res.user.fname;
+                if(res.user && res.user.lname) userProfile.lname = res.user.lname;
+                hide3DLoader(); navigate('page-home'); 
+            }
+        }).catch(() => { hide3DLoader(); navigate('page-home'); });
     }
 
     // --- Dashboard History ---
@@ -393,7 +465,7 @@
                 card.innerHTML = `
                     <div class="flex justify-between items-center mb-2">
                         <p class="text-emerald-700 font-bold text-sm"><i class="fa-solid fa-calendar-check"></i> คิวของคุณที่กำลังจะมาถึง</p>
-                        <span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-md text-[10px] font-bold animate-pulse">รอยืนยันบริการ</span>
+                        <span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-md text-[10px] font-bold animate-pulse">รอรับบริการ</span>
                     </div>
                     <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 flex items-center justify-between">
                         <div><p class="font-bold text-gray-800 text-sm">${active.service}</p><p class="text-xs text-gray-500 mt-1"><i class="fa-regular fa-clock"></i> ${active.date} | ${active.time} น.</p></div>
@@ -406,33 +478,29 @@
 
     // --- 3D Loader ---
     function show3DLoader(text) {
-        Swal.fire({
-            html: `
-            <div class="flex flex-col items-center justify-center py-4">
-                <div class="loader-3d-container">
-                    <div class="loader-cube">
-                        <div class="loader-face"><i class="fa-solid fa-leaf"></i></div>
-                        <div class="loader-face"><i class="fa-solid fa-yin-yang"></i></div>
-                        <div class="loader-face"><i class="fa-solid fa-hot-tub-person"></i></div>
-                        <div class="loader-face"><i class="fa-solid fa-heart-pulse"></i></div>
-                    </div>
-                </div>
-                <h3 class="font-extrabold text-lg text-gray-800 mt-6">${text}</h3>
-                <p class="text-xs text-gray-500 mt-1 font-medium">โปรดรอสักครู่...</p>
-            </div>`,
-            showConfirmButton: false, allowOutsideClick: false, background: 'transparent', backdrop: 'rgba(0,0,0,0.5)', customClass: { popup: 'rounded-[2rem] shadow-2xl bg-white/95 backdrop-blur-md border border-white' }
-        });
+        document.getElementById('loader-text').innerText = text;
+        document.getElementById('global-loader').classList.remove('hidden');
+    }
+    function hide3DLoader() {
+        document.getElementById('global-loader').classList.add('hidden');
     }
 
-    // --- Step-by-Step Flow ---
+    // --- Reset Addons & Prices (แก้บัคค่าค้าง) ---
+    function resetAddonsAndPrice() {
+        document.getElementById('step-addon').classList.remove('show');
+        document.getElementById('addon-options-area').innerHTML = '';
+        totalFee = 0;
+        document.getElementById('est-price').innerText = '-';
+        document.getElementById('btn-submit-book').disabled = true;
+        document.getElementById('btn-submit-book').classList.add('opacity-50', 'cursor-not-allowed');
+    }
+
     function hideStepsAfter(stepId) {
         let steps = ['step-time', 'step-service', 'step-staff', 'step-addon'];
         let idx = steps.indexOf(stepId);
         if(idx === -1) return;
         for(let i = idx; i < steps.length; i++) { document.getElementById(steps[i]).classList.remove('show'); }
-        document.getElementById('btn-submit-book').disabled = true; document.getElementById('btn-submit-book').classList.add('opacity-50', 'cursor-not-allowed');
-        document.getElementById('est-price').innerText = '-';
-        addonCart = { ttm: null, tcm: null, steam: null }; 
+        resetAddonsAndPrice();
     }
 
     function openBookingFlow(dept) {
@@ -446,15 +514,14 @@
         
         show3DLoader('กำลังค้นหาคิวว่างทั้งหมด...');
         
-        // ดึง SadaoData ทั้งหมดเพื่อใช้ทำ Cross-selling
         fetch(FIREBASE_URL + "sadaoData.json?t=" + new Date().getTime())
         .then(r => r.json()).then(data => {
-            Swal.close();
+            hide3DLoader();
             fullFirebaseData = data; fetchedData = data[dept];
             selectedDateIdx = 0; selectedTimeStr = '';
             renderDates();
         }).catch(err => {
-            Swal.close(); Swal.fire({title: 'ขัดข้อง', text: 'ไม่สามารถโหลดข้อมูลได้', icon: 'error', customClass: {popup: 'swal-3d-popup'}}); navigate('page-home');
+            hide3DLoader(); Swal.fire({title: 'ขัดข้อง', text: 'ไม่สามารถโหลดข้อมูลได้', icon: 'error', customClass: {popup: 'swal-3d-popup'}}); navigate('page-home');
         });
     }
 
@@ -507,7 +574,7 @@
     }
 
     function stepServiceDone() {
-        hideStepsAfter('step-staff');
+        hideStepsAfter('step-staff'); resetAddonsAndPrice(); // ล้าง Addon เสมอเมื่อเปลี่ยนบริการ/เวลา
         document.getElementById('step-staff').classList.add('show');
         let day = fetchedData[selectedDateIdx]; let slot = day.slots.find(s => s.time === selectedTimeStr);
 
@@ -539,41 +606,36 @@
         checkAddonsAndEnableSubmit();
     }
 
-    // --- 🛒 ระบบ Cross-selling อัจฉริยะ ---
+    // --- 🛒 ระบบ Cross-selling แม่นยำเรื่องเวลา ---
     function checkAddonsAndEnableSubmit() {
-        document.getElementById('step-addon').classList.remove('show');
-        addonCart = { ttm: null, tcm: null, steam: null }; 
+        resetAddonsAndPrice(); // ล้างของเก่าให้สะอาด
         let nextTime = ALLOWED_2HR_PAIRS[selectedTimeStr];
         let addonsHtml = '';
         
+        // แก้บัควันหยุด: ถ้าไม่มี nextTime (คิวสุดท้ายของวัน) จะไม่โชว์ Addon
         if (nextTime && fullFirebaseData) {
-            // Check TTM/TCM (ชั่วโมงที่ 2)
+            
+            // 1. TTM -> TCM หรือ TCM -> TTM (ข้ามแผนก)
+            let crossDept = currentDept === 'ttm' ? 'tcm' : 'ttm';
+            let crossSlot = fullFirebaseData[crossDept][selectedDateIdx].slots.find(s => s.time === nextTime);
+            if (crossSlot && crossSlot.staffAvailable && crossSlot.staffAvailable.length > 0) {
+                let txt = currentDept === 'ttm' ? 'ฝังเข็ม/ครอบแก้ว แผนจีน' : 'นวดแผนไทย';
+                let price = currentDept === 'ttm' ? '+ 150 บาท' : '+ 250 บาท';
+                addonsHtml += createAddonCard('cross', txt, price, 'fa-user-md', 'text-amber-500', 'bg-amber-50', JSON.stringify(crossSlot.staffAvailable[0]));
+            }
+
+            // 2. 2nd Hour (ทำแผนกเดิมต่อ)
             if(currentDept === 'ttm' || currentDept === 'tcm') {
                 let sameSlot = fullFirebaseData[currentDept][selectedDateIdx].slots.find(s => s.time === nextTime);
                 if (sameSlot && sameSlot.staffAvailable && sameSlot.staffAvailable.some(st => st.name === selectedStaffObj.name)) {
-                    let txt = currentDept === 'tcm' ? 'ฝังเข็ม/ครอบแก้ว ชั่วโมงที่ 2' : 'นวดแผนไทย ชั่วโมงที่ 2';
+                    let txt = currentDept === 'tcm' ? 'ครอบแก้ว ชั่วโมงที่ 2' : 'นวดแผนไทย ชั่วโมงที่ 2';
                     let price = currentDept === 'tcm' ? '+ 150 บาท' : '+ 250 บาท';
                     let stf = sameSlot.staffAvailable.find(st => st.name === selectedStaffObj.name);
-                    addonsHtml += createAddonCard('ttm2', txt, price, 'fa-clock', 'text-amber-500', 'bg-amber-50', JSON.stringify(stf));
+                    addonsHtml += createAddonCard('2hr', txt, price, 'fa-clock', 'text-emerald-500', 'bg-emerald-50', JSON.stringify(stf));
                 }
             }
 
-            // Check ข้ามแผนก: TTM -> TCM
-            if (currentDept === 'ttm') {
-                let tcmSlot = fullFirebaseData.tcm[selectedDateIdx].slots.find(s => s.time === nextTime);
-                if (tcmSlot && tcmSlot.staffAvailable && tcmSlot.staffAvailable.length > 0) {
-                    addonsHtml += createAddonCard('tcm', 'ฝังเข็ม/ครอบแก้ว แผนจีน', '+ 150 บาท', 'fa-yin-yang', 'text-red-500', 'bg-red-50', JSON.stringify(tcmSlot.staffAvailable[0]));
-                }
-            }
-            // Check ข้ามแผนก: TCM -> TTM
-            if (currentDept === 'tcm') {
-                let ttmSlot = fullFirebaseData.ttm[selectedDateIdx].slots.find(s => s.time === nextTime);
-                if (ttmSlot && ttmSlot.staffAvailable && ttmSlot.staffAvailable.length > 0) {
-                    addonsHtml += createAddonCard('ttm', 'นวดแผนไทย', '+ 250 บาท', 'fa-leaf', 'text-emerald-500', 'bg-emerald-50', JSON.stringify(ttmSlot.staffAvailable[0]));
-                }
-            }
-
-            // Check อบไอน้ำ
+            // 3. Steam อบไอน้ำ
             let steamSlot = fullFirebaseData.steam[selectedDateIdx].slots.find(s => s.time === nextTime);
             if (steamSlot && !steamSlot.val.includes('เต็ม')) {
                 let price = (userProfile.right === '4' || userProfile.right === '5') ? '+ 100 บาท' : 'ฟรีตามสิทธิ';
@@ -623,40 +685,50 @@
             if(rV === '1') base = 30; else if(rV === '2' || rV === '3') base = 0; else if (rV === '4') base = 670; else base = 500;
         }
 
-        // Add-ons
-        if(document.getElementById('chk-ttm2') && document.getElementById('chk-ttm2').checked) base += (currentDept === 'tcm' ? 150 : 250);
-        if(document.getElementById('chk-tcm') && document.getElementById('chk-tcm').checked) base += 150;
-        if(document.getElementById('chk-ttm') && document.getElementById('chk-ttm').checked) base += 250;
-        if(document.getElementById('chk-steam') && document.getElementById('chk-steam').checked && (rV === '4' || rV === '5')) base += 100;
+        // Add-ons (เช็คก่อนว่า Checkbox มีอยู่จริงใน DOM และถูกติ๊กไหม)
+        let chk2hr = document.getElementById('chk-2hr');
+        let chkCross = document.getElementById('chk-cross');
+        let chkSteam = document.getElementById('chk-steam');
+
+        if(chk2hr && chk2hr.checked) base += (currentDept === 'tcm' ? 150 : 250);
+        if(chkCross && chkCross.checked) base += (currentDept === 'ttm' ? 150 : 250); // สลับราคา
+        if(chkSteam && chkSteam.checked && (rV === '4' || rV === '5')) base += 100;
 
         totalFee = base + ooh;
         document.getElementById('est-price').innerText = totalFee + ".-";
     }
 
-    // --- 📋 สรุปบิลก่อนยิง (Cart Summary) ---
-    function showCartSummary() {
+    // --- 📋 หน้าสรุปบิล (Page Summary) ---
+    function buildSummaryPage() {
         let svc = document.getElementById('select-service').value;
         let day = fetchedData[selectedDateIdx];
         
-        let cartHtml = `<div class="text-left bg-gray-50 p-4 rounded-xl border border-gray-100 mb-4 font-medium text-sm text-gray-700">
-            <div class="flex justify-between mb-2"><span>${svc}</span> <span class="font-bold text-gray-800">✅</span></div>`;
-        
-        if(document.getElementById('chk-ttm2') && document.getElementById('chk-ttm2').checked) cartHtml += `<div class="flex justify-between mb-2 text-amber-600"><span><i class="fa-solid fa-clock"></i> รับบริการชั่วโมงที่ 2</span> <span>✅</span></div>`;
-        if(document.getElementById('chk-tcm') && document.getElementById('chk-tcm').checked) cartHtml += `<div class="flex justify-between mb-2 text-red-500"><span><i class="fa-solid fa-yin-yang"></i> แผนจีน (ฝังเข็ม/ครอบแก้ว)</span> <span>✅</span></div>`;
-        if(document.getElementById('chk-ttm') && document.getElementById('chk-ttm').checked) cartHtml += `<div class="flex justify-between mb-2 text-emerald-600"><span><i class="fa-solid fa-leaf"></i> นวดแผนไทย</span> <span>✅</span></div>`;
-        if(document.getElementById('chk-steam') && document.getElementById('chk-steam').checked) cartHtml += `<div class="flex justify-between mb-2 text-blue-500"><span><i class="fa-solid fa-hot-tub-person"></i> อบไอน้ำสมุนไพร</span> <span>✅</span></div>`;
-        
-        cartHtml += `<hr class="my-2 border-gray-300"><div class="flex justify-between font-extrabold text-lg text-emerald-700 mt-2"><span>ยอดรวมโดยประมาณ</span> <span>${totalFee} บาท</span></div></div>`;
+        document.getElementById('sum-date-time').innerText = `${day.displayDate} | ${selectedTimeStr} น.`;
+        document.getElementById('sum-name').innerText = `คุณ${userProfile.fname} ${userProfile.lname}`;
+        document.getElementById('sum-right').innerText = `สิทธิ: ${userProfile.rightName}`;
+        document.getElementById('sum-total-price').innerText = `${totalFee}.-`;
 
-        Swal.fire({
-            title: 'สรุปรายการจองคิว',
-            html: `<p class="text-sm font-bold text-emerald-700 mb-2">${day.displayDate} | ${selectedTimeStr} น.</p>` + cartHtml,
-            showCancelButton: true, confirmButtonText: 'ยืนยันรับบริการ', cancelButtonText: 'แก้ไขข้อมูล',
-            confirmButtonColor: '#059669', cancelButtonColor: '#94a3b8',
-            customClass: { popup: 'swal-3d-popup', confirmButton: 'swal-3d-btn', cancelButton: 'swal-3d-btn' }
-        }).then((result) => {
-            if (result.isConfirmed) { submitBookingAPI(); }
-        });
+        let itemsHtml = `
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-bold text-gray-700">${svc}</span>
+                <span class="text-emerald-500"><i class="fa-solid fa-circle-check"></i></span>
+            </div>`;
+        
+        if(document.getElementById('chk-2hr') && document.getElementById('chk-2hr').checked) {
+            itemsHtml += `<div class="flex justify-between items-center mb-2 text-emerald-600">
+                <span class="text-sm font-bold"><i class="fa-solid fa-clock"></i> บริการต่อเนื่องชั่วโมงที่ 2</span><span><i class="fa-solid fa-circle-check"></i></span></div>`;
+        }
+        if(document.getElementById('chk-cross') && document.getElementById('chk-cross').checked) {
+            let nSvc = currentDept === 'ttm' ? 'ฝังเข็มแผนจีน' : 'นวดแผนไทย';
+            itemsHtml += `<div class="flex justify-between items-center mb-2 text-amber-500">
+                <span class="text-sm font-bold"><i class="fa-solid fa-user-md"></i> ต่อด้วย ${nSvc}</span><span><i class="fa-solid fa-circle-check"></i></span></div>`;
+        }
+        if(document.getElementById('chk-steam') && document.getElementById('chk-steam').checked) {
+            itemsHtml += `<div class="flex justify-between items-center mb-2 text-blue-500">
+                <span class="text-sm font-bold"><i class="fa-solid fa-hot-tub-person"></i> อบไอน้ำสมุนไพรต่อ</span><span><i class="fa-solid fa-circle-check"></i></span></div>`;
+        }
+        
+        document.getElementById('sum-items-container').innerHTML = itemsHtml;
     }
 
     // --- 🚀 ยิงเข้า API V45 ---
@@ -667,21 +739,24 @@
         
         let items = [{ time: selectedTimeStr, dept: currentDept, service: svc, staff: selectedStaffObj.name, col: selectedStaffObj.col }];
         
-        // แนบ Add-ons
-        if(document.getElementById('chk-ttm2') && document.getElementById('chk-ttm2').checked) {
-            let stf = JSON.parse(document.getElementById('chk-ttm2').getAttribute('data-stf'));
+        // เช็คการทำ Addon
+        if(document.getElementById('chk-2hr') && document.getElementById('chk-2hr').checked) {
+            let stf = JSON.parse(document.getElementById('chk-2hr').getAttribute('data-stf'));
             items.push({ time: nextTime, dept: currentDept, service: currentDept==='tcm'?'ครอบแก้ว':'นวดตัวส่งเสริมสุขภาพ(ชำระเงินเอง)', staff: stf.name, col: stf.col });
         }
-        if(document.getElementById('chk-tcm') && document.getElementById('chk-tcm').checked) {
-            let stf = JSON.parse(document.getElementById('chk-tcm').getAttribute('data-stf'));
-            items.push({ time: nextTime, dept: 'tcm', service: 'ฝังเข็มเพื่อการรักษา/ครอบแก้ว', staff: stf.name, col: stf.col });
+        if(document.getElementById('chk-cross') && document.getElementById('chk-cross').checked) {
+            let stf = JSON.parse(document.getElementById('chk-cross').getAttribute('data-stf'));
+            let cDept = currentDept === 'ttm' ? 'tcm' : 'ttm';
+            let cSvc = currentDept === 'ttm' ? 'ฝังเข็มเพื่อการรักษา/ครอบแก้ว' : 'นวดและประคบเพื่อการรักษา';
+            items.push({ time: nextTime, dept: cDept, service: cSvc, staff: stf.name, col: stf.col });
         }
-        if(document.getElementById('chk-ttm') && document.getElementById('chk-ttm').checked) {
-            let stf = JSON.parse(document.getElementById('chk-ttm').getAttribute('data-stf'));
-            items.push({ time: nextTime, dept: 'ttm', service: 'นวดและประคบเพื่อการรักษา', staff: stf.name, col: stf.col });
-        }
-        if(document.getElementById('chk-steam') && document.getElementById('chk-steam').checked) {
-            items.push({ time: nextTime, dept: 'steam', service: 'อบไอน้ำสมุนไพร', gender: 'ไม่ระบุ' });
+        
+        // หากมี 2 ชั่วโมงแล้ว อบไอน้ำต้องขยับไป Slot ที่ 3 (คำนวณง่ายๆ)
+        let isDouble = (document.getElementById('chk-2hr') && document.getElementById('chk-2hr').checked) || (document.getElementById('chk-cross') && document.getElementById('chk-cross').checked);
+        let steamTime = isDouble ? ALLOWED_2HR_PAIRS[nextTime] : nextTime; // ถ้าทำ 2 ชม. อบไอน้ำจะไปอยู่ชั่วโมงที่ 3
+
+        if(document.getElementById('chk-steam') && document.getElementById('chk-steam').checked && steamTime) {
+            items.push({ time: steamTime, dept: 'steam', service: 'อบไอน้ำสมุนไพร', gender: 'ไม่ระบุ' });
         }
 
         let payload = { action: 'book_queue_cart', mainIdCard: userProfile.id, patientIdCard: userProfile.id, fname: userProfile.fname, lname: userProfile.lname, tel: userProfile.phone, right: userProfile.rightName, sysDate: day.sysDate, sheetName: day.sheetName, items: items, lineUid: '' };
@@ -690,12 +765,13 @@
 
         fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
         .then(r => r.json()).then(res => {
+            hide3DLoader();
             if(res.status === 'success') {
                 Swal.fire({ title: 'จองคิวสำเร็จ!', html: `<p class="text-sm font-medium mt-2">บันทึกคิวเรียบร้อยแล้ว<br><b class="text-emerald-600 text-lg">${day.displayDate} | ${selectedTimeStr} น.</b></p>`, icon: 'success', confirmButtonColor: '#059669', customClass: {popup: 'swal-3d-popup', confirmButton: 'swal-3d-btn'} }).then(() => navigate('page-home'));
             } else {
                 Swal.fire({ title: 'คิวไม่ว่าง', text: res.message || 'คิวนี้ถูกจองตัดหน้าไปแล้วครับ', icon: 'warning', customClass: {popup: 'swal-3d-popup'} }); openBookingFlow(currentDept);
             }
-        }).catch(() => { Swal.fire({title: 'ขัดข้อง', text: 'เชื่อมต่อไม่สำเร็จ', icon: 'error', customClass: {popup: 'swal-3d-popup'}}); });
+        }).catch(() => { hide3DLoader(); Swal.fire({title: 'ขัดข้อง', text: 'เชื่อมต่อไม่สำเร็จ', icon: 'error', customClass: {popup: 'swal-3d-popup'}}); });
     }
 </script>
 

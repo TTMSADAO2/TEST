@@ -4,28 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sadao Wellness Clinic - จองคิวออนไลน์</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- LIFF SDK (เผื่ออนาคต) -->
-    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-
     <style>
         body { font-family: 'Prompt', sans-serif; background-color: #e5e7eb; display: flex; justify-content: center; margin: 0; }
-        .app-container { width: 100%; max-width: 414px; height: 100dvh; background-color: #ffffff; position: relative; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.15); }
+        .app-container { width: 100%; max-width: 414px; height: 100dvh; background-color: #f8fafc; position: relative; overflow: hidden; box-shadow: 0 0 20px rgba(0,0,0,0.15); }
         .page { position: absolute; inset: 0; display: none; flex-direction: column; background-color: #f8fafc; overflow-y: auto; overflow-x: hidden; z-index: 10; animation: fadeSlide 0.3s ease-out; }
         .page.active { display: flex; }
         @keyframes fadeSlide { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         .bottom-bar { position: absolute; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid #e2e8f0; z-index: 50; padding-bottom: env(safe-area-inset-bottom); }
-        .staff-card.active { border-color: #10b981; background-color: #ecfdf5; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.1); }
-        .loader-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.9); z-index: 999; display: flex; flex-col; justify-content: center; align-items: center; }
+        .staff-card.active { border-color: #10b981; background-color: #ecfdf5; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.1); transform: translateY(-2px); }
+        .swal-3d-popup { border-radius: 24px !important; box-shadow: 0 20px 40px rgba(0,0,0,0.2) !important; border: 1px solid rgba(255,255,255,0.8) !important; background: rgba(255,255,255,0.95) !important; backdrop-filter: blur(10px); }
+        /* 3D Loader Animation */
+        @keyframes float3D { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-10px) scale(1.05); } }
+        .animate-float-3d { animation: float3D 2s ease-in-out infinite; }
+        /* Input Readonly */
+        input[readonly] { background-color: #f1f5f9; color: #64748b; cursor: not-allowed; border-color: #cbd5e1; }
     </style>
 </head>
 <body>
@@ -34,124 +32,135 @@
 
     <!-- ==================== หน้า 1: Splash Screen ==================== -->
     <div id="page-splash" class="page active bg-cover bg-center" style="background-image: url('https://lh3.googleusercontent.com/d/1Jb91xkRQYkUlGKBQopCO4f_gfBPqpo5q');">
-        <div class="absolute inset-0 bg-white/60 backdrop-blur-sm"></div>
+        <div class="absolute inset-0 bg-white/70 backdrop-blur-sm"></div>
         <div class="relative z-10 flex flex-col items-center justify-center h-full p-6">
-            <img src="https://lh3.googleusercontent.com/d/1sxp0wrhV7MKhr2_6nOLQsj-jVddMmnzR" class="w-40 h-40 object-contain mb-4 filter drop-shadow-lg">
+            <img src="https://lh3.googleusercontent.com/d/1sxp0wrhV7MKhr2_6nOLQsj-jVddMmnzR" class="w-40 h-40 object-contain mb-4 filter drop-shadow-xl animate-float-3d">
             <h1 class="text-2xl font-extrabold text-emerald-800 text-center">Sadao Wellness Clinic</h1>
-            <p class="text-sm text-emerald-700 font-semibold text-center mt-2 mb-12">กลุ่มงานการแพทย์แผนไทย<br>และการแพทย์ทางเลือก โรงพยาบาลสะเดา</p>
-            <button onclick="navigate('page-login')" class="w-full bg-emerald-600 text-white rounded-full py-3.5 font-bold text-lg hover:bg-emerald-700 shadow-xl transition-transform active:scale-95">
-                เข้าสู่ระบบ / ลงทะเบียน
+            <p class="text-sm text-emerald-700 font-bold text-center mt-2 mb-12">กลุ่มงานการแพทย์แผนไทย<br>และการแพทย์ทางเลือก โรงพยาบาลสะเดา</p>
+            <button onclick="navigate('page-login')" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-700 text-white rounded-full py-4 font-bold text-lg shadow-xl active:scale-95 transition-all flex justify-center items-center gap-2">
+                เข้าสู่ระบบ / ลงทะเบียน <i class="fa-solid fa-arrow-right"></i>
             </button>
         </div>
     </div>
 
     <!-- ==================== หน้า 2: ข้อมูลผู้ใช้งาน ==================== -->
     <div id="page-login" class="page">
-        <div class="p-6 pb-24">
-            <div class="flex items-center mb-6 pt-2">
-                <button onclick="navigate('page-splash')" class="text-emerald-700 text-xl w-8"><i class="fa-solid fa-arrow-left"></i></button>
-                <h2 class="text-xl font-bold text-emerald-800 flex-1">ข้อมูลผู้รับบริการ</h2>
+        <div class="p-5 pb-24">
+            <div class="flex items-center mb-5 pt-2">
+                <button onclick="navigate('page-splash')" class="text-emerald-700 text-xl w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm"><i class="fa-solid fa-arrow-left"></i></button>
+                <h2 class="text-xl font-extrabold text-emerald-800 flex-1 ml-3">ข้อมูลผู้รับบริการ</h2>
             </div>
 
-            <!-- รายชื่อที่บันทึกไว้ -->
-            <div id="saved-profiles-section" class="mb-6 hidden">
-                <p class="text-sm font-bold text-emerald-700 mb-2"><i class="fa-solid fa-users"></i> เลือกจากประวัติในเครื่อง</p>
-                <div class="flex gap-3 overflow-x-auto hide-scrollbar pb-2" id="profile-list"></div>
-                <div class="text-center text-xs text-gray-400 mt-2 font-medium">- หรือกรอกข้อมูลใหม่ด้านล่าง -</div>
-            </div>
+            <!-- ฟอร์มลงทะเบียน -->
+            <div class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 relative overflow-hidden mb-5">
+                <!-- แถบสีตกแต่ง -->
+                <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-400 to-blue-500"></div>
 
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-                <label class="block text-gray-700 font-bold mb-2 text-sm">เลขประจำตัวประชาชน (13 หลัก) <span class="text-red-500">*</span></label>
-                <input type="tel" id="inputIdCard" class="w-full border-2 border-gray-200 rounded-xl p-3 mb-4 focus:border-emerald-500 focus:outline-none font-medium" placeholder="ระบุเลข 13 หลัก" maxlength="13" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                <div class="flex justify-between items-center mb-2 mt-2">
+                    <label class="text-gray-800 font-bold text-sm">เลขประจำตัวประชาชน <span class="text-red-500">*</span></label>
+                    <span id="idcard-status" class="text-[10px] font-bold"></span>
+                </div>
+                <input type="tel" id="inputIdCard" class="w-full border-2 border-gray-200 rounded-xl p-3 mb-4 focus:border-emerald-500 focus:outline-none font-bold text-center tracking-widest text-lg transition-all" placeholder="X-XXXX-XXXXX-XX-X" maxlength="13" oninput="checkIDCardFast(this)">
 
-                <div class="flex gap-4 mb-4">
+                <div class="flex gap-3 mb-4">
                     <div class="flex-1">
-                        <label class="block text-gray-700 font-bold mb-2 text-sm">ชื่อ <span class="text-red-500">*</span></label>
-                        <input type="text" id="inputFname" class="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-emerald-500 focus:outline-none font-medium" placeholder="ชื่อจริง">
+                        <label class="block text-gray-700 font-bold mb-1 text-xs">ชื่อ <span class="text-red-500">*</span></label>
+                        <input type="text" id="inputFname" class="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-emerald-500 focus:outline-none font-medium text-sm transition-all" placeholder="ชื่อจริง">
                     </div>
                     <div class="flex-1">
-                        <label class="block text-gray-700 font-bold mb-2 text-sm">นามสกุล</label>
-                        <input type="text" id="inputLname" class="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-emerald-500 focus:outline-none font-medium" placeholder="นามสกุล">
+                        <label class="block text-gray-700 font-bold mb-1 text-xs">นามสกุล</label>
+                        <input type="text" id="inputLname" class="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-emerald-500 focus:outline-none font-medium text-sm transition-all" placeholder="นามสกุล">
                     </div>
                 </div>
 
-                <label class="block text-gray-700 font-bold mb-2 text-sm">เบอร์โทรศัพท์ <span class="text-red-500">*</span></label>
-                <input type="tel" id="inputPhone" class="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-emerald-500 focus:outline-none font-medium" placeholder="08XXXXXXXX" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                <label class="block text-gray-700 font-bold mb-1 text-xs">เบอร์โทรศัพท์ <span class="text-red-500">*</span></label>
+                <input type="tel" id="inputPhone" class="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-emerald-500 focus:outline-none font-medium text-sm" placeholder="08XXXXXXXX" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                
+                <div class="mt-4 flex items-center justify-center gap-2 bg-emerald-50 p-2 rounded-lg border border-emerald-100">
+                    <i class="fa-solid fa-shield-halved text-emerald-500"></i>
+                    <span class="text-xs text-emerald-800 font-semibold">ปกป้องข้อมูลส่วนบุคคลตามมาตรฐาน PDPA</span>
+                </div>
             </div>
 
-            <h3 class="font-bold text-gray-800 mt-6 mb-3">สิทธิการรักษา <span class="text-red-500">*</span></h3>
-            <div class="grid grid-cols-2 gap-3 mb-4">
-                <label class="flex flex-col items-center justify-center p-3 border-2 border-emerald-500 bg-emerald-50 rounded-xl cursor-pointer transition-all right-option" onclick="selectRightUI(this)">
-                    <input type="radio" name="patient_right" value="บัตรทอง" class="hidden" checked>
-                    <i class="fa-solid fa-id-card text-emerald-600 mb-1 text-xl"></i>
-                    <span class="text-emerald-800 font-bold text-sm text-center">บัตรทอง<br><span class="text-[10px] font-normal text-emerald-600">(ร่วมจ่าย/ฟรี)</span></span>
-                </label>
-                <label class="flex flex-col items-center justify-center p-3 border-2 border-gray-200 bg-white rounded-xl cursor-pointer transition-all right-option" onclick="selectRightUI(this)">
-                    <input type="radio" name="patient_right" value="ข้าราชการ" class="hidden">
-                    <i class="fa-solid fa-building-user text-blue-500 mb-1 text-xl"></i>
-                    <span class="text-gray-700 font-bold text-sm text-center">ข้าราชการ<br><span class="text-[10px] font-normal text-gray-500">(เบิกตรง/อปท.)</span></span>
-                </label>
-                <label class="flex flex-col items-center justify-center p-3 border-2 border-gray-200 bg-white rounded-xl cursor-pointer transition-all right-option" onclick="selectRightUI(this)">
-                    <input type="radio" name="patient_right" value="ประกันสังคม" class="hidden">
-                    <i class="fa-solid fa-wallet text-orange-500 mb-1 text-xl"></i>
-                    <span class="text-gray-700 font-bold text-sm text-center">ประกันสังคม<br><span class="text-[10px] font-normal text-gray-500">(สำรองจ่าย)</span></span>
-                </label>
-                <label class="flex flex-col items-center justify-center p-3 border-2 border-gray-200 bg-white rounded-xl cursor-pointer transition-all right-option" onclick="selectRightUI(this)">
-                    <input type="radio" name="patient_right" value="สิทธิอื่นๆ" class="hidden">
-                    <i class="fa-solid fa-money-bill-wave text-gray-500 mb-1 text-xl"></i>
-                    <span class="text-gray-700 font-bold text-sm text-center">สิทธิอื่นๆ<br><span class="text-[10px] font-normal text-gray-500">(ชำระเงินเอง)</span></span>
-                </label>
+            <!-- สิทธิการรักษา (อิงแบบเว็บเก่า 5 สิทธิ) -->
+            <h3 class="font-extrabold text-gray-800 mb-3 px-1">💳 สิทธิการรักษา <span class="text-red-500">*</span></h3>
+            <div class="flex flex-col gap-2 mb-4">
+                <div class="right-option bg-white border-2 border-emerald-500 bg-emerald-50 p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer shadow-sm transition-all" onclick="selectRightUI(this, '1')">
+                    <div class="w-10 h-10 rounded-full bg-emerald-100 flex justify-center items-center text-emerald-600"><i class="fa-solid fa-id-card"></i></div>
+                    <div class="flex-1"><p class="font-bold text-emerald-800 text-sm leading-none mb-1">บัตรทอง (ร่วมจ่าย 30 บาท)</p><p class="text-[10px] text-gray-500 font-medium">อายุ 12-59 ปี</p></div>
+                    <i class="fa-solid fa-circle-check text-emerald-500 text-lg check-icon"></i>
+                </div>
+                
+                <div class="right-option bg-white border-2 border-gray-200 p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer transition-all" onclick="selectRightUI(this, '2')">
+                    <div class="w-10 h-10 rounded-full bg-green-100 flex justify-center items-center text-green-600"><i class="fa-solid fa-id-card-clip"></i></div>
+                    <div class="flex-1"><p class="font-bold text-gray-800 text-sm leading-none mb-1">บัตรทอง (ยกเว้นร่วมจ่าย)</p><p class="text-[10px] text-gray-500 font-medium">ผู้สูงอายุ, ผู้มีรายได้น้อย, อสม.</p></div>
+                    <i class="fa-solid fa-circle-check text-gray-300 text-lg check-icon hidden"></i>
+                </div>
+
+                <div class="right-option bg-white border-2 border-gray-200 p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer transition-all" onclick="selectRightUI(this, '3')">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex justify-center items-center text-blue-600"><i class="fa-solid fa-building-flag"></i></div>
+                    <div class="flex-1"><p class="font-bold text-gray-800 text-sm leading-none mb-1">ข้าราชการ / อปท.</p><p class="text-[10px] text-gray-500 font-medium">เบิกจ่ายตรง ไม่ต้องสำรองจ่าย</p></div>
+                    <i class="fa-solid fa-circle-check text-gray-300 text-lg check-icon hidden"></i>
+                </div>
+
+                <div class="right-option bg-white border-2 border-gray-200 p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer transition-all" onclick="selectRightUI(this, '4')">
+                    <div class="w-10 h-10 rounded-full bg-purple-100 flex justify-center items-center text-purple-600"><i class="fa-solid fa-landmark"></i></div>
+                    <div class="flex-1"><p class="font-bold text-gray-800 text-sm leading-none mb-1">รัฐวิสาหกิจ</p><p class="text-[10px] text-gray-500 font-medium">สำรองจ่าย เบิกต้นสังกัด</p></div>
+                    <i class="fa-solid fa-circle-check text-gray-300 text-lg check-icon hidden"></i>
+                </div>
+
+                <div class="right-option bg-white border-2 border-gray-200 p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer transition-all" onclick="selectRightUI(this, '5')">
+                    <div class="w-10 h-10 rounded-full bg-orange-100 flex justify-center items-center text-orange-600"><i class="fa-solid fa-wallet"></i></div>
+                    <div class="flex-1"><p class="font-bold text-gray-800 text-sm leading-none mb-1">ประกันสังคม / ชำระเงินเอง</p><p class="text-[10px] text-gray-500 font-medium">ชำระเงินสด / โอนสแกนจ่าย</p></div>
+                    <i class="fa-solid fa-circle-check text-gray-300 text-lg check-icon hidden"></i>
+                </div>
             </div>
+            <input type="hidden" id="selected-right-val" value="1">
         </div>
 
         <div class="bottom-bar p-4">
-            <button onclick="loginUser()" class="w-full bg-emerald-600 text-white rounded-full py-3.5 font-bold text-lg hover:bg-emerald-700 shadow-lg active:scale-95 transition-transform">
-                ยืนยันข้อมูล <i class="fa-solid fa-arrow-right ml-1"></i>
+            <button onclick="loginUser()" class="w-full bg-emerald-600 text-white rounded-full py-3.5 font-bold text-lg hover:bg-emerald-700 shadow-[0_8px_20px_rgba(5,150,105,0.3)] active:scale-95 transition-all flex items-center justify-center gap-2">
+                ยืนยันข้อมูล <i class="fa-solid fa-arrow-right"></i>
             </button>
         </div>
     </div>
 
-    <!-- ==================== หน้า 3: หน้าหลัก (Dashboard) ==================== -->
+    <!-- ==================== หน้า 3: Dashboard ==================== -->
     <div id="page-home" class="page">
-        <div class="h-44 bg-cover bg-center rounded-b-3xl shadow-md relative" style="background-image: url('https://lh3.googleusercontent.com/d/1m2ZXlypNPLfMUPhmekjZ51WA0MEgEcOG');">
-            <div class="absolute inset-0 bg-black/40 rounded-b-3xl"></div>
+        <div class="h-44 bg-cover bg-center rounded-b-[2rem] shadow-md relative" style="background-image: url('https://lh3.googleusercontent.com/d/1m2ZXlypNPLfMUPhmekjZ51WA0MEgEcOG');">
+            <div class="absolute inset-0 bg-gradient-to-b from-black/60 to-black/20 rounded-b-[2rem]"></div>
             <div class="absolute top-8 left-6 right-6 flex justify-between items-center text-white">
                 <div>
-                    <p class="text-sm font-medium opacity-90">สวัสดีค่ะ</p>
+                    <p class="text-sm font-medium opacity-90">ยินดีต้อนรับ</p>
                     <h2 class="text-xl font-bold drop-shadow-md" id="displayUserName">คุณผู้รับบริการ</h2>
                 </div>
-                <div class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/50 cursor-pointer shadow-lg" onclick="navigate('page-login')">
+                <div class="w-11 h-11 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/40 cursor-pointer shadow-lg active:scale-90 transition-transform" onclick="navigate('page-login')">
                     <i class="fa-solid fa-user-pen text-white"></i>
                 </div>
             </div>
         </div>
 
         <div class="px-5 -mt-10 relative z-10 pb-24">
-            <!-- กรอบแจ้งเตือนคิว -->
-            <div class="bg-white rounded-2xl p-4 mb-5 shadow-lg border border-gray-100 flex items-center justify-between">
-                <div>
-                    <p class="text-emerald-700 font-bold text-sm mb-1"><i class="fa-solid fa-calendar-check"></i> นัดหมายของคุณ</p>
-                    <p class="text-xs text-gray-500" id="user-status-text">เช็คประวัติการนัดหมายได้ที่นี่</p>
-                </div>
-                <button class="bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-full text-xs font-bold border border-emerald-200">ดูประวัติ</button>
-            </div>
-
-            <h3 class="text-gray-800 font-bold mb-3 text-lg px-1">เลือกบริการที่ต้องการ</h3>
-            <div class="grid grid-cols-2 gap-4">
-                <button onclick="openBookingFlow('ttm')" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-md transition active:scale-95">
-                    <img src="https://lh3.googleusercontent.com/d/1k-FNSpmwRok820gKcjIPkPwf-mwDljXM" class="w-16 h-16 object-contain mb-2 drop-shadow-sm">
+            <h3 class="text-gray-800 font-extrabold mb-3 text-lg px-1 flex items-center gap-2"><i class="fa-solid fa-notes-medical text-emerald-500"></i> เลือกบริการที่ต้องการ</h3>
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="openBookingFlow('ttm')" class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-lg transition-all active:scale-95 relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <img src="https://lh3.googleusercontent.com/d/1k-FNSpmwRok820gKcjIPkPwf-mwDljXM" class="w-14 h-14 object-contain mb-3 drop-shadow-md transform group-hover:scale-110 transition-transform">
                     <span class="font-bold text-emerald-800 text-sm">แพทย์แผนไทย</span>
                 </button>
-                <button onclick="openBookingFlow('tcm')" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-md transition active:scale-95">
-                    <img src="https://lh3.googleusercontent.com/d/1d-4vkKOiB8O_R_kbJVIomSpUQUTjCTcD" class="w-16 h-16 object-contain mb-2 drop-shadow-sm">
+                <button onclick="openBookingFlow('tcm')" class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-lg transition-all active:scale-95 relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-red-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <img src="https://lh3.googleusercontent.com/d/1d-4vkKOiB8O_R_kbJVIomSpUQUTjCTcD" class="w-14 h-14 object-contain mb-3 drop-shadow-md transform group-hover:scale-110 transition-transform">
                     <span class="font-bold text-red-800 text-sm">แพทย์แผนจีน</span>
                 </button>
-                <button onclick="openBookingFlow('postpartum')" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-md transition active:scale-95">
-                    <img src="https://lh3.googleusercontent.com/d/1EGJP2nE7NbK5Fb0bMmQ5G1dCMS4QE7Ql" class="w-16 h-16 object-contain mb-2 drop-shadow-sm">
+                <button onclick="openBookingFlow('postpartum')" class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-lg transition-all active:scale-95 relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-pink-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <img src="https://lh3.googleusercontent.com/d/1EGJP2nE7NbK5Fb0bMmQ5G1dCMS4QE7Ql" class="w-14 h-14 object-contain mb-3 drop-shadow-md transform group-hover:scale-110 transition-transform">
                     <span class="font-bold text-pink-700 text-sm">หลังคลอด</span>
                 </button>
-                <button onclick="openBookingFlow('steam')" class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-md transition active:scale-95">
-                    <img src="https://lh3.googleusercontent.com/d/1drV8_zMkCqYi41Esp3c2dTstpzjqRf5Z" class="w-16 h-16 object-contain mb-2 drop-shadow-sm">
+                <button onclick="openBookingFlow('steam')" class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-lg transition-all active:scale-95 relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <img src="https://lh3.googleusercontent.com/d/1drV8_zMkCqYi41Esp3c2dTstpzjqRf5Z" class="w-14 h-14 object-contain mb-3 drop-shadow-md transform group-hover:scale-110 transition-transform">
                     <span class="font-bold text-blue-700 text-sm">อบไอน้ำสมุนไพร</span>
                 </button>
             </div>
@@ -161,48 +170,45 @@
     <!-- ==================== หน้า 4: เลือกรอบเวลาและผู้ให้บริการ ==================== -->
     <div id="page-booking" class="page">
         <div class="bg-white p-4 shadow-sm flex items-center sticky top-0 z-20">
-            <button onclick="navigate('page-home')" class="text-gray-600 text-xl w-8"><i class="fa-solid fa-arrow-left"></i></button>
-            <h2 class="text-lg font-bold text-gray-800 flex-1 text-center" id="booking-header-title">เลือกเวลา</h2>
+            <button onclick="navigate('page-home')" class="text-gray-500 hover:text-emerald-600 text-xl w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center transition-colors"><i class="fa-solid fa-arrow-left"></i></button>
+            <h2 class="text-lg font-extrabold text-gray-800 flex-1 text-center" id="booking-header-title">เลือกเวลา</h2>
             <div class="w-8"></div>
         </div>
 
         <div class="p-4 pb-32">
-            <!-- โหลดข้อมูล -->
-            <div id="booking-loader" class="text-center py-10">
-                <i class="fa-solid fa-spinner fa-spin text-4xl text-emerald-500 mb-3"></i>
-                <p class="text-gray-500 font-bold">กำลังค้นหาคิวว่าง...</p>
-            </div>
-
             <div id="booking-content" class="hidden">
-                <h3 class="font-bold text-gray-800 text-sm mb-2">1. เลือกวันที่</h3>
-                <div class="flex gap-3 overflow-x-auto hide-scrollbar mb-5 pb-2" id="date-scroller"></div>
+                <h3 class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2"><i class="fa-regular fa-calendar text-emerald-500"></i> 1. เลือกวันที่</h3>
+                <div class="flex gap-3 overflow-x-auto hide-scrollbar mb-6 pb-2 px-1" id="date-scroller"></div>
 
-                <h3 class="font-bold text-gray-800 text-sm mb-2">2. เลือกรอบเวลา</h3>
+                <h3 class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2"><i class="fa-regular fa-clock text-emerald-500"></i> 2. เลือกรอบเวลา</h3>
                 <div class="grid grid-cols-3 gap-3 mb-6" id="time-grid"></div>
 
                 <div id="service-staff-section" class="hidden">
-                    <h3 class="font-bold text-gray-800 text-sm mb-2">3. เลือกบริการ</h3>
-                    <select id="select-service" class="w-full bg-white border-2 border-gray-200 rounded-xl p-3 mb-5 font-bold text-emerald-800 shadow-sm outline-none focus:border-emerald-500" onchange="calculatePrice()">
-                    </select>
+                    <h3 class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2"><i class="fa-solid fa-hand-holding-medical text-emerald-500"></i> 3. เลือกบริการ</h3>
+                    <div class="relative mb-6">
+                        <select id="select-service" class="w-full bg-white border-2 border-gray-200 rounded-xl p-3.5 font-bold text-emerald-800 shadow-sm appearance-none focus:border-emerald-500 outline-none transition-all" onchange="calculatePrice()">
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    </div>
 
-                    <h3 class="font-bold text-gray-800 text-sm mb-2" id="lbl-staff">4. เลือกผู้ให้บริการ</h3>
+                    <h3 class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2" id="lbl-staff"><i class="fa-solid fa-user-doctor text-emerald-500"></i> 4. เลือกผู้ให้บริการ</h3>
                     <div class="grid grid-cols-3 gap-3 mb-6" id="staff-grid"></div>
 
                     <!-- Add-ons (Cross-sell) -->
-                    <div id="addon-section" class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mb-4 shadow-inner hidden">
-                        <h4 class="font-bold text-emerald-800 text-sm mb-3"><i class="fa-solid fa-plus-circle"></i> รับบริการต่อเนื่องไหมครับ?</h4>
-                        <label class="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 mb-2 cursor-pointer shadow-sm" id="opt-2hr">
-                            <input type="checkbox" id="chk-2hr" class="w-4 h-4 text-emerald-600 rounded" onchange="calculatePrice()">
+                    <div id="addon-section" class="bg-gradient-to-br from-emerald-50 to-white border border-emerald-100 rounded-2xl p-4 mb-4 shadow-sm hidden">
+                        <h4 class="font-bold text-emerald-800 text-sm mb-3 flex items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i> รับบริการต่อเนื่องไหมครับ?</h4>
+                        <label class="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 mb-2 cursor-pointer shadow-sm hover:border-emerald-300 transition-colors" id="opt-2hr">
+                            <input type="checkbox" id="chk-2hr" class="w-5 h-5 text-emerald-600 rounded focus:ring-emerald-500" onchange="calculatePrice()">
                             <div>
                                 <p class="font-bold text-gray-800 text-xs" id="txt-2hr-title">นวดต่อเนื่องชั่วโมงที่ 2</p>
-                                <p class="text-[10px] text-orange-600 font-bold">+ 250 บาท</p>
+                                <p class="text-[10px] text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded-md inline-block mt-1" id="txt-2hr-price">+ 250 บาท</p>
                             </div>
                         </label>
-                        <label class="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 cursor-pointer shadow-sm" id="opt-steam">
-                            <input type="checkbox" id="chk-steam" class="w-4 h-4 text-blue-500 rounded" onchange="calculatePrice()">
+                        <label class="flex items-center gap-3 p-3 bg-white rounded-xl border border-gray-100 cursor-pointer shadow-sm hover:border-blue-300 transition-colors" id="opt-steam">
+                            <input type="checkbox" id="chk-steam" class="w-5 h-5 text-blue-500 rounded focus:ring-blue-500" onchange="calculatePrice()">
                             <div>
                                 <p class="font-bold text-gray-800 text-xs">อบไอน้ำสมุนไพรต่อ</p>
-                                <p class="text-[10px] text-blue-600 font-bold" id="txt-steam-price">+ 100 บาท</p>
+                                <p class="text-[10px] text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-md inline-block mt-1" id="txt-steam-price">+ 100 บาท</p>
                             </div>
                         </label>
                     </div>
@@ -211,11 +217,11 @@
         </div>
 
         <div class="bottom-bar p-4">
-            <div class="flex justify-between items-center mb-2 px-1">
-                <span class="text-gray-500 text-xs font-bold">ยอดชำระโดยประมาณ</span>
-                <span class="text-emerald-600 font-black text-2xl" id="est-price">-</span>
+            <div class="flex justify-between items-center mb-2 px-2 bg-emerald-50 rounded-lg p-2 border border-emerald-100">
+                <span class="text-emerald-800 text-xs font-bold"><i class="fa-solid fa-receipt"></i> ยอดชำระโดยประมาณ</span>
+                <span class="text-emerald-600 font-black text-xl" id="est-price">-</span>
             </div>
-            <button onclick="submitBooking()" id="btn-submit-book" class="w-full bg-emerald-600 text-white rounded-full py-3.5 font-bold text-lg hover:bg-emerald-700 shadow-lg opacity-50 cursor-not-allowed transition-all" disabled>
+            <button onclick="submitBooking()" id="btn-submit-book" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-700 text-white rounded-full py-3.5 font-bold text-lg shadow-[0_8px_20px_rgba(5,150,105,0.3)] opacity-50 cursor-not-allowed transition-all" disabled>
                 ยืนยันการจองคิว
             </button>
         </div>
@@ -223,12 +229,23 @@
 
 </div>
 
-<!-- Logic -->
+<!-- ⚙️ Logic JavaScript -->
 <script>
     // ----------------------------------------------------
-    // ⚙️ ตั้งค่าระบบ (Configuration)
+    // API & Data (เปลี่ยนดึงจาก Firebase 100% เร็วปรื๊ด)
     // ----------------------------------------------------
     const API_URL = "https://script.google.com/macros/s/AKfycbxdk0hCqf3AndmyvdYX-G3s-gmmODrQq2hYRkw_T4OCJg9ubI9tB3SlPsXx5Qk43j0/exec";
+    const FIREBASE_URL = "https://sadao-queue-999c3-default-rtdb.asia-southeast1.firebasedatabase.app/";
+
+    const DAY_COLORS = [
+        { bg: 'bg-red-50', border: 'border-red-400', text: 'text-red-700' },     // อาทิตย์
+        { bg: 'bg-yellow-50', border: 'border-yellow-400', text: 'text-yellow-700' }, // จันทร์
+        { bg: 'bg-pink-50', border: 'border-pink-400', text: 'text-pink-700' },   // อังคาร
+        { bg: 'bg-green-50', border: 'border-green-400', text: 'text-green-700' },  // พุธ
+        { bg: 'bg-orange-50', border: 'border-orange-400', text: 'text-orange-700' }, // พฤหัส
+        { bg: 'bg-blue-50', border: 'border-blue-400', text: 'text-blue-700' },    // ศุกร์
+        { bg: 'bg-purple-50', border: 'border-purple-400', text: 'text-purple-700' }  // เสาร์
+    ];
 
     const STAFF_IMAGES = {
         "จินดา J": "https://lh3.googleusercontent.com/d/1tx7ASnH7vrvsXJx6zvOAJ6ErbDOubvlP",
@@ -250,115 +267,125 @@
     const SERVICES = {
         "ttm": ["นวดและประคบเพื่อการรักษา", "นวดตัวส่งเสริมสุขภาพ(ชำระเงินเอง)", "นวดเท้าส่งเสริมสุขภาพ(ชำระเงินเอง)"],
         "tcm": ["ฝังเข็มเพื่อการรักษา", "ครอบแก้ว", "ฝังเข็มใบหน้า", "เม็ดผักกาดแปะหู", "ปรึกษาแพทย์แผนจีน"],
-        "postpartum": ["บริการหลังคลอด"],
+        "postpartum": ["บริการดูแลมารดาหลังคลอด (2 ชม.)"],
         "steam": ["อบไอน้ำสมุนไพร"]
     };
 
-    // State
-    let userProfile = { id: '', fname: '', lname: '', phone: '', right: 'บัตรทอง' };
-    let currentDept = '';
-    let fetchedData = [];
-    let selectedDateIdx = 0;
-    let selectedTimeStr = '';
-    let selectedStaffObj = null;
-    let totalFee = 0;
-
-    // ----------------------------------------------------
-    // 👤 ระบบ User & Profile
-    // ----------------------------------------------------
-    window.onload = () => {
-        let saved = JSON.parse(localStorage.getItem('swc_profiles') || '[]');
-        if(saved.length > 0) {
-            document.getElementById('saved-profiles-section').classList.remove('hidden');
-            let phtml = '';
-            saved.forEach(p => {
-                phtml += `<div class="flex flex-col items-center bg-white border border-emerald-100 p-2 rounded-xl min-w-[75px] shadow-sm cursor-pointer hover:bg-emerald-50" 
-                            onclick="fillProfile('${p.id}', '${p.f}', '${p.l}', '${p.p}', '${p.r}')">
-                    <div class="w-11 h-11 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center font-black text-lg mb-1">${p.f.charAt(0)}</div>
-                    <span class="text-[10px] font-bold text-gray-700 truncate w-full text-center">${p.f}</span>
-                </div>`;
-            });
-            document.getElementById('profile-list').innerHTML = phtml;
-        }
-    };
+    let userProfile = { id: '', fname: '', lname: '', phone: '', right: '1', rightName: 'บัตรทอง' };
+    let currentDept = ''; let fetchedData = []; let selectedDateIdx = 0; let selectedTimeStr = ''; let selectedStaffObj = null; let totalFee = 0;
+    let typingTimer;
 
     function navigate(pageId) {
         document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
         document.getElementById(pageId).classList.add('active');
+        if(pageId === 'page-home') {
+            document.getElementById('displayUserName').innerText = `คุณ${userProfile.fname}`;
+        }
     }
 
-    function selectRightUI(el) {
+    // --- PDPA & Auto Fetch ---
+    function checkIDCardFast(input) {
+        clearTimeout(typingTimer);
+        let id = input.value;
+        let stat = document.getElementById('idcard-status');
+        if (id.length === 13) {
+            stat.innerHTML = '<span class="text-amber-500"><i class="fa-solid fa-spinner fa-spin"></i> ตรวจสอบ...</span>';
+            typingTimer = setTimeout(() => {
+                fetch(FIREBASE_URL + "patientRegistry/" + id + ".json")
+                .then(r => r.json()).then(data => {
+                    if(data && data.fname) {
+                        stat.innerHTML = '<span class="text-emerald-500"><i class="fa-solid fa-check-circle"></i> พบประวัติเดิม</span>';
+                        document.getElementById('inputFname').value = data.fname;
+                        document.getElementById('inputLname').value = data.lname || "";
+                        document.getElementById('inputPhone').value = data.tel;
+                        // Lock Input
+                        document.getElementById('inputFname').readOnly = true;
+                        document.getElementById('inputLname').readOnly = true;
+                    } else {
+                        stat.innerHTML = '<span class="text-blue-500">ข้อมูลใหม่</span>';
+                        document.getElementById('inputFname').readOnly = false;
+                        document.getElementById('inputLname').readOnly = false;
+                    }
+                }).catch(() => { stat.innerHTML = ''; });
+            }, 500);
+        } else {
+            stat.innerHTML = '';
+            document.getElementById('inputFname').readOnly = false;
+            document.getElementById('inputLname').readOnly = false;
+        }
+    }
+
+    function selectRightUI(el, val) {
         document.querySelectorAll('.right-option').forEach(c => {
             c.classList.remove('border-emerald-500', 'bg-emerald-50');
             c.classList.add('border-gray-200', 'bg-white');
+            c.querySelector('.check-icon').classList.add('hidden');
+            c.querySelector('.check-icon').classList.remove('text-emerald-500');
+            c.querySelector('.check-icon').classList.add('text-gray-300');
         });
         el.classList.remove('border-gray-200', 'bg-white');
         el.classList.add('border-emerald-500', 'bg-emerald-50');
-        el.querySelector('input').checked = true;
-    }
-
-    function fillProfile(id, f, l, p, r) {
-        document.getElementById('inputIdCard').value = id;
-        document.getElementById('inputFname').value = f;
-        document.getElementById('inputLname').value = l;
-        document.getElementById('inputPhone').value = p;
-        document.querySelectorAll('input[name="patient_right"]').forEach(radio => {
-            if(radio.value === r) { selectRightUI(radio.parentElement); }
-        });
+        el.querySelector('.check-icon').classList.remove('hidden', 'text-gray-300');
+        el.querySelector('.check-icon').classList.add('text-emerald-500');
+        document.getElementById('selected-right-val').value = val;
     }
 
     function loginUser() {
         const id = document.getElementById('inputIdCard').value;
-        const fname = document.getElementById('inputFname').value.trim();
-        const phone = document.getElementById('inputPhone').value;
-        if(id.length < 13 || fname === '' || phone.length < 10) {
-            Swal.fire({ icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณากรอกเลขบัตร 13 หลัก, ชื่อ และเบอร์โทรให้ครบถ้วน', confirmButtonColor: '#059669' });
-            return;
-        }
+        const f = document.getElementById('inputFname').value.trim();
+        const p = document.getElementById('inputPhone').value;
+        const rVal = document.getElementById('selected-right-val').value;
+        if(id.length < 13 || f === '' || p.length < 10) { Swal.fire({ icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณากรอกข้อมูลให้ครบถ้วน', customClass: {popup: 'swal-3d-popup'} }); return; }
         
-        userProfile = { 
-            id: id, fname: fname, lname: document.getElementById('inputLname').value.trim(), 
-            phone: phone, right: document.querySelector('input[name="patient_right"]:checked').value 
-        };
-        
-        let saved = JSON.parse(localStorage.getItem('swc_profiles') || '[]');
-        if(!saved.find(x => x.id === id)) { saved.push({id: id, f: fname, l: userProfile.lname, p: phone, r: userProfile.right}); localStorage.setItem('swc_profiles', JSON.stringify(saved)); }
-        
-        document.getElementById('displayUserName').innerText = `คุณ${fname}`;
-        Swal.fire({ title: 'กำลังตรวจสอบ...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-        
-        // ยิงเช็คระบบแบน V45
-        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'check_user', patientIdCard: id, serviceCategory: 'ttm' }) })
-        .then(r => r.json()).then(res => {
-            Swal.close();
-            if(res.isBanned) { Swal.fire('ระงับการจอง', `บัญชีนี้ถูกระงับจนถึงวันที่ ${res.banUntil}`, 'error'); } 
-            else { navigate('page-home'); }
-        }).catch(() => { Swal.close(); navigate('page-home'); });
+        let rNames = { '1': 'บัตรทอง (ร่วมจ่าย 30 บาท)', '2': 'บัตรทอง (ยกเว้นร่วมจ่าย)', '3': 'ข้าราชการ / อปท.', '4': 'รัฐวิสาหกิจ', '5': 'ประกันสังคม / ชำระเงินเอง' };
+        userProfile = { id: id, fname: f, lname: document.getElementById('inputLname').value.trim(), phone: p, right: rVal, rightName: rNames[rVal] };
+        navigate('page-home');
     }
 
-    // ----------------------------------------------------
-    // 📅 ระบบดึงคิว และ ตะกร้าบริการ (Cart Flow)
-    // ----------------------------------------------------
+    // --- Loading 3D ---
+    function show3DLoader(text) {
+        Swal.fire({
+            html: `
+            <div class="flex flex-col items-center justify-center py-4">
+                <div class="relative w-24 h-24 mb-6">
+                    <div class="absolute inset-0 border-4 border-gray-100 rounded-full"></div>
+                    <div class="absolute inset-0 border-4 border-emerald-500 rounded-full border-t-transparent animate-spin"></div>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center text-3xl text-emerald-600">
+                        <i class="fa-solid fa-leaf animate-pulse"></i>
+                    </div>
+                </div>
+                <h3 class="font-extrabold text-lg text-gray-800">${text}</h3>
+                <p class="text-xs text-gray-500 mt-1 font-medium">โปรดรอสักครู่ ระบบกำลังประสานงาน</p>
+            </div>`,
+            showConfirmButton: false, allowOutsideClick: false, background: 'transparent', backdrop: 'rgba(0,0,0,0.5)',
+            customClass: { popup: 'rounded-[2rem] shadow-2xl bg-white/95 backdrop-blur-md border border-white' }
+        });
+    }
+
+    // --- Fetch จาก Firebase เร็วทะลุนรก ---
     function openBookingFlow(dept) {
         currentDept = dept;
         let t = dept === 'ttm' ? 'แพทย์แผนไทย' : dept === 'tcm' ? 'แพทย์แผนจีน' : dept === 'postpartum' ? 'หลังคลอด' : 'อบไอน้ำสมุนไพร';
         document.getElementById('booking-header-title').innerText = t;
         navigate('page-booking');
         
-        document.getElementById('booking-loader').classList.remove('hidden');
         document.getElementById('booking-content').classList.add('hidden');
         document.getElementById('btn-submit-book').disabled = true;
         document.getElementById('btn-submit-book').classList.add('opacity-50', 'cursor-not-allowed');
         
-        let act = dept === 'ttm' ? 'getTTMData' : dept === 'tcm' ? 'getTCMData' : dept === 'steam' ? 'getSteamData' : 'getPostpartumData';
+        show3DLoader('กำลังดึงตารางคิวว่าง...');
         
-        fetch(API_URL + "?action=" + act).then(r => r.json()).then(data => {
+        // โหลดตรงจาก Firebase (เร็ว 100%)
+        fetch(FIREBASE_URL + "sadaoData/" + dept + ".json?t=" + new Date().getTime())
+        .then(r => r.json()).then(data => {
+            Swal.close();
             fetchedData = data;
-            document.getElementById('booking-loader').classList.add('hidden');
             document.getElementById('booking-content').classList.remove('hidden');
+            selectedDateIdx = 0; selectedTimeStr = '';
             renderDates();
         }).catch(err => {
-            Swal.fire('เชื่อมต่อขัดข้อง', 'ไม่สามารถดึงข้อมูลคิวได้', 'error');
+            Swal.close();
+            Swal.fire({title: 'ขัดข้อง', text: 'ไม่สามารถโหลดข้อมูลได้', icon: 'error', customClass: {popup: 'swal-3d-popup'}});
             navigate('page-home');
         });
     }
@@ -366,118 +393,95 @@
     function renderDates() {
         let html = '';
         fetchedData.forEach((day, i) => {
-            let active = i === selectedDateIdx ? 'bg-emerald-600 text-white border-emerald-700 shadow-md' : 'bg-white text-gray-500 border-gray-200';
-            let dTxt = day.displayDate.split(" ")[0];
-            let mTxt = day.displayDate.split(" ")[1];
-            html += `<div onclick="selectDate(${i})" class="rounded-xl p-3 min-w-[70px] text-center border cursor-pointer transition-all ${active}">
-                <p class="text-[10px] font-bold">${mTxt}</p>
-                <p class="font-black text-xl leading-tight">${dTxt}</p>
+            let col = DAY_COLORS[day.dayOfWeek];
+            let active = i === selectedDateIdx ? `${col.bg} ${col.border} border-2 shadow-md transform -translate-y-1` : `bg-white border-gray-200 text-gray-400 border`;
+            let txtCol = i === selectedDateIdx ? col.text : 'text-gray-400';
+            let dTxt = day.displayDate.split(" ")[0]; let mTxt = day.displayDate.split(" ")[1];
+            html += `<div onclick="selectDate(${i})" class="rounded-2xl p-3 min-w-[75px] text-center cursor-pointer transition-all ${active}">
+                <p class="text-[10px] font-bold ${txtCol}">${mTxt}</p>
+                <p class="font-black text-xl leading-tight ${txtCol}">${dTxt}</p>
             </div>`;
         });
         document.getElementById('date-scroller').innerHTML = html;
         renderTimes();
     }
 
-    function selectDate(idx) {
-        selectedDateIdx = idx;
-        selectedTimeStr = ''; selectedStaffObj = null;
-        renderDates();
-    }
+    function selectDate(idx) { selectedDateIdx = idx; selectedTimeStr = ''; selectedStaffObj = null; renderDates(); }
 
     function renderTimes() {
         document.getElementById('service-staff-section').classList.add('hidden');
-        document.getElementById('btn-submit-book').disabled = true;
-        document.getElementById('btn-submit-book').classList.add('opacity-50', 'cursor-not-allowed');
+        document.getElementById('btn-submit-book').disabled = true; document.getElementById('btn-submit-book').classList.add('opacity-50', 'cursor-not-allowed');
         document.getElementById('est-price').innerText = '-';
 
         let day = fetchedData[selectedDateIdx];
-        if(!day || !day.slots || day.slots.length === 0) {
-            document.getElementById('time-grid').innerHTML = `<p class="col-span-3 text-center text-sm text-red-500 font-bold py-4">ไม่มีคิวว่างในวันนี้</p>`;
-            return;
-        }
+        if(!day || !day.slots || day.slots.length === 0) { document.getElementById('time-grid').innerHTML = `<p class="col-span-3 text-center text-sm text-red-500 font-bold py-4 bg-red-50 rounded-xl">ไม่มีคิวว่างในวันนี้</p>`; return; }
 
         let html = '';
         day.slots.forEach(slot => {
             let isFull = slot.val.includes('เต็ม');
-            let c = isFull ? 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed' : 
-                    (selectedTimeStr === slot.time ? 'bg-emerald-50 border-emerald-500 text-emerald-800 shadow-sm ring-2 ring-emerald-200' : 'bg-white border-gray-200 text-gray-700 hover:border-emerald-300 cursor-pointer');
-            
+            let c = isFull ? 'bg-gray-100 text-gray-300 border-gray-100 cursor-not-allowed' : 
+                    (selectedTimeStr === slot.time ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-md ring-2 ring-emerald-100' : 'bg-white border-gray-200 text-gray-600 hover:border-emerald-300 cursor-pointer shadow-sm');
             let act = isFull ? '' : `onclick="selectTime('${slot.time}')"`;
-            html += `<div ${act} class="border-2 rounded-xl p-3 text-center transition-all ${c}">
+            html += `<div ${act} class="border-2 rounded-2xl p-3 text-center transition-all ${c}">
                 <p class="font-black text-lg">${slot.time}</p>
-                <p class="text-[10px] font-bold mt-1">${isFull ? 'เต็ม' : 'เลือก'}</p>
+                <p class="text-[10px] font-bold mt-1 bg-white/50 rounded-full inline-block px-2">${isFull ? 'เต็ม' : 'ว่าง'}</p>
             </div>`;
         });
         document.getElementById('time-grid').innerHTML = html;
     }
 
     function selectTime(time) {
-        selectedTimeStr = time; selectedStaffObj = null;
-        renderTimes(); // รีเฟรชสีปุ่มเวลา
-
-        // โหลด Service Options
-        let sel = document.getElementById('select-service');
-        sel.innerHTML = '';
+        selectedTimeStr = time; selectedStaffObj = null; renderTimes();
+        let sel = document.getElementById('select-service'); sel.innerHTML = '';
         SERVICES[currentDept].forEach(s => { sel.innerHTML += `<option value="${s}">${s}</option>`; });
         
-        let day = fetchedData[selectedDateIdx];
-        let slot = day.slots.find(s => s.time === time);
+        let day = fetchedData[selectedDateIdx]; let slot = day.slots.find(s => s.time === time);
 
-        // Render หมอ
         if(currentDept === 'ttm' || currentDept === 'tcm') {
-            document.getElementById('lbl-staff').style.display = 'block';
-            document.getElementById('staff-grid').style.display = 'grid';
-            let sHtml = '';
-            
-            // กรองหมอซ้ำ
-            let uniqueStaff = []; let map = {};
+            document.getElementById('lbl-staff').style.display = 'flex'; document.getElementById('staff-grid').style.display = 'grid';
+            let sHtml = ''; let uniqueStaff = []; let map = {};
             (slot.staffAvailable || []).forEach(s => { if(!map[s.name]) { map[s.name]=s; uniqueStaff.push(s); }});
 
             uniqueStaff.forEach(st => {
                 let img = STAFF_IMAGES[st.name] || STAFF_IMAGES['DEFAULT'];
                 let nShort = st.name.replace(' J','').replace(' M','').replace(' B','').replace(' C','').replace(' F','').replace(' KW','').replace(' T','').replace(' W','');
-                sHtml += `<div onclick='chooseStaff(${JSON.stringify(st)})' class="flex flex-col items-center p-2 border-2 border-gray-200 bg-white rounded-xl cursor-pointer staff-card transition-all">
-                    <img src="${img}" class="w-12 h-12 rounded-full object-cover mb-2 shadow-sm border border-gray-100">
-                    <span class="text-[10px] font-bold text-gray-800 text-center leading-tight">${nShort}</span>
+                sHtml += `<div onclick='chooseStaff(this, ${JSON.stringify(st)})' class="flex flex-col items-center p-3 border-2 border-gray-100 bg-white rounded-2xl cursor-pointer staff-card transition-all">
+                    <img src="${img}" class="w-12 h-12 rounded-full object-cover mb-2 shadow-sm border-2 border-white">
+                    <span class="text-[10px] font-extrabold text-gray-700 text-center leading-tight">${nShort}</span>
                 </div>`;
             });
             document.getElementById('staff-grid').innerHTML = sHtml;
         } else {
-            document.getElementById('lbl-staff').style.display = 'none';
-            document.getElementById('staff-grid').style.display = 'none';
+            document.getElementById('lbl-staff').style.display = 'none'; document.getElementById('staff-grid').style.display = 'none';
             selectedStaffObj = { name: "ไม่ระบุ", col: 0, dept: currentDept };
             enableSubmit();
         }
 
-        // จัดการ Add-on
         document.getElementById('addon-section').classList.add('hidden');
-        document.getElementById('chk-2hr').checked = false;
-        document.getElementById('chk-steam').checked = false;
+        document.getElementById('chk-2hr').checked = false; document.getElementById('chk-steam').checked = false;
 
         if(currentDept === 'ttm' || currentDept === 'tcm') {
             document.getElementById('addon-section').classList.remove('hidden');
             if(currentDept === 'tcm') {
                 document.getElementById('txt-2hr-title').innerText = "ทำครอบแก้วต่อ";
+                document.getElementById('txt-2hr-price').innerText = "+ 150 บาท";
                 document.getElementById('opt-steam').style.display = 'none';
             } else {
                 document.getElementById('txt-2hr-title').innerText = "นวดต่อเนื่องชั่วโมงที่ 2";
+                document.getElementById('txt-2hr-price').innerText = "+ 250 บาท";
                 document.getElementById('opt-steam').style.display = 'flex';
-                document.getElementById('txt-steam-price').innerText = (userProfile.right === 'สิทธิอื่นๆ' || userProfile.right === 'ประกันสังคม') ? '+ 100 บาท' : 'ไม่มีค่าใช้จ่าย';
+                let isFreeSteam = (userProfile.right === '1' || userProfile.right === '2' || userProfile.right === '3');
+                document.getElementById('txt-steam-price').innerText = isFreeSteam ? "ฟรีตามสิทธิ" : "+ 100 บาท";
             }
         }
-        
         document.getElementById('service-staff-section').classList.remove('hidden');
         calculatePrice();
     }
 
-    function chooseStaff(stData) {
+    function chooseStaff(el, stData) {
         selectedStaffObj = stData;
-        document.querySelectorAll('.staff-card').forEach(c => {
-            c.classList.remove('border-emerald-500', 'bg-emerald-50');
-            c.classList.add('border-gray-200', 'bg-white');
-        });
-        event.currentTarget.classList.remove('border-gray-200', 'bg-white');
-        event.currentTarget.classList.add('border-emerald-500', 'bg-emerald-50');
+        document.querySelectorAll('.staff-card').forEach(c => { c.classList.remove('active', 'border-emerald-500'); c.classList.add('border-gray-100'); });
+        el.classList.add('active', 'border-emerald-500'); el.classList.remove('border-gray-100');
         enableSubmit();
     }
 
@@ -487,105 +491,72 @@
         calculatePrice();
     }
 
-    // 🧮 คำนวณราคาแบบ Real-time
+    // --- คำนวณราคาตาม 5 สิทธิ (เป๊ะตามเว็บเก่า) ---
     function calculatePrice() {
         if(!selectedTimeStr) return;
         let svc = document.getElementById('select-service').value;
         let is2Hr = document.getElementById('chk-2hr') ? document.getElementById('chk-2hr').checked : false;
         let isSteam = document.getElementById('chk-steam') ? document.getElementById('chk-steam').checked : false;
-        let r = userProfile.right;
+        let rV = userProfile.right; // 1-5
         
         let base = 0; let ooh = 0;
-        
-        // เช็คนอกเวลา
         let day = fetchedData[selectedDateIdx];
-        let isHol = (day.dayOfWeek >= 1 && day.dayOfWeek <= 5) && day.slots.length <= 6; // กฎวันหยุด
+        let isHol = (day.dayOfWeek >= 1 && day.dayOfWeek <= 5) && day.slots.length <= 6;
         if(day.dayOfWeek === 0 || day.dayOfWeek === 6 || selectedTimeStr === '17:00' || selectedTimeStr === '18:00' || isHol) ooh = 60;
 
         if(currentDept === 'ttm') {
             if(svc.includes("ชำระเงินเอง")) base = 300;
-            else if(r === 'ข้าราชการ') base = 0;
-            else if(r === 'บัตรทอง') { base = 100; ooh = 0; } // บัตรทองเหมา
+            else if(rV === '3') base = 0; // ข้าราชการ
+            else if(rV === '1' || rV === '2') { base = 100; ooh = 0; } // บัตรทอง
             else base = 250;
             if(is2Hr) base += 250;
-            if(isSteam && (r === 'สิทธิอื่นๆ' || r === 'ประกันสังคม')) base += 100;
+            if(isSteam && (rV === '4' || rV === '5')) base += 100;
         } else if (currentDept === 'tcm') {
-            if(svc.includes("ฝังเข็มเพื่อการรักษา")) base = r === 'ข้าราชการ' ? 0 : 200;
+            if(svc.includes("ฝังเข็มเพื่อการรักษา")) base = (rV === '3') ? 0 : 200;
             else if(svc.includes("ครอบแก้ว")) base = 150;
             else if(svc.includes("ใบหน้า")) base = 300;
+            else if(svc.includes("ผักกาด")) base = 100;
             else if(svc.includes("ปรึกษา")) { base = 0; ooh = 0; }
-            else base = 100;
             if(is2Hr) base += 150;
         } else if (currentDept === 'steam') {
-            if(r === 'ข้าราชการ' || r === 'บัตรทอง') base = 0; // สมมติ
-            else base = 100;
+            if(rV === '1') base = 30; else if(rV === '2' || rV === '3') base = 0; else if (rV === '4') base = 120; else base = 100;
+        } else if (currentDept === 'postpartum') {
+            if(rV === '1') base = 30; else if(rV === '2' || rV === '3') base = 0; else if (rV === '4') base = 670; else base = 500;
         }
 
         totalFee = base + ooh;
         document.getElementById('est-price').innerText = totalFee + ".-";
     }
 
-    // 🚀 ยิงตะกร้าเข้า API V45
     function submitBooking() {
-        if(!selectedStaffObj) { Swal.fire('กรุณาเลือกผู้ให้บริการ', '', 'warning'); return; }
+        if(!selectedStaffObj) { Swal.fire({title: 'เตือน', text:'กรุณาเลือกผู้ให้บริการ', icon:'warning', customClass:{popup:'swal-3d-popup'}}); return; }
         
         let svc = document.getElementById('select-service').value;
         let is2Hr = document.getElementById('chk-2hr') ? document.getElementById('chk-2hr').checked : false;
         let isSteam = document.getElementById('chk-steam') ? document.getElementById('chk-steam').checked : false;
-        
         let day = fetchedData[selectedDateIdx];
         
-        // สร้าง Items Array สำหรับ Cart API
-        let items = [];
-        items.push({ time: selectedTimeStr, dept: currentDept, service: svc, staff: selectedStaffObj.name, col: selectedStaffObj.col });
+        let items = [{ time: selectedTimeStr, dept: currentDept, service: svc, staff: selectedStaffObj.name, col: selectedStaffObj.col }];
         
-        // คำนวณเวลาถัดไปแบบง่ายๆ (สาธิต)
-        let tParts = selectedTimeStr.split(":");
-        let m = (parseInt(tParts[0])*60) + parseInt(tParts[1]);
-        let mNext1 = m + 60; let h1 = Math.floor(mNext1/60); let mn1 = mNext1%60;
-        let tNext = (h1<10?'0':'')+h1+':'+(mn1<10?'0':'')+mn1;
+        let tParts = selectedTimeStr.split(":"); let m = (parseInt(tParts[0])*60) + parseInt(tParts[1]);
+        let fT = (mins) => { let h = Math.floor(mins/60); let mn = mins%60; return (h<10?'0':'')+h+':'+(mn<10?'0':'')+mn; };
 
-        let mNext2 = m + 120; let h2 = Math.floor(mNext2/60); let mn2 = mNext2%60;
-        let tNext2 = (h2<10?'0':'')+h2+':'+(mn2<10?'0':'')+mn2;
+        if(is2Hr) { items.push({ time: fT(m+60), dept: currentDept, service: currentDept === 'tcm' ? 'ครอบแก้ว' : svc, staff: selectedStaffObj.name, col: selectedStaffObj.col }); }
+        if(isSteam) { items.push({ time: is2Hr ? fT(m+120) : fT(m+60), dept: 'steam', service: 'อบไอน้ำสมุนไพร', gender: 'ไม่ระบุ' }); }
 
-        if(is2Hr) {
-            let svc2 = currentDept === 'tcm' ? 'ครอบแก้ว' : 'นวดตัวส่งเสริมสุขภาพ(ชำระเงินเอง)';
-            items.push({ time: tNext, dept: currentDept, service: svc2, staff: selectedStaffObj.name, col: selectedStaffObj.col });
-        }
-        if(isSteam) {
-            items.push({ time: is2Hr ? tNext2 : tNext, dept: 'steam', service: 'อบไอน้ำสมุนไพร', gender: 'ไม่ระบุ' });
-        }
+        let payload = { action: 'book_queue_cart', mainIdCard: userProfile.id, patientIdCard: userProfile.id, fname: userProfile.fname, lname: userProfile.lname, tel: userProfile.phone, right: userProfile.rightName, sysDate: day.sysDate, sheetName: day.sheetName, items: items, lineUid: '' };
 
-        let payload = {
-            action: 'book_queue_cart',
-            mainIdCard: userProfile.id,
-            patientIdCard: userProfile.id,
-            fname: userProfile.fname,
-            lname: userProfile.lname,
-            tel: userProfile.phone,
-            right: userProfile.right,
-            sysDate: day.sysDate,
-            sheetName: day.sheetName,
-            items: items
-        };
-
-        Swal.fire({ title: 'กำลังยืนยันคิว...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        show3DLoader('กำลังส่งข้อมูลลงระบบ...');
 
         fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
         .then(r => r.json()).then(res => {
             if(res.status === 'success') {
-                Swal.fire({
-                    title: 'จองคิวสำเร็จ!', 
-                    html: `<p class="text-sm">ระบบได้บันทึกคิวของคุณเรียบร้อยแล้ว<br><b class="text-emerald-600">${day.displayDate} เวลา ${selectedTimeStr} น.</b></p>`,
-                    icon: 'success', confirmButtonColor: '#059669'
-                }).then(() => navigate('page-home'));
+                Swal.fire({ title: 'จองคิวสำเร็จ!', html: `<p class="text-sm font-medium mt-2">บันทึกคิวเรียบร้อยแล้ว<br><b class="text-emerald-600 text-lg">${day.displayDate} | ${selectedTimeStr} น.</b></p>`, icon: 'success', confirmButtonColor: '#059669', customClass: {popup: 'swal-3d-popup'} }).then(() => navigate('page-home'));
             } else {
-                Swal.fire('คิวไม่ว่าง', res.message || 'เกิดข้อผิดพลาด คิวอาจถูกจองตัดหน้า', 'warning');
-                openBookingFlow(currentDept); // โหลดใหม่
+                Swal.fire({ title: 'คิวไม่ว่าง', text: res.message || 'คิวนี้ถูกจองตัดหน้าไปแล้วครับ', icon: 'warning', customClass: {popup: 'swal-3d-popup'} });
+                openBookingFlow(currentDept);
             }
-        }).catch(err => {
-            Swal.fire('เชื่อมต่อขัดข้อง', 'กรุณาลองใหม่อีกครั้ง', 'error');
-        });
+        }).catch(() => { Swal.fire({title: 'ขัดข้อง', text: 'เชื่อมต่อไม่สำเร็จ', icon: 'error', customClass: {popup: 'swal-3d-popup'}}); });
     }
 </script>
 

@@ -398,12 +398,21 @@
                 .then(r => r.json()).then(data => {
                     if(data && data.fname) {
                         stat.innerHTML = '<span class="text-emerald-500"><i class="fa-solid fa-check-circle"></i> พบประวัติเดิม</span>';
-                        // PDPA: Mask name and force empty phone
-                        let mName = data.fname.charAt(0) + "***" + (data.fname.length > 3 ? data.fname.slice(-1) : "");
-                        document.getElementById('inputFname').value = mName;
-                        document.getElementById('inputLname').value = "***";
+                        
+                        // PDPA: ซ่อนชื่อ-สกุล โชว์แค่ตัวแรกและตัวสุดท้าย
+                        function maskString(str) {
+                            if (!str || str === "-" || str === "***") return "***";
+                            str = str.trim();
+                            if (str.length <= 1) return str + "***";
+                            if (str.length === 2) return str.charAt(0) + "*";
+                            return str.charAt(0) + "***" + str.charAt(str.length - 1);
+                        }
+
+                        document.getElementById('inputFname').value = maskString(data.fname);
+                        document.getElementById('inputLname').value = maskString(data.lname || "");
                         document.getElementById('inputPhone').value = ""; // บังคับกรอกใหม่
-                        document.getElementById('inputFname').readOnly = true; document.getElementById('inputLname').readOnly = true;
+                        document.getElementById('inputFname').readOnly = true; 
+                        document.getElementById('inputLname').readOnly = true;
                     } else {
                         stat.innerHTML = '<span class="text-blue-500">ผู้รับบริการใหม่</span>';
                         document.getElementById('inputFname').value = ''; document.getElementById('inputLname').value = ''; document.getElementById('inputPhone').value = '';
@@ -485,7 +494,7 @@
         document.getElementById('global-loader').classList.add('hidden');
     }
 
-    // --- Reset Addons & Prices (แก้บัคค่าค้าง) ---
+    // --- Reset Addons & Prices ---
     function resetAddonsAndPrice() {
         document.getElementById('step-addon').classList.remove('show');
         document.getElementById('addon-options-area').innerHTML = '';
@@ -517,7 +526,7 @@
         fetch(FIREBASE_URL + "sadaoData.json?t=" + new Date().getTime())
         .then(r => r.json()).then(data => {
             hide3DLoader();
-            fullFirebaseData = data; fetchedData = data[dept];
+            fullFirebaseData = data; fetchedData = data[dept] || [];
             selectedDateIdx = 0; selectedTimeStr = '';
             renderDates();
         }).catch(err => {
@@ -528,10 +537,10 @@
     function renderDates() {
         let html = '';
         fetchedData.forEach((day, i) => {
-            let col = DAY_COLORS[day.dayOfWeek];
+            let col = DAY_COLORS[day.dayOfWeek] || DAY_COLORS[0];
             let active = i === selectedDateIdx ? `${col.bg} ${col.border} border-2 shadow-md transform -translate-y-1` : `bg-white border-gray-200 text-gray-400 border`;
             let txtCol = i === selectedDateIdx ? col.text : 'text-gray-400';
-            let dTxt = day.displayDate.split(" ")[0];
+            let dTxt = (day.displayDate || "ไม่ระบุ").split(" ")[0];
             html += `<div onclick="selectDate(${i})" class="rounded-2xl p-3 min-w-[75px] text-center cursor-pointer transition-all ${active}">
                 <p class="text-[10px] font-bold ${txtCol}">${col.day}</p>
                 <p class="font-black text-xl leading-tight ${txtCol}">${dTxt}</p>
@@ -567,14 +576,16 @@
         document.getElementById('step-service').classList.add('show');
         
         let sel = document.getElementById('select-service'); sel.innerHTML = '';
-        SERVICES[currentDept].forEach(s => { sel.innerHTML += `<option value="${s}">${s}</option>`; });
+        if(SERVICES[currentDept]) {
+            SERVICES[currentDept].forEach(s => { sel.innerHTML += `<option value="${s}">${s}</option>`; });
+        }
         
         setTimeout(() => { document.getElementById('step-service').scrollIntoView({behavior: "smooth", block: "center"}); }, 100);
         stepServiceDone();
     }
 
     function stepServiceDone() {
-        hideStepsAfter('step-staff'); resetAddonsAndPrice(); // ล้าง Addon เสมอเมื่อเปลี่ยนบริการ/เวลา
+        hideStepsAfter('step-staff'); resetAddonsAndPrice();
         document.getElementById('step-staff').classList.add('show');
         let day = fetchedData[selectedDateIdx]; let slot = day.slots.find(s => s.time === selectedTimeStr);
 
@@ -606,7 +617,7 @@
         checkAddonsAndEnableSubmit();
     }
 
-    // --- 🛒 ระบบ Cross-selling แม่นยำเรื่องเวลา (อัปเกรด Radio & 2 Steps) ---
+    // --- 🛒 ระบบ Cross-selling ที่แม่นยำขึ้น ---
     function checkAddonsAndEnableSubmit() {
         try {
             resetAddonsAndPrice();
@@ -614,27 +625,32 @@
             let nextNextTime = nextTime ? ALLOWED_2HR_PAIRS[nextTime] : null; 
 
             let optionsHtml = '';
-            // ปุ่มเริ่มต้น: ไม่รับบริการเพิ่ม
+            // ปุ่มเริ่มต้น
             optionsHtml += createAddonRadio('none', 'ไม่รับบริการเพิ่ม (เสร็จสิ้น)', '', 'fa-circle-xmark', 'text-gray-500', 'bg-gray-100', '{}', true);
 
             if (nextTime && fullFirebaseData) {
-                let ttmNext = fullFirebaseData.ttm[selectedDateIdx].slots.find(s => s.time === nextTime);
-                let tcmNext = fullFirebaseData.tcm[selectedDateIdx].slots.find(s => s.time === nextTime);
-                let steamNext = fullFirebaseData.steam[selectedDateIdx].slots.find(s => s.time === nextTime);
+                // แก้ Error undefined ในวันหยุด โดยใช้ fallback []
+                let ttmSlots = (fullFirebaseData.ttm && fullFirebaseData.ttm[selectedDateIdx]) ? fullFirebaseData.ttm[selectedDateIdx].slots || [] : [];
+                let tcmSlots = (fullFirebaseData.tcm && fullFirebaseData.tcm[selectedDateIdx]) ? fullFirebaseData.tcm[selectedDateIdx].slots || [] : [];
+                let steamSlots = (fullFirebaseData.steam && fullFirebaseData.steam[selectedDateIdx]) ? fullFirebaseData.steam[selectedDateIdx].slots || [] : [];
+
+                let ttmNext = ttmSlots.find(s => s.time === nextTime);
+                let tcmNext = tcmSlots.find(s => s.time === nextTime);
+                let steamNext = steamSlots.find(s => s.time === nextTime);
 
                 let ttmFree = ttmNext && ttmNext.staffAvailable && ttmNext.staffAvailable.length > 0;
                 let tcmFree = tcmNext && tcmNext.staffAvailable && tcmNext.staffAvailable.length > 0;
                 let steamFree = steamNext && !steamNext.val.includes('เต็ม');
 
                 let ttmStaff = ttmFree ? ttmNext.staffAvailable[0] : null;
-                if(currentDept === 'ttm' && selectedStaffObj) {
+                if(currentDept === 'ttm' && selectedStaffObj && ttmFree) {
                     let sameStf = ttmNext.staffAvailable.find(st => st.name === selectedStaffObj.name);
                     ttmStaff = sameStf || null;
                     ttmFree = ttmStaff !== null;
                 }
                 let tcmStaff = tcmFree ? tcmNext.staffAvailable[0] : null;
 
-                // 1. บริการเสริม 1 ชั่วโมง (จองรอบ 14.00 หรืออื่นๆ)
+                // 1. บริการเสริม 1 ชั่วโมง
                 if(currentDept === 'ttm' && ttmFree) {
                     optionsHtml += createAddonRadio('2hr', 'นวดแผนไทย ชั่วโมงที่ 2 ('+nextTime+' น.)', '+ 250 บาท', 'fa-clock', 'text-emerald-500', 'bg-emerald-50', JSON.stringify(ttmStaff));
                 }
@@ -642,11 +658,14 @@
                     let sameStf = tcmNext.staffAvailable.find(st => st.name === selectedStaffObj.name);
                     if(sameStf) optionsHtml += createAddonRadio('2hr', 'ครอบแก้ว ชั่วโมงที่ 2 ('+nextTime+' น.)', '+ 150 บาท', 'fa-clock', 'text-emerald-500', 'bg-emerald-50', JSON.stringify(sameStf));
                 }
+                // ข้ามแผนกจาก ไทย -> จีน (แยกราคาชัดเจน)
                 if(currentDept === 'ttm' && tcmFree) {
-                     optionsHtml += createAddonRadio('cross', 'ฝังเข็ม/ครอบแก้ว แผนจีน ('+nextTime+' น.)', '+ 150 บาท', 'fa-yin-yang', 'text-amber-500', 'bg-amber-50', JSON.stringify(tcmStaff));
+                     optionsHtml += createAddonRadio('cross_acu', 'ฝังเข็มแผนจีน ('+nextTime+' น.)', '+ 200 บาท', 'fa-yin-yang', 'text-amber-500', 'bg-amber-50', JSON.stringify(tcmStaff));
+                     optionsHtml += createAddonRadio('cross_cup', 'ครอบแก้ว ('+nextTime+' น.)', '+ 150 บาท', 'fa-fire-burner', 'text-amber-500', 'bg-amber-50', JSON.stringify(tcmStaff));
                 }
+                // ข้ามแผนกจาก จีน -> ไทย
                 if(currentDept === 'tcm' && ttmFree) {
-                     optionsHtml += createAddonRadio('cross', 'นวดแผนไทย ('+nextTime+' น.)', '+ 250 บาท', 'fa-leaf', 'text-amber-500', 'bg-amber-50', JSON.stringify(ttmStaff));
+                     optionsHtml += createAddonRadio('cross_ttm', 'นวดแผนไทย ('+nextTime+' น.)', '+ 250 บาท', 'fa-leaf', 'text-amber-500', 'bg-amber-50', JSON.stringify(ttmStaff));
                 }
                 if(steamFree) {
                      let steamPriceStr = (userProfile.right === '4' || userProfile.right === '5') ? '+ 100 บาท' : 'ฟรีตามสิทธิ';
@@ -655,16 +674,22 @@
 
                 // 2. บริการเสริม 2 ชั่วโมงต่อเนื่อง (จองรอบ 13.00 น.)
                 if (nextNextTime) {
-                    let steamNextNext = fullFirebaseData.steam[selectedDateIdx].slots.find(s => s.time === nextNextTime);
+                    let steamNextNext = steamSlots.find(s => s.time === nextNextTime);
                     let steamNextNextFree = steamNextNext && !steamNextNext.val.includes('เต็ม');
                     
                     if (currentDept === 'ttm' && ttmFree && steamNextNextFree) {
-                        let price2hrSteam = 250 + ((userProfile.right === '4' || userProfile.right === '5') ? 100 : 0);
-                        optionsHtml += createAddonRadio('2hr_steam', 'นวด 2 ชม. + อบไอน้ำ ('+nextTime+' และ '+nextNextTime+' น.)', '+ '+price2hrSteam+' บาท', 'fa-layer-group', 'text-purple-500', 'bg-purple-50', JSON.stringify(ttmStaff));
+                        let p = 250 + ((userProfile.right === '4' || userProfile.right === '5') ? 100 : 0);
+                        optionsHtml += createAddonRadio('2hr_steam', 'นวด 2 ชม. + อบไอน้ำ ('+nextTime+' และ '+nextNextTime+' น.)', '+ '+p+' บาท', 'fa-layer-group', 'text-purple-500', 'bg-purple-50', JSON.stringify(ttmStaff));
                     }
                     if (currentDept === 'ttm' && tcmFree && steamNextNextFree) {
-                        let priceCrossSteam = 150 + ((userProfile.right === '4' || userProfile.right === '5') ? 100 : 0);
-                        optionsHtml += createAddonRadio('cross_steam', 'ข้ามแผนก + อบไอน้ำ ('+nextTime+' และ '+nextNextTime+' น.)', '+ '+priceCrossSteam+' บาท', 'fa-layer-group', 'text-indigo-500', 'bg-indigo-50', JSON.stringify(tcmStaff));
+                        let p_acu = 200 + ((userProfile.right === '4' || userProfile.right === '5') ? 100 : 0);
+                        let p_cup = 150 + ((userProfile.right === '4' || userProfile.right === '5') ? 100 : 0);
+                        optionsHtml += createAddonRadio('cross_acu_steam', 'ฝังเข็ม + อบไอน้ำ ('+nextTime+' และ '+nextNextTime+' น.)', '+ '+p_acu+' บาท', 'fa-layer-group', 'text-indigo-500', 'bg-indigo-50', JSON.stringify(tcmStaff));
+                        optionsHtml += createAddonRadio('cross_cup_steam', 'ครอบแก้ว + อบไอน้ำ ('+nextTime+' และ '+nextNextTime+' น.)', '+ '+p_cup+' บาท', 'fa-layer-group', 'text-indigo-500', 'bg-indigo-50', JSON.stringify(tcmStaff));
+                    }
+                    if (currentDept === 'tcm' && ttmFree && steamNextNextFree) {
+                        let p_ttm = 250 + ((userProfile.right === '4' || userProfile.right === '5') ? 100 : 0);
+                        optionsHtml += createAddonRadio('cross_ttm_steam', 'นวดแผนไทย + อบไอน้ำ ('+nextTime+' และ '+nextNextTime+' น.)', '+ '+p_ttm+' บาท', 'fa-layer-group', 'text-indigo-500', 'bg-indigo-50', JSON.stringify(ttmStaff));
                     }
                 }
             }
@@ -673,7 +698,7 @@
             document.getElementById('step-addon').classList.add('show');
             setTimeout(() => { document.getElementById('step-addon').scrollIntoView({behavior: "smooth", block: "end"}); }, 200);
 
-            // บังคับเปิดปุ่มตรวจสอบเสมอ แม้จะไม่มี Addon
+            // บังคับเปิดปุ่มตรวจสอบเสมอ แม้จะไม่มี Addon หรือมี
             document.getElementById('btn-submit-book').disabled = false;
             document.getElementById('btn-submit-book').classList.remove('opacity-50', 'cursor-not-allowed');
             calculatePrice();
@@ -726,11 +751,16 @@
             let addonChoice = document.querySelector('input[name="addon_choice"]:checked');
             let addonVal = addonChoice ? addonChoice.value : 'none';
 
+            // บวกราคา Addon ตรงไปตรงมา
             if(addonVal === '2hr') base += (currentDept === 'tcm' ? 150 : 250);
-            if(addonVal === 'cross') base += (currentDept === 'ttm' ? 150 : 250);
+            if(addonVal === 'cross_acu') base += 200;
+            if(addonVal === 'cross_cup') base += 150;
+            if(addonVal === 'cross_ttm') base += 250;
             if(addonVal === 'steam' && (rV === '4' || rV === '5')) base += 100;
             if(addonVal === '2hr_steam') { base += (currentDept === 'tcm' ? 150 : 250); if(rV === '4' || rV === '5') base += 100; }
-            if(addonVal === 'cross_steam') { base += (currentDept === 'ttm' ? 150 : 250); if(rV === '4' || rV === '5') base += 100; }
+            if(addonVal === 'cross_acu_steam') { base += 200; if(rV === '4' || rV === '5') base += 100; }
+            if(addonVal === 'cross_cup_steam') { base += 150; if(rV === '4' || rV === '5') base += 100; }
+            if(addonVal === 'cross_ttm_steam') { base += 250; if(rV === '4' || rV === '5') base += 100; }
 
             totalFee = base + ooh;
             
@@ -744,7 +774,7 @@
             let estPriceEl = document.getElementById('est-price');
             estPriceEl.classList.remove('text-xl', 'text-emerald-600');
             estPriceEl.classList.add('text-xs', 'text-red-500');
-            estPriceEl.innerText = 'Err: ' + err.message; // พิมพ์ Error ลงบนจอถ้าเกิดบัก
+            estPriceEl.innerText = 'Err: ' + err.message;
         }
     }
 
@@ -771,10 +801,17 @@
             itemsHtml += `<div class="flex justify-between items-center mb-2 text-emerald-600">
                 <span class="text-sm font-bold"><i class="fa-solid fa-clock"></i> บริการต่อเนื่องชั่วโมงที่ 2</span><span><i class="fa-solid fa-circle-check"></i></span></div>`;
         }
-        if(val.includes('cross')) {
-            let nSvc = currentDept === 'ttm' ? 'ฝังเข็มแผนจีน' : 'นวดแผนไทย';
+        if(val.includes('cross_acu')) {
             itemsHtml += `<div class="flex justify-between items-center mb-2 text-amber-500">
-                <span class="text-sm font-bold"><i class="fa-solid fa-user-md"></i> ต่อด้วย ${nSvc}</span><span><i class="fa-solid fa-circle-check"></i></span></div>`;
+                <span class="text-sm font-bold"><i class="fa-solid fa-yin-yang"></i> ต่อด้วย ฝังเข็มแผนจีน</span><span><i class="fa-solid fa-circle-check"></i></span></div>`;
+        }
+        if(val.includes('cross_cup')) {
+            itemsHtml += `<div class="flex justify-between items-center mb-2 text-amber-500">
+                <span class="text-sm font-bold"><i class="fa-solid fa-fire-burner"></i> ต่อด้วย ครอบแก้ว</span><span><i class="fa-solid fa-circle-check"></i></span></div>`;
+        }
+        if(val.includes('cross_ttm')) {
+            itemsHtml += `<div class="flex justify-between items-center mb-2 text-amber-500">
+                <span class="text-sm font-bold"><i class="fa-solid fa-leaf"></i> ต่อด้วย นวดแผนไทย</span><span><i class="fa-solid fa-circle-check"></i></span></div>`;
         }
         if(val.includes('steam')) {
             itemsHtml += `<div class="flex justify-between items-center mb-2 text-blue-500">
@@ -798,16 +835,20 @@
             let val = addonChoice.value;
             let stf = JSON.parse(addonChoice.getAttribute('data-stf') || '{}');
             
-            if (val === '2hr' || val === '2hr_steam') {
+            if (val.includes('2hr')) {
                 items.push({ time: nextTime, dept: currentDept, service: currentDept==='tcm'?'ครอบแก้ว':'นวดตัวส่งเสริมสุขภาพ(ชำระเงินเอง)', staff: stf.name, col: stf.col });
             }
-            if (val === 'cross' || val === 'cross_steam') {
-                let cDept = currentDept === 'ttm' ? 'tcm' : 'ttm';
-                let cSvc = currentDept === 'ttm' ? 'ฝังเข็มเพื่อการรักษา/ครอบแก้ว' : 'นวดและประคบเพื่อการรักษา';
-                items.push({ time: nextTime, dept: cDept, service: cSvc, staff: stf.name, col: stf.col });
+            if (val.includes('cross_acu')) {
+                items.push({ time: nextTime, dept: 'tcm', service: 'ฝังเข็มเพื่อการรักษา', staff: stf.name, col: stf.col });
             }
-            if (val === 'steam' || val === '2hr_steam' || val === 'cross_steam') {
-                let sTime = (val.includes('2hr') || val.includes('cross')) ? nextNextTime : nextTime;
+            if (val.includes('cross_cup')) {
+                items.push({ time: nextTime, dept: 'tcm', service: 'ครอบแก้ว', staff: stf.name, col: stf.col });
+            }
+            if (val.includes('cross_ttm')) {
+                items.push({ time: nextTime, dept: 'ttm', service: 'นวดและประคบเพื่อการรักษา', staff: stf.name, col: stf.col });
+            }
+            if (val.includes('steam')) {
+                let sTime = val.includes('_steam') ? nextNextTime : nextTime;
                 items.push({ time: sTime, dept: 'steam', service: 'อบไอน้ำสมุนไพร', gender: 'ไม่ระบุ' });
             }
         }

@@ -739,7 +739,7 @@
             if(day.dayOfWeek === 0 || day.dayOfWeek === 6 || selectedTimeStr === '17:00' || selectedTimeStr === '18:00' || isHol) ooh = 60;
 
             if(currentDept === 'ttm') {
-                if(svc.includes("ชำระเงินเอง")) base = 300; else if(rV === '3') base = 0; else if(rV === '1' || rV === '2') { base = 100; ooh = 0; } else base = 250;
+                if(svc.includes("ชำระเงินเอง")) base = 250; else if(rV === '3') base = 0; else if(rV === '1' || rV === '2') { base = 100; ooh = 0; } else base = 250;
             } else if (currentDept === 'tcm') {
                 if(svc.includes("ฝังเข็มเพื่อการรักษา")) base = (rV === '3') ? 0 : 200; else if(svc.includes("ครอบแก้ว")) base = 150; else if(svc.includes("ใบหน้า")) base = 300; else if(svc.includes("ผักกาด")) base = 100; else if(svc.includes("ปรึกษา")) { base = 0; ooh = 0; }
             } else if (currentDept === 'steam') {

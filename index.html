@@ -74,6 +74,10 @@
                     เข้าสู่ระบบ / ลงทะเบียน <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </div>
+            <!-- ปุ่มลับสำหรับเข้าหน้า Admin Login -->
+            <button onclick="navigate('page-admin-login')" class="absolute bottom-4 right-4 p-3 text-emerald-800/30 hover:text-emerald-700 transition-colors z-20">
+                <i class="fa-solid fa-shield-halved text-xl"></i>
+            </button>
         </div>
     </div>
 
@@ -310,6 +314,93 @@
             <button onclick="submitBookingAPI()" class="w-full bg-emerald-600 text-white rounded-full py-4 font-bold text-lg shadow-[0_8px_20px_rgba(5,150,105,0.3)] active:scale-95 transition-transform flex justify-center items-center gap-2">
                 <i class="fa-solid fa-check-circle"></i> ยืนยันรับบริการ
             </button>
+        </div>
+    </div>
+
+    <!-- ==================== หน้า 6: Admin Login (OTP) ==================== -->
+    <div id="page-admin-login" class="page bg-slate-800">
+        <div class="page-content flex flex-col items-center justify-center p-6 h-full">
+            <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-sm relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-slate-700 to-slate-900"></div>
+                <h2 class="text-2xl font-extrabold text-slate-800 mb-2 text-center"><i class="fa-solid fa-user-shield text-slate-600"></i> Admin Portal</h2>
+                <p class="text-xs text-center text-gray-500 mb-6">ระบบจัดการสำหรับเจ้าหน้าที่เท่านั้น</p>
+                
+                <!-- Step 1: ขอ OTP -->
+                <div id="admin-step-1">
+                    <label class="block text-sm font-bold text-gray-700 mb-2">LINE User ID</label>
+                    <input type="text" id="admin-uid-input" class="w-full border-2 border-gray-200 p-3.5 rounded-xl mb-4 focus:border-slate-500 outline-none transition-colors" placeholder="Uxxxxxxxxxxxxxxxxxxxxx">
+                    <button onclick="reqOTP()" class="w-full bg-slate-800 hover:bg-slate-900 text-white p-3.5 rounded-xl font-bold transition-all shadow-lg active:scale-95">
+                        รับรหัส OTP
+                    </button>
+                </div>
+
+                <!-- Step 2: ยืนยัน OTP -->
+                <div id="admin-step-2" class="hidden">
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-4 text-center">
+                        <p class="text-xs text-green-700 font-bold"><i class="fa-solid fa-paper-plane"></i> ส่ง OTP ไปที่ LINE ของท่านแล้ว</p>
+                    </div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2 text-center">รหัส OTP 6 หลัก</label>
+                    <input type="number" id="admin-otp-input" class="w-full border-2 border-slate-300 focus:border-green-500 p-3.5 rounded-xl mb-4 text-center text-2xl font-black tracking-[0.5em] outline-none" placeholder="------">
+                    <button onclick="verifyOTP()" class="w-full bg-green-600 hover:bg-green-700 text-white p-3.5 rounded-xl font-bold shadow-lg active:scale-95 transition-all">
+                        ยืนยันเข้าสู่ระบบ
+                    </button>
+                    <button onclick="resetAdminLogin()" class="w-full mt-3 text-xs text-gray-500 underline hover:text-slate-700">ยกเลิก / ขอรหัสใหม่</button>
+                </div>
+                
+                <button onclick="navigate('page-splash')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fa-solid fa-times text-lg"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== หน้า 7: Admin Dashboard ==================== -->
+    <div id="page-admin-dashboard" class="page bg-slate-50">
+        <!-- Header -->
+        <div class="bg-slate-800 p-4 shadow-md flex justify-between items-center z-20">
+            <h2 class="text-lg font-extrabold text-white flex items-center gap-2"><i class="fa-solid fa-user-shield text-emerald-400"></i> Admin Dashboard</h2>
+            <button onclick="navigate('page-login')" class="text-xs bg-slate-700 hover:bg-red-500 text-white px-3 py-1.5 rounded-full transition-colors"><i class="fa-solid fa-power-off"></i> ออกจากระบบ</button>
+        </div>
+
+        <!-- Tab Menus -->
+        <div class="flex border-b border-slate-200 bg-white shadow-sm z-10 sticky top-0">
+            <button id="tab-btn-bookings" onclick="adminSwitchTab('bookings')" class="flex-1 py-3 text-sm font-bold border-b-2 border-emerald-600 text-emerald-700 transition-colors"><i class="fa-solid fa-list-check"></i> จัดการนัดหมาย</button>
+            <button id="tab-btn-patients" onclick="adminSwitchTab('patients')" class="flex-1 py-3 text-sm font-bold border-b-2 border-transparent text-slate-500 transition-colors"><i class="fa-solid fa-users-gear"></i> ฐานข้อมูลผู้ป่วย</button>
+        </div>
+
+        <div class="page-content p-4 pb-10">
+            <!-- ====== TAB 1: จัดการนัดหมาย ====== -->
+            <div id="admin-view-bookings" class="block">
+                <!-- Filters -->
+                <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 mb-4 space-y-3">
+                    <div>
+                        <label class="text-xs font-bold text-slate-600 block mb-1">วันที่รับบริการ (เว้นว่างเพื่อดูทั้งหมด)</label>
+                        <input type="date" id="admin-filter-date" class="w-full border-2 border-slate-200 rounded-xl p-2 text-sm outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-600 block mb-1">รูปแบบการเรียงลำดับ</label>
+                        <select id="admin-filter-sort" class="w-full border-2 border-slate-200 rounded-xl p-2 text-sm outline-none focus:border-emerald-500">
+                            <option value="appoint">เรียงตาม วันเวลานัดหมาย (จากล่าสุด)</option>
+                            <option value="created">เรียงตาม วันเวลาที่กดจอง (คิวที่เพิ่งกดจอง)</option>
+                        </select>
+                    </div>
+                    <button onclick="adminLoadBookings()" class="w-full bg-emerald-600 text-white py-2 rounded-xl text-sm font-bold shadow-md hover:bg-emerald-700 active:scale-95 transition-all"><i class="fa-solid fa-magnifying-glass"></i> โหลดข้อมูลคิว</button>
+                </div>
+                <!-- Results -->
+                <div id="admin-booking-list" class="space-y-3">
+                    <p class="text-center text-sm text-slate-400 mt-10">กดโหลดข้อมูลเพื่อแสดงรายการคิว</p>
+                </div>
+            </div>
+
+            <!-- ====== TAB 2: จัดการผู้รับบริการ ====== -->
+            <div id="admin-view-patients" class="hidden">
+                <div class="flex gap-2 mb-4">
+                    <input type="text" id="admin-search-user" class="flex-1 border-2 border-slate-200 rounded-xl p-3 text-sm outline-none focus:border-emerald-500" placeholder="พิมพ์ชื่อ, นามสกุล หรือ เลข ปชช.">
+                    <button onclick="adminSearchPatientBtn()" class="bg-slate-800 text-white px-4 rounded-xl shadow-md hover:bg-slate-900 active:scale-95 transition-all"><i class="fa-solid fa-search"></i></button>
+                </div>
+                
+                <div id="admin-patient-list" class="space-y-3">
+                    <p class="text-center text-sm text-slate-400 mt-10">พิมพ์ข้อมูลเพื่อค้นหาผู้รับบริการ</p>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -866,6 +957,255 @@
                 Swal.fire({ title: 'คิวไม่ว่าง', text: res.message || 'คิวนี้ถูกจองตัดหน้าไปแล้วครับ', icon: 'warning', customClass: {popup: 'swal-3d-popup'} }); openBookingFlow(currentDept);
             }
         }).catch(() => { hide3DLoader(); Swal.fire({title: 'ขัดข้อง', text: 'เชื่อมต่อไม่สำเร็จ', icon: 'error', customClass: {popup: 'swal-3d-popup'}}); });
+    }
+
+    // ==========================================
+    // ⚙️ ADMIN LOGIC & DASHBOARD
+    // ==========================================
+
+    function reqOTP() {
+        let uid = document.getElementById('admin-uid-input').value.trim();
+        if(!uid) { Swal.fire({icon:'warning', title:'กรุณากรอก', text:'LINE User ID'}); return; }
+        
+        show3DLoader('ตรวจสอบสิทธิ์...');
+        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'admin_request_otp', uid: uid }) })
+        .then(r => r.json()).then(res => {
+            hide3DLoader();
+            if(res.status === 'success') {
+                document.getElementById('admin-step-1').classList.add('hidden');
+                document.getElementById('admin-step-2').classList.remove('hidden');
+                document.getElementById('admin-otp-input').value = '';
+                document.getElementById('admin-otp-input').focus();
+            } else {
+                Swal.fire({icon:'error', title:'ปฏิเสธการเข้าถึง', text: res.message});
+            }
+        }).catch(err => hide3DLoader());
+    }
+
+    function verifyOTP() {
+        let uid = document.getElementById('admin-uid-input').value.trim();
+        let otp = document.getElementById('admin-otp-input').value.trim();
+        if(otp.length !== 6) { Swal.fire({icon:'warning', title:'ระบุ OTP ให้ครบ 6 หลัก'}); return; }
+
+        show3DLoader('ยืนยันรหัสผ่าน...');
+        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'admin_verify_otp', uid: uid, otp: otp }) })
+        .then(r => r.json()).then(res => {
+            hide3DLoader();
+            if(res.status === 'success') {
+                Swal.fire({icon:'success', title:'ยินดีต้อนรับ', text: res.message}).then(() => {
+                    navigate('page-admin-dashboard');
+                    adminLoadBookings(); // โหลดคิวอัตโนมัติเมื่อเข้าหน้าแอดมิน
+                });
+            } else {
+                Swal.fire({icon:'error', title:'ผิดพลาด', text: res.message});
+            }
+        }).catch(err => hide3DLoader());
+    }
+
+    function resetAdminLogin() {
+        document.getElementById('admin-step-2').classList.add('hidden');
+        document.getElementById('admin-step-1').classList.remove('hidden');
+        document.getElementById('admin-otp-input').value = '';
+    }
+
+    function adminSwitchTab(tab) {
+        document.getElementById('admin-view-bookings').classList.toggle('hidden', tab !== 'bookings');
+        document.getElementById('admin-view-patients').classList.toggle('hidden', tab !== 'patients');
+        
+        document.getElementById('tab-btn-bookings').className = tab === 'bookings' ? 'flex-1 py-3 text-sm font-bold border-b-2 border-emerald-600 text-emerald-700 transition-colors' : 'flex-1 py-3 text-sm font-bold border-b-2 border-transparent text-slate-500 transition-colors';
+        document.getElementById('tab-btn-patients').className = tab === 'patients' ? 'flex-1 py-3 text-sm font-bold border-b-2 border-emerald-600 text-emerald-700 transition-colors' : 'flex-1 py-3 text-sm font-bold border-b-2 border-transparent text-slate-500 transition-colors';
+    }
+
+    // --- 1. ระบบจัดการคิว (นัดหมาย) ---
+    function adminLoadBookings() {
+        let fDate = document.getElementById('admin-filter-date').value;
+        let sType = document.getElementById('admin-filter-sort').value;
+        
+        let listContainer = document.getElementById('admin-booking-list');
+        listContainer.innerHTML = '<div class="text-center py-5 text-emerald-600"><i class="fa-solid fa-spinner fa-spin text-2xl"></i><p class="text-xs mt-2 font-bold">กำลังดึงข้อมูล...</p></div>';
+
+        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'admin_get_logs', filterDate: fDate, sortType: sType, pass: '11395' }) })
+        .then(r => r.json()).then(res => {
+            if(res.status !== 'success') { listContainer.innerHTML = `<p class="text-center text-red-500 text-sm">${res.message}</p>`; return; }
+            
+            let html = '';
+            if(res.data.length === 0) { html = '<p class="text-center text-slate-400 text-sm mt-5">ไม่พบรายการคิว</p>'; }
+            
+            res.data.forEach(b => {
+                let statusColor = b.status === 'รอรับบริการ' ? 'bg-amber-100 text-amber-700' : (b.status.includes('ยกเลิก') || b.status.includes('ผิดนัด') ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700');
+                
+                html += `
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <p class="font-bold text-slate-800 text-sm"><i class="fa-solid fa-user-injured text-slate-400"></i> ${b.name}</p>
+                            <p class="text-[10px] text-slate-500">${b.idCard}</p>
+                        </div>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${statusColor}">${b.status}</span>
+                    </div>
+                    <div class="bg-slate-50 p-2 rounded-lg mb-3">
+                        <p class="text-xs font-bold text-emerald-700">${b.service}</p>
+                        <p class="text-[11px] text-slate-600 mt-1"><i class="fa-regular fa-calendar"></i> นัด: ${b.bookFor}</p>
+                        <p class="text-[10px] text-slate-400 mt-1"><i class="fa-regular fa-clock"></i> จองเมื่อ: ${b.createdAt}</p>
+                    </div>
+                    ${b.status === 'รอรับบริการ' ? `
+                    <div class="flex justify-end">
+                        <button onclick="adminCancelQueue('\${b.idCard}', '${b.sysDate}', '${b.timeOnly}', '${b.dept}', '${b.name}')" class="text-xs bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg font-bold hover:bg-red-100 active:scale-95 transition-all"><i class="fa-solid fa-ban"></i> ยกเลิกนัด / แบน</button>
+                    </div>` : ''}
+                </div>`;
+            });
+            listContainer.innerHTML = html;
+        }).catch(e => { listContainer.innerHTML = '<p class="text-center text-red-500 text-sm">เกิดข้อผิดพลาดในการเชื่อมต่อ</p>'; });
+    }
+
+    function adminCancelQueue(idCard, sysDate, time, dept, name) {
+        Swal.fire({
+            title: 'ยกเลิกคิวนี้?',
+            html: `<p class="text-sm">ผู้ป่วย: <b>${name}</b><br>รอบ: <b>${sysDate} | ${time}</b></p><p class="text-xs text-red-500 mt-2">โปรดเลือกระดับการลงโทษ (หากมีการผิดนัด)</p>`,
+            input: 'select',
+            inputOptions: {
+                '0': '🟢 ยกเลิกเฉยๆ (ไม่แบน)',
+                '2': '🟡 ยกเลิก และแบน 2 วัน',
+                '7': '🔴 ยกเลิก และแบน 7 วัน',
+                '30': '⚫ ยกเลิก และแบน 30 วัน'
+            },
+            showCancelButton: true, confirmButtonText: 'ยืนยัน', cancelButtonText: 'ปิด',
+            customClass: { popup: 'swal-3d-popup' }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                show3DLoader('กำลังประมวลผล...');
+                fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'admin_cancel_booking', idCard: idCard, sysDate: sysDate, time: time, dept: dept, banDays: result.value, pass: '11395' }) })
+                .then(r => r.json()).then(res => {
+                    hide3DLoader();
+                    if(res.status === 'success') { Swal.fire('สำเร็จ', 'ยกเลิกคิวเรียบร้อยแล้ว', 'success'); adminLoadBookings(); }
+                    else { Swal.fire('ล้มเหลว', res.message, 'error'); }
+                }).catch(() => hide3DLoader());
+            }
+        });
+    }
+
+    // --- 2. ระบบจัดการผู้รับบริการ (แก้ข้อมูล/แบน/ดูประวัติ) ---
+    function adminSearchPatientBtn() {
+        let q = document.getElementById('admin-search-user').value.trim();
+        if(q.length < 3) { Swal.fire({icon:'warning', text:'กรุณาพิมพ์อย่างน้อย 3 ตัวอักษร', customClass:{popup:'swal-3d-popup'}}); return; }
+        
+        let listContainer = document.getElementById('admin-patient-list');
+        listContainer.innerHTML = '<div class="text-center py-5 text-emerald-600"><i class="fa-solid fa-spinner fa-spin text-2xl"></i></div>';
+
+        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'admin_search', query: q, pass: '11395' }) })
+        .then(r => r.json()).then(res => {
+            if(res.status !== 'success') { listContainer.innerHTML = `<p class="text-center text-red-500 text-sm">ค้นหาไม่สำเร็จ</p>`; return; }
+            if(res.data.length === 0) { listContainer.innerHTML = '<p class="text-center text-slate-400 text-sm mt-5">ไม่พบข้อมูลในระบบ</p>'; return; }
+            
+            let html = '';
+            res.data.forEach(u => {
+                let isBanned = u.plans && u.plans.some(p => p.service === 'BANNED');
+                let banBadge = isBanned ? '<span class="bg-red-500 text-white px-2 py-0.5 rounded text-[10px] font-bold"><i class="fa-solid fa-lock"></i> ถูกระงับ</span>' : '<span class="bg-green-100 text-green-700 border border-green-200 px-2 py-0.5 rounded text-[10px] font-bold">ปกติ</span>';
+
+                html += `
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <p class="font-bold text-slate-800">${u.fname} ${u.lname}</p>
+                            <p class="text-xs text-slate-500 mt-0.5"><i class="fa-regular fa-id-card"></i> ${u.idCard} | <i class="fa-solid fa-phone"></i> ${u.tel}</p>
+                        </div>
+                        ${banBadge}
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 border-t border-slate-100 pt-3">
+                        <button onclick="adminEditPatient('${u.idCard}', '${u.fname}', '${u.lname}', '${u.tel}')" class="text-xs bg-blue-50 text-blue-600 rounded-lg py-2 font-bold active:scale-95 transition-transform"><i class="fa-solid fa-pen-to-square"></i> แก้ไข</button>
+                        <button onclick="adminToggleBan('${u.idCard}', ${isBanned})" class="text-xs ${isBanned ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'} rounded-lg py-2 font-bold active:scale-95 transition-transform"><i class="fa-solid fa-gavel"></i> ${isBanned ? 'ปลดแบน' : 'แบนบัญชี'}</button>
+                        <button onclick="adminViewFullHistory('${u.idCard}', '${u.fname}')" class="text-xs bg-slate-100 text-slate-700 rounded-lg py-2 font-bold active:scale-95 transition-transform"><i class="fa-solid fa-clock-rotate-left"></i> ประวัติ</button>
+                    </div>
+                </div>`;
+            });
+            listContainer.innerHTML = html;
+        }).catch(e => { listContainer.innerHTML = '<p class="text-center text-red-500 text-sm">เกิดข้อผิดพลาด</p>'; });
+    }
+
+    function adminEditPatient(id, f, l, tel) {
+        Swal.fire({
+            title: 'แก้ไขข้อมูล',
+            html: `
+                <div class="text-left text-xs text-slate-500 mb-1 font-bold">เลขบัตร ปชช.</div>
+                <input id="swal-e-id" class="swal2-input !mt-0 !mb-3 !w-full" value="${id}" maxlength="13">
+                <div class="text-left text-xs text-slate-500 mb-1 font-bold">ชื่อ</div>
+                <input id="swal-e-f" class="swal2-input !mt-0 !mb-3 !w-full" value="${f}">
+                <div class="text-left text-xs text-slate-500 mb-1 font-bold">นามสกุล</div>
+                <input id="swal-e-l" class="swal2-input !mt-0 !mb-3 !w-full" value="${l}">
+                <div class="text-left text-xs text-slate-500 mb-1 font-bold">เบอร์โทร</div>
+                <input id="swal-e-t" class="swal2-input !mt-0 !mb-3 !w-full" value="${tel}" maxlength="10">
+            `,
+            showCancelButton: true, confirmButtonText: 'บันทึก', cancelButtonText: 'ยกเลิก',
+            customClass: { popup: 'swal-3d-popup' },
+            preConfirm: () => {
+                return {
+                    oldId: id, idCard: document.getElementById('swal-e-id').value,
+                    fname: document.getElementById('swal-e-f').value, lname: document.getElementById('swal-e-l').value,
+                    tel: document.getElementById('swal-e-t').value
+                }
+            }
+        }).then((result) => {
+            if(result.isConfirmed) {
+                show3DLoader('บันทึกข้อมูล...');
+                fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'admin_manage_patient', payload: result.value, pass: '11395' }) })
+                .then(r => r.json()).then(res => {
+                    hide3DLoader();
+                    if(res.status === 'success') { Swal.fire('สำเร็จ', 'อัปเดตข้อมูลแล้ว', 'success'); adminSearchPatientBtn(); }
+                }).catch(() => hide3DLoader());
+            }
+        });
+    }
+
+    function adminToggleBan(idCard, isCurrentlyBanned) {
+        Swal.fire({
+            title: isCurrentlyBanned ? 'ปลดแบนบัญชีนี้?' : 'ระงับบัญชีนี้?',
+            input: 'select',
+            inputOptions: {
+                'CLEAR': '🟢 ปลดสถานะแบน (ใช้งานได้ทันที)',
+                '7': '🔴 แบน 7 วัน',
+                '30': '🔴 แบน 30 วัน',
+                '365': '⚫ แบนถาวร (1 ปี)'
+            },
+            inputValue: isCurrentlyBanned ? 'CLEAR' : '7',
+            showCancelButton: true, confirmButtonText: 'ดำเนินการ', cancelButtonText: 'ยกเลิก',
+            customClass: { popup: 'swal-3d-popup' }
+        }).then((result) => {
+            if(result.isConfirmed) {
+                show3DLoader('อัปเดตสถานะ...');
+                fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'admin_manage_plan', idCard: idCard, service: 'BANNED', days: result.value, pass: '11395' }) })
+                .then(r => r.json()).then(res => {
+                    hide3DLoader();
+                    if(res.status === 'success') { Swal.fire('สำเร็จ', 'อัปเดตสถานะแบนแล้ว', 'success'); adminSearchPatientBtn(); }
+                }).catch(() => hide3DLoader());
+            }
+        });
+    }
+
+    function adminViewFullHistory(idCard, name) {
+        show3DLoader('โหลดประวัติ...');
+        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'admin_get_patient_history', idCard: idCard, pass: '11395' }) })
+        .then(r => r.json()).then(res => {
+            hide3DLoader();
+            if(res.status === 'success') {
+                let histHtml = `<div class="max-h-60 overflow-y-auto text-left space-y-2 mt-3 hide-scrollbar">`;
+                if(res.data.length === 0) { histHtml += '<p class="text-center text-sm text-slate-400">ไม่พบประวัติการรับบริการ</p>'; }
+                res.data.forEach(h => {
+                    let c = h.status === 'รอรับบริการ' ? 'text-amber-500' : (h.status.includes('ยกเลิก') || h.status.includes('ผิดนัด') ? 'text-red-500' : 'text-emerald-500');
+                    histHtml += `
+                    <div class="border-l-4 border-slate-200 pl-3 py-1 mb-2 bg-slate-50 rounded-r-lg">
+                        <p class="text-xs font-bold text-slate-800">${h.service}</p>
+                        <p class="text-[10px] text-slate-500">${h.date} | ${h.time} น. <span class="${c} font-bold float-right">${h.status}</span></p>
+                    </div>`;
+                });
+                histHtml += `</div>`;
+                
+                Swal.fire({
+                    title: `ประวัติคุณ ${name}`,
+                    html: histHtml,
+                    confirmButtonText: 'ปิด', customClass: { popup: 'swal-3d-popup' }
+                });
+            }
+        }).catch(() => hide3DLoader());
     }
 </script>
 

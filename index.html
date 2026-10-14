@@ -28,10 +28,10 @@
         .loader-cube-wrap { width: 80px; height: 80px; perspective: 1000px; margin-bottom: 20px; }
         .loader-cube { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; animation: spinCube 2.5s infinite linear; }
         .loader-face { position: absolute; width: 80px; height: 80px; background: rgba(255,255,255,0.9); border: 2px solid #10b981; border-radius: 20px; display: flex; justify-content: center; align-items: center; font-size: 2.2rem; box-shadow: inset 0 0 15px rgba(16,185,129,0.1), 0 5px 15px rgba(0,0,0,0.1); }
-        .loader-face:nth-child(1) { transform: translateZ(40px); color: #10b981; } /* แผนไทย */
-        .loader-face:nth-child(2) { transform: rotateY(90deg) translateZ(40px); color: #ef4444; } /* แผนจีน */
-        .loader-face:nth-child(3) { transform: rotateY(180deg) translateZ(40px); color: #0ea5e9; } /* อบไอน้ำ */
-        .loader-face:nth-child(4) { transform: rotateY(-90deg) translateZ(40px); color: #ec4899; } /* หลังคลอด */
+        .loader-face:nth-child(1) { transform: translateZ(40px); color: #10b981; }
+        .loader-face:nth-child(2) { transform: rotateY(90deg) translateZ(40px); color: #ef4444; }
+        .loader-face:nth-child(3) { transform: rotateY(180deg) translateZ(40px); color: #0ea5e9; }
+        .loader-face:nth-child(4) { transform: rotateY(-90deg) translateZ(40px); color: #ec4899; }
         @keyframes spinCube { 0% { transform: rotateX(-15deg) rotateY(0deg); } 100% { transform: rotateX(-15deg) rotateY(360deg); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
@@ -69,10 +69,10 @@
         <div class="page-content flex flex-col justify-center items-center p-6 bg-cover bg-center h-full relative" style="background-image: url('https://lh3.googleusercontent.com/d/1Jb91xkRQYkUlGKBQopCO4f_gfBPqpo5q');">
             <div class="absolute inset-0 bg-white/70 backdrop-blur-sm"></div>
             <div class="relative z-10 flex flex-col items-center justify-center w-full">
-                <img src="https://lh3.googleusercontent.com/d/1sxp0wrhV7MKhr2_6nOLQsj-jVddMmnzR" class="w-40 h-40 object-contain mb-4 filter drop-shadow-xl" style="animation: float3D 3s ease-in-out infinite;">
+                <img src="https://lh3.googleusercontent.com/d/1sxp0wrhV7MKhr2_6nOLQsj-jVddMmnzR" class="w-40 h-40 object-contain mb-4 filter drop-shadow-xl">
                 <h1 class="text-2xl font-extrabold text-emerald-800 text-center">Sadao Wellness Clinic</h1>
                 <p class="text-sm text-emerald-700 font-bold text-center mt-2 mb-12">กลุ่มงานการแพทย์แผนไทย<br>และการแพทย์ทางเลือก โรงพยาบาลสะเดา</p>
-                <button onclick="navigate('page-login')" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-700 text-white rounded-full py-4 font-bold text-lg shadow-xl active:scale-95 transition-all flex justify-center items-center gap-2">
+                <button onclick="enterAppFromSplash()" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-700 text-white rounded-full py-4 font-bold text-lg shadow-xl active:scale-95 transition-all flex justify-center items-center gap-2">
                     เข้าสู่ระบบ / ลงทะเบียน <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </div>
@@ -107,18 +107,21 @@
                 </div>
                 <input type="tel" id="inputIdCard" class="w-full border-2 border-gray-200 rounded-xl p-3 mb-4 focus:border-emerald-500 focus:outline-none font-bold text-center tracking-widest text-lg transition-all" placeholder="X-XXXX-XXXXX-XX-X" maxlength="13" oninput="checkIDCardFast(this)">
 
-                <!-- 🔴 แสดงข้อมูลเมื่อพบประวัติเดิม (PDPA Safe) -->
+                <!-- แสดงข้อมูลเมื่อพบประวัติเดิม -->
                 <div id="existing-user-card" class="hidden bg-emerald-50 border border-emerald-100 rounded-xl p-4 mb-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-emerald-200 text-emerald-700 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-user-check"></i></div>
-                        <div>
-                            <p class="text-xs text-emerald-600 font-bold mb-0.5">พบประวัติผู้รับบริการ</p>
-                            <p class="text-sm font-extrabold text-slate-800" id="display-masked-name">-</p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 bg-emerald-200 text-emerald-700 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-user-check"></i></div>
+                            <div>
+                                <p class="text-xs text-emerald-600 font-bold mb-0.5">พบประวัติผู้รับบริการ</p>
+                                <p class="text-sm font-extrabold text-slate-800" id="display-masked-name">-</p>
+                            </div>
                         </div>
+                        <button onclick="clearLoginFormForNewUser()" class="text-[11px] bg-white border border-gray-200 text-gray-600 px-2.5 py-1 rounded-lg font-bold shadow-sm">เปลี่ยนคน</button>
                     </div>
                 </div>
 
-                <!-- 🔴 ฟอร์มกรอกชื่อ-สกุล สำหรับคนไข้ใหม่เท่านั้น -->
+                <!-- ฟอร์มกรอกชื่อ-สกุล สำหรับคนไข้ใหม่ -->
                 <div id="new-user-form" class="block">
                     <div class="flex gap-3 mb-4">
                         <div class="flex-1">
@@ -132,13 +135,12 @@
                     </div>
                 </div>
 
-                <label class="block text-gray-700 font-bold mb-1 text-xs">เบอร์โทรศัพท์ <span class="text-red-500">*</span></label>
-                <!-- PDPA Fix: ไม่ดึงเบอร์มาโชว์ ให้ผู้ใช้พิมพ์เองเพื่อยืนยัน -->
+                <label class="block text-gray-700 font-bold mb-1 text-xs">เบอร์โทรศัพท์ติดต่อ <span class="text-red-500">*</span> <span class="text-[10px] text-emerald-600 font-normal">(แก้ไขได้หากเปลี่ยนเบอร์ใหม่)</span></label>
                 <input type="tel" id="inputPhone" class="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-emerald-500 focus:outline-none font-bold text-sm text-emerald-800" placeholder="08XXXXXXXX" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 
                 <div class="mt-4 flex flex-col items-center justify-center gap-1 bg-emerald-50 p-2 rounded-lg border border-emerald-100">
                     <div class="flex items-center gap-2"><i class="fa-solid fa-shield-halved text-emerald-500"></i><span class="text-xs text-emerald-800 font-semibold">ระบบปกป้องข้อมูลส่วนบุคคล (PDPA)</span></div>
-                    <span class="text-[10px] text-gray-500">หากพบประวัติเดิม กรุณาพิมพ์เบอร์โทรเพื่อยืนยันตัวตน</span>
+                    <span class="text-[10px] text-gray-500">สามารถตรวจสอบหรือแก้ไขเบอร์โทรศัพท์ให้เป็นปัจจุบันก่อนกดยืนยัน</span>
                 </div>
             </div>
 
@@ -146,27 +148,31 @@
             <h3 class="font-extrabold text-gray-800 mb-3 px-1">💳 สิทธิการรักษา <span class="text-red-500">*</span></h3>
             <div class="flex flex-col gap-2 mb-4">
                 <div class="right-option border-2 border-emerald-500 bg-emerald-50 p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer shadow-sm transition-all" onclick="selectRightUI(this, '1')">
-                    <input type="radio" name="patient_right" value="บัตรทอง" class="hidden" checked>
+                    <input type="radio" name="patient_right" value="1" class="hidden" checked>
                     <div class="w-10 h-10 rounded-full bg-emerald-100 flex justify-center items-center text-emerald-600"><i class="fa-solid fa-id-card"></i></div>
                     <div class="flex-1"><p class="font-bold text-emerald-800 text-sm leading-none mb-1">บัตรทอง (ร่วมจ่าย 30 บาท)</p><p class="text-[10px] text-gray-500 font-medium">อายุ 12-59 ปี</p></div>
                     <i class="fa-solid fa-circle-check text-emerald-500 text-lg check-icon"></i>
                 </div>
                 <div class="right-option border-2 border-gray-200 bg-white p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer transition-all" onclick="selectRightUI(this, '2')">
+                    <input type="radio" name="patient_right" value="2" class="hidden">
                     <div class="w-10 h-10 rounded-full bg-green-100 flex justify-center items-center text-green-600"><i class="fa-solid fa-id-card-clip"></i></div>
                     <div class="flex-1"><p class="font-bold text-gray-800 text-sm leading-none mb-1">บัตรทอง (ยกเว้นร่วมจ่าย)</p><p class="text-[10px] text-gray-500 font-medium">ผู้สูงอายุ, ผู้มีรายได้น้อย, อสม.</p></div>
                     <i class="fa-solid fa-circle-check text-gray-300 text-lg check-icon hidden"></i>
                 </div>
                 <div class="right-option border-2 border-gray-200 bg-white p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer transition-all" onclick="selectRightUI(this, '3')">
+                    <input type="radio" name="patient_right" value="3" class="hidden">
                     <div class="w-10 h-10 rounded-full bg-blue-100 flex justify-center items-center text-blue-600"><i class="fa-solid fa-building-flag"></i></div>
                     <div class="flex-1"><p class="font-bold text-gray-800 text-sm leading-none mb-1">ข้าราชการ / อปท.</p><p class="text-[10px] text-gray-500 font-medium">เบิกจ่ายตรง ไม่ต้องสำรองจ่าย</p></div>
                     <i class="fa-solid fa-circle-check text-gray-300 text-lg check-icon hidden"></i>
                 </div>
                 <div class="right-option border-2 border-gray-200 bg-white p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer transition-all" onclick="selectRightUI(this, '4')">
+                    <input type="radio" name="patient_right" value="4" class="hidden">
                     <div class="w-10 h-10 rounded-full bg-purple-100 flex justify-center items-center text-purple-600"><i class="fa-solid fa-landmark"></i></div>
                     <div class="flex-1"><p class="font-bold text-gray-800 text-sm leading-none mb-1">รัฐวิสาหกิจ</p><p class="text-[10px] text-gray-500 font-medium">สำรองจ่าย เบิกต้นสังกัด</p></div>
                     <i class="fa-solid fa-circle-check text-gray-300 text-lg check-icon hidden"></i>
                 </div>
                 <div class="right-option border-2 border-gray-200 bg-white p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer transition-all" onclick="selectRightUI(this, '5')">
+                    <input type="radio" name="patient_right" value="5" class="hidden">
                     <div class="w-10 h-10 rounded-full bg-orange-100 flex justify-center items-center text-orange-600"><i class="fa-solid fa-wallet"></i></div>
                     <div class="flex-1"><p class="font-bold text-gray-800 text-sm leading-none mb-1">ประกันสังคม / ชำระเงินเอง</p><p class="text-[10px] text-gray-500 font-medium">ชำระเงินสด / โอนสแกนจ่าย</p></div>
                     <i class="fa-solid fa-circle-check text-gray-300 text-lg check-icon hidden"></i>
@@ -191,8 +197,10 @@
                         <p class="text-sm font-medium opacity-90">ยินดีต้อนรับ</p>
                         <h2 class="text-xl font-bold drop-shadow-md" id="displayUserName">คุณผู้รับบริการ</h2>
                     </div>
-                    <div class="w-11 h-11 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/40 cursor-pointer shadow-lg active:scale-90 transition-transform" onclick="navigate('page-login')">
-                        <i class="fa-solid fa-user-pen text-white"></i>
+                    <div class="flex items-center gap-2">
+                        <button onclick="navigate('page-login')" class="bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/40 cursor-pointer shadow-lg active:scale-90 transition-transform text-xs font-bold flex items-center gap-1.5">
+                            <i class="fa-solid fa-user-pen"></i> สลับผู้ใช้/แก้เบอร์
+                        </button>
                     </div>
                 </div>
             </div>
@@ -267,13 +275,11 @@
             <div id="step-addon" class="step-section">
                 <div class="bg-gradient-to-br from-emerald-50 to-white border border-emerald-100 rounded-2xl p-4 mb-4 shadow-sm" id="addon-container">
                     <h4 class="font-bold text-emerald-800 text-sm mb-3 flex items-center gap-2"><i class="fa-solid fa-cart-plus text-amber-500"></i> 5. รับบริการต่อเนื่องไหมครับ?</h4>
-                    <div id="addon-options-area" class="flex flex-col gap-2">
-                        <!-- ถูกเติมด้วย JS เมื่อเช็คคิวว่าง -->
-                    </div>
+                    <div id="addon-options-area" class="flex flex-col gap-2"></div>
                 </div>
             </div>
             
-            <!-- ส่วนหมายเหตุ (อยู่ล่างสุด) -->
+            <!-- ส่วนหมายเหตุ -->
             <div id="step-note" class="step-section hidden mt-4">
                 <h3 class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-emerald-500"></i> หมายเหตุ (ถ้ามี)</h3>
                 <input type="text" id="inp-note" class="w-full bg-white border-2 border-gray-200 rounded-xl p-3.5 font-medium text-sm focus:border-emerald-500 outline-none transition-all" placeholder="เช่น มีไข้, ประจำเดือน, ระบุอาการเบื้องต้น">
@@ -316,11 +322,7 @@
                 </div>
 
                 <div class="dashed-line"></div>
-
-                <div id="sum-items-container" class="mb-4">
-                    <!-- รายการจะถูกแทรกที่นี่ -->
-                </div>
-
+                <div id="sum-items-container" class="mb-4"></div>
                 <div class="dashed-line"></div>
 
                 <div class="flex justify-between items-end bg-emerald-50 p-3 rounded-xl border border-emerald-100">
@@ -347,7 +349,6 @@
                 <h2 class="text-2xl font-extrabold text-slate-800 mb-2 text-center"><i class="fa-solid fa-user-shield text-slate-600"></i> Admin Portal</h2>
                 <p class="text-xs text-center text-gray-500 mb-6">ระบบจัดการสำหรับเจ้าหน้าที่เท่านั้น</p>
                 
-                <!-- Step 1: ขอ OTP -->
                 <div id="admin-step-1">
                     <label class="block text-sm font-bold text-gray-700 mb-2">LINE User ID</label>
                     <input type="text" id="admin-uid-input" class="w-full border-2 border-gray-200 p-3.5 rounded-xl mb-4 focus:border-slate-500 outline-none transition-colors" placeholder="Uxxxxxxxxxxxxxxxxxxxxx">
@@ -356,7 +357,6 @@
                     </button>
                 </div>
 
-                <!-- Step 2: ยืนยัน OTP -->
                 <div id="admin-step-2" class="hidden">
                     <div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-4 text-center">
                         <p class="text-xs text-green-700 font-bold"><i class="fa-solid fa-paper-plane"></i> ส่ง OTP ไปที่ LINE ของท่านแล้ว</p>
@@ -376,22 +376,18 @@
 
     <!-- ==================== หน้า 7: Admin Dashboard ==================== -->
     <div id="page-admin-dashboard" class="page bg-slate-50">
-        <!-- Header -->
         <div class="bg-slate-800 p-4 shadow-md flex justify-between items-center z-20">
             <h2 class="text-lg font-extrabold text-white flex items-center gap-2"><i class="fa-solid fa-user-shield text-emerald-400"></i> Admin Dashboard</h2>
             <button onclick="navigate('page-login')" class="text-xs bg-slate-700 hover:bg-red-500 text-white px-3 py-1.5 rounded-full transition-colors"><i class="fa-solid fa-power-off"></i> ออกจากระบบ</button>
         </div>
 
-        <!-- Tab Menus -->
         <div class="flex border-b border-slate-200 bg-white shadow-sm z-10 sticky top-0">
             <button id="tab-btn-bookings" onclick="adminSwitchTab('bookings')" class="flex-1 py-3 text-sm font-bold border-b-2 border-emerald-600 text-emerald-700 transition-colors"><i class="fa-solid fa-list-check"></i> จัดการนัดหมาย</button>
             <button id="tab-btn-patients" onclick="adminSwitchTab('patients')" class="flex-1 py-3 text-sm font-bold border-b-2 border-transparent text-slate-500 transition-colors"><i class="fa-solid fa-users-gear"></i> ฐานข้อมูลผู้ป่วย</button>
         </div>
 
         <div class="page-content p-4 pb-10">
-            <!-- ====== TAB 1: จัดการนัดหมาย ====== -->
             <div id="admin-view-bookings" class="block">
-                <!-- Filters -->
                 <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 mb-4 space-y-3">
                     <div>
                         <label class="text-xs font-bold text-slate-600 block mb-1">วันที่รับบริการ (เว้นว่างเพื่อดูทั้งหมด)</label>
@@ -406,13 +402,11 @@
                     </div>
                     <button onclick="adminLoadBookings()" class="w-full bg-emerald-600 text-white py-2 rounded-xl text-sm font-bold shadow-md hover:bg-emerald-700 active:scale-95 transition-all"><i class="fa-solid fa-magnifying-glass"></i> โหลดข้อมูลคิว</button>
                 </div>
-                <!-- Results -->
                 <div id="admin-booking-list" class="space-y-3">
                     <p class="text-center text-sm text-slate-400 mt-10">กดโหลดข้อมูลเพื่อแสดงรายการคิว</p>
                 </div>
             </div>
 
-            <!-- ====== TAB 2: จัดการผู้รับบริการ ====== -->
             <div id="admin-view-patients" class="hidden">
                 <div class="flex gap-2 mb-4">
                     <input type="text" id="admin-search-user" class="flex-1 border-2 border-slate-200 rounded-xl p-3 text-sm outline-none focus:border-emerald-500" placeholder="พิมพ์ชื่อ, นามสกุล หรือ เลข ปชช.">
@@ -435,6 +429,7 @@
     const LIFF_ID = "2010086236-cSpA2YLB";
     
     let userLineUid = ""; 
+    let tempFoundUser = null; // เก็บชื่อ-นามสกุลจริงที่ดึงได้จากฐานข้อมูล
 
     const DAY_COLORS = [
         { bg: 'bg-red-50', border: 'border-red-400', text: 'text-red-700', day: 'อา.' },
@@ -463,6 +458,18 @@
         "DEFAULT": "https://lh3.googleusercontent.com/d/1sxp0wrhV7MKhr2_6nOLQsj-jVddMmnzR"
     };
 
+    const STAFF_NAME_MAP = { 
+        "จินดา J": "จินดา (เจี๊ยบ)", 
+        "รจนา M": "รจนา (แหม่ม)", 
+        "อรรถพล B": "อรรถพล (บ่าว)", 
+        "ศินารัตน์ C": "ศินารัตน์ (ซี)", 
+        "จุฑามาศ F": "จุฑามาศ (ฝน)", 
+        "รัตน์ชนก KW": "รัตน์ชนก (กวาง)", 
+        "นิกษ์นิภา T": "นิกษ์นิภา (การ์ตูน)", 
+        "ณิชาภัทร W": "ณิชาภัทร (วาวา)", 
+        "แพทย์แผนจีน": "แพทย์แผนจีน" 
+    };
+
     const SERVICES = {
         "ttm": ["นวดและประคบเพื่อการรักษา", "นวดตัวส่งเสริมสุขภาพ(ชำระเงินเอง)", "นวดเท้าส่งเสริมสุขภาพ(ชำระเงินเอง)"],
         "tcm": ["ฝังเข็มเพื่อการรักษา", "ครอบแก้ว", "ฝังเข็มใบหน้า", "เม็ดผักกาดแปะหู", "ปรึกษาแพทย์แผนจีน"],
@@ -472,9 +479,17 @@
 
     const ALLOWED_2HR_PAIRS = { "08:30": "09:30", "09:30": "10:30", "13:00": "14:00", "14:00": "15:00", "17:00": "18:00" };
 
-    let userProfile = { id: '', fname: '', lname: '', phone: '', right: '1', rightName: 'บัตรทอง' };
+    let userProfile = { id: '', fname: '', lname: '', phone: '', right: '1', rightName: 'บัตรทอง (ร่วมจ่าย 30 บาท)' };
     let currentDept = ''; let fullFirebaseData = null; let fetchedData = []; 
     let selectedDateIdx = 0; let selectedTimeStr = ''; let selectedStaffObj = null; let totalFee = 0;
+
+    function maskStringPDPA(str) {
+        if(!str || str === "-" || str === "***") return "";
+        let s = str.toString().trim();
+        if(s.length <= 2) return s.substring(0, 1) + "***"; 
+        if(s.length <= 4) return s.substring(0, 2) + "***";
+        return s.substring(0, 3) + "***"; 
+    }
 
     // --- LIFF & INIT ---
     window.onload = () => {
@@ -485,28 +500,40 @@
             } else {
                 liff.getProfile().then(profile => {
                     userLineUid = profile.userId;
-                    
                     let adminUidInput = document.getElementById('admin-uid-input');
                     if(adminUidInput) {
                         adminUidInput.value = userLineUid;
                         adminUidInput.readOnly = true; 
                         adminUidInput.classList.add('bg-slate-100', 'text-slate-500', 'cursor-not-allowed', 'border-slate-300');
-                        adminUidInput.placeholder = "ดึงข้อมูลจาก LINE ปลอดภัย 100%";
                     }
-
                     hide3DLoader();
                     loadLocalProfiles();
                 }).catch(err => {
                     hide3DLoader();
-                    Swal.fire('ข้อผิดพลาด', 'ไม่สามารถดึงข้อมูล LINE ได้', 'error');
+                    loadLocalProfiles();
                 });
             }
         }).catch(err => {
             hide3DLoader();
-            console.error('LIFF Init Error:', err);
             loadLocalProfiles(); 
         });
     };
+
+    // 🔴 หากผู้ใช้เคยล็อกอินไว้แล้ว เมื่อกดปุ่มจากหน้าแรก ให้พาเข้าหน้าคิว (page-home) ทันทีโดยไม่ต้องกรอกใหม่!
+    function enterAppFromSplash() {
+        let lastActive = localStorage.getItem('swc_active_user');
+        if (lastActive) {
+            try {
+                let parsed = JSON.parse(lastActive);
+                if (parsed && parsed.id && parsed.fname && parsed.phone) {
+                    userProfile = parsed;
+                    navigate('page-home');
+                    return;
+                }
+            } catch(e) {}
+        }
+        navigate('page-login');
+    }
 
     function loadLocalProfiles() {
         let saved = JSON.parse(localStorage.getItem('swc_profiles') || '[]');
@@ -515,12 +542,16 @@
             let phtml = '';
             saved.forEach(p => {
                 phtml += `<div class="flex flex-col items-center bg-white border border-emerald-100 p-2 rounded-xl min-w-[75px] shadow-sm cursor-pointer hover:bg-emerald-50" 
-                            onclick="fillProfile('${p.id}', '${p.f}', '${p.l}', '', '${p.r}')">
+                            onclick="fillProfile('${p.id}', '${p.f}', '${p.l || ''}', '${p.p || ''}', '${p.r || '1'}')">
                     <div class="w-11 h-11 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center font-black text-lg mb-1">${p.f.charAt(0)}</div>
                     <span class="text-[10px] font-bold text-gray-700 truncate w-full text-center">${p.f}</span>
                 </div>`;
             });
             document.getElementById('profile-list').innerHTML = phtml;
+            
+            // เลือกโปรไฟล์ล่าสุดให้อัตโนมัติในหน้า Login
+            let lastUser = saved[saved.length - 1];
+            fillProfile(lastUser.id, lastUser.f, lastUser.l || '', lastUser.p || '', lastUser.r || '1');
         }
     }
 
@@ -530,47 +561,76 @@
         if(pageId === 'page-home') {
             document.getElementById('displayUserName').innerText = `คุณ${userProfile.fname}`;
             fetchDashboardHistory();
+        } else if(pageId === 'page-login') {
+            loadLocalProfiles();
         } else if(pageId === 'page-summary') {
             buildSummaryPage();
         }
     }
 
+    function clearLoginFormForNewUser() {
+        tempFoundUser = null;
+        document.getElementById('inputIdCard').value = '';
+        document.getElementById('inputFname').value = '';
+        document.getElementById('inputLname').value = '';
+        document.getElementById('inputPhone').value = '';
+        document.getElementById('idcard-status').innerHTML = '';
+        document.getElementById('existing-user-card').classList.add('hidden');
+        document.getElementById('new-user-form').classList.remove('hidden');
+        document.getElementById('inputIdCard').focus();
+    }
+
     let typingTimer;
     function checkIDCardFast(input) {
-        clearTimeout(typingTimer); let id = input.value; let stat = document.getElementById('idcard-status');
+        clearTimeout(typingTimer); 
+        let id = input.value.replace(/[^0-9]/g, ''); 
+        input.value = id;
+        let stat = document.getElementById('idcard-status');
+        
         if (id.length === 13) {
             stat.innerHTML = '<span class="text-amber-500"><i class="fa-solid fa-spinner fa-spin"></i> ตรวจสอบ...</span>';
+            
+            // เช็คในเครื่องก่อน
+            let saved = JSON.parse(localStorage.getItem('swc_profiles') || '[]');
+            let localMatch = saved.find(x => x.id === id);
+            if (localMatch && localMatch.f) {
+                tempFoundUser = { fname: localMatch.f, lname: localMatch.l || "", tel: localMatch.p || "" };
+                document.getElementById('inputFname').value = tempFoundUser.fname;
+                document.getElementById('inputLname').value = tempFoundUser.lname;
+                if (tempFoundUser.tel) document.getElementById('inputPhone').value = tempFoundUser.tel;
+            }
+
             typingTimer = setTimeout(() => {
                 fetch(FIREBASE_URL + "patientRegistry/" + id + ".json")
                 .then(r => r.json()).then(data => {
                     if(data && data.fname) {
-                        stat.innerHTML = '<span class="text-emerald-500"><i class="fa-solid fa-check-circle"></i> พบประวัติ</span>';
+                        stat.innerHTML = '<span class="text-emerald-500"><i class="fa-solid fa-check-circle"></i> พบประวัติเดิม</span>';
                         
-                        function maskString(str) {
-                            if (!str || str === "-" || str === "***") return "***";
-                            str = str.trim();
-                            if (str.length <= 1) return str + "***";
-                            if (str.length === 2) return str.charAt(0) + "*";
-                            return str.charAt(0) + "***" + str.charAt(str.length - 1);
+                        tempFoundUser = { fname: data.fname, lname: data.lname || "", tel: (data.tel || "").replace(/[^0-9]/g, '') };
+                        document.getElementById('inputFname').value = data.fname;
+                        document.getElementById('inputLname').value = data.lname || "";
+                        
+                        // 🔴 แสดงเบอร์โทรที่ลงทะเบียนไว้ขึ้นมาอัตโนมัติ และแก้ไขได้
+                        if (tempFoundUser.tel) {
+                            document.getElementById('inputPhone').value = tempFoundUser.tel;
                         }
 
-                        document.getElementById('display-masked-name').innerText = maskString(data.fname) + " " + maskString(data.lname || "");
+                        document.getElementById('display-masked-name').innerText = maskStringPDPA(data.fname) + " " + maskStringPDPA(data.lname || "");
                         document.getElementById('existing-user-card').classList.remove('hidden');
                         document.getElementById('new-user-form').classList.add('hidden');
-                        
-                        document.getElementById('inputPhone').value = ""; 
-                    } else {
-                        stat.innerHTML = '<span class="text-blue-500">ผู้รับบริการใหม่</span>';
+                    } else if (!localMatch) {
+                        tempFoundUser = null;
+                        stat.innerHTML = '<span class="text-blue-500">ผู้รับบริการใหม่ กรุณากรอกชื่อ-สกุล</span>';
                         document.getElementById('existing-user-card').classList.add('hidden');
                         document.getElementById('new-user-form').classList.remove('hidden');
-                        
                         document.getElementById('inputFname').value = ''; 
                         document.getElementById('inputLname').value = ''; 
                         document.getElementById('inputPhone').value = '';
                     }
                 }).catch(() => { stat.innerHTML = ''; });
-            }, 500);
+            }, 400);
         } else { 
+            tempFoundUser = null;
             stat.innerHTML = ''; 
             document.getElementById('existing-user-card').classList.add('hidden');
             document.getElementById('new-user-form').classList.remove('hidden');
@@ -588,21 +648,28 @@
     }
 
     function fillProfile(id, f, l, p, r) { 
+        tempFoundUser = { fname: f, lname: l || "", tel: p || "" };
         document.getElementById('inputIdCard').value = id; 
-        document.getElementById('inputPhone').value = ""; 
+        document.getElementById('inputFname').value = f; 
+        document.getElementById('inputLname').value = l || ""; 
+        document.getElementById('inputPhone').value = p || ""; 
         
-        function maskString(str) {
-            if (!str || str === "-" || str === "***") return "***";
-            str = str.trim();
-            if (str.length <= 1) return str + "***";
-            if (str.length === 2) return str.charAt(0) + "*";
-            return str.charAt(0) + "***" + str.charAt(str.length - 1);
-        }
-        document.getElementById('display-masked-name').innerText = maskString(f) + " " + maskString(l || "");
+        document.getElementById('display-masked-name').innerText = maskStringPDPA(f) + " " + maskStringPDPA(l || "");
         document.getElementById('existing-user-card').classList.remove('hidden');
         document.getElementById('new-user-form').classList.add('hidden');
-        
         document.getElementById('idcard-status').innerHTML = '<span class="text-emerald-500"><i class="fa-solid fa-check-circle"></i> เลือกจากประวัติ</span>';
+
+        // ดึงเบอร์โทรล่าสุดจาก Firebase มาเสริมเผื่อในเครื่องไม่มี
+        if (!p) {
+            fetch(FIREBASE_URL + "patientRegistry/" + id + ".json")
+            .then(res => res.json()).then(data => {
+                if (data && data.tel) {
+                    let cleanTel = data.tel.toString().replace(/[^0-9]/g, '');
+                    document.getElementById('inputPhone').value = cleanTel;
+                    tempFoundUser.tel = cleanTel;
+                }
+            }).catch(() => {});
+        }
 
         document.querySelectorAll('input[name="patient_right"]').forEach(radio => { 
             if(radio.value === r) { selectRightUI(radio.parentElement, r); } 
@@ -610,12 +677,12 @@
     }
 
     function loginUser() {
-        const id = document.getElementById('inputIdCard').value; 
-        const p = document.getElementById('inputPhone').value; 
+        const id = document.getElementById('inputIdCard').value.trim(); 
+        const p = document.getElementById('inputPhone').value.trim(); 
         const rVal = document.getElementById('selected-right-val').value;
         
-        let f = document.getElementById('inputFname').value.trim();
-        let l = document.getElementById('inputLname').value.trim();
+        let f = (tempFoundUser && tempFoundUser.fname) ? tempFoundUser.fname : document.getElementById('inputFname').value.trim();
+        let l = (tempFoundUser && tempFoundUser.lname !== undefined) ? tempFoundUser.lname : document.getElementById('inputLname').value.trim();
 
         let isNewUser = !document.getElementById('new-user-form').classList.contains('hidden');
         if(id.length < 13 || p.length < 10 || (isNewUser && f === '')) { 
@@ -625,30 +692,35 @@
         
         let rNames = { '1': 'บัตรทอง (ร่วมจ่าย 30 บาท)', '2': 'บัตรทอง (ยกเว้นร่วมจ่าย)', '3': 'ข้าราชการ / อปท.', '4': 'รัฐวิสาหกิจ', '5': 'ประกันสังคม / ชำระเงินเอง' };
         
-        show3DLoader('กำลังเข้าสู่ระบบ...');
+        show3DLoader('กำลังเข้าสู่ระบบและบันทึกข้อมูล...');
         
-        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'check_user', patientIdCard: id, serviceCategory: 'ttm' }) }).then(r => r.json()).then(res => {
+        // ส่งเบอร์โทรและชื่อไปอัปเดตที่ Server ทันที
+        fetch(API_URL, { 
+            method: 'POST', 
+            body: JSON.stringify({ action: 'check_user', patientIdCard: id, serviceCategory: 'ttm', tel: p, fname: f, lname: l, lineUid: userLineUid }) 
+        }).then(r => r.json()).then(res => {
             if(res.isBanned) { 
                 hide3DLoader();
                 Swal.fire({title:'ระงับการจอง', text:`บัญชีนี้ถูกระงับจนถึงวันที่ ${res.banUntil}`, icon:'error', customClass:{popup:'swal-3d-popup'}}); 
             } else { 
-                userProfile = { id: id, phone: p, right: rVal, rightName: rNames[rVal] };
+                let finalFname = (res.user && res.user.fname) ? res.user.fname : f;
+                let finalLname = (res.user && res.user.lname) ? res.user.lname : l;
 
-                if(res.user && res.user.fname) {
-                    userProfile.fname = res.user.fname;
-                    userProfile.lname = res.user.lname || "";
-                } else {
-                    userProfile.fname = f;
-                    userProfile.lname = l;
-                }
+                userProfile = { id: id, fname: finalFname, lname: finalLname, phone: p, right: rVal, rightName: rNames[rVal] };
 
+                // 🔴 บันทึกหรืออัปเดตเบอร์โทรใหม่ลงในเครื่อง (Local Storage) ทันที
                 let saved = JSON.parse(localStorage.getItem('swc_profiles') || '[]');
-                if(!saved.find(x => x.id === id)) { 
-                    saved.push({id: id, f: userProfile.fname, l: userProfile.lname, p: '', r: rVal}); 
-                    localStorage.setItem('swc_profiles', JSON.stringify(saved)); 
+                let existIdx = saved.findIndex(x => x.id === id);
+                if(existIdx > -1) {
+                    saved[existIdx] = { id: id, f: finalFname, l: finalLname, p: p, r: rVal };
+                } else {
+                    saved.push({ id: id, f: finalFname, l: finalLname, p: p, r: rVal });
                 }
+                localStorage.setItem('swc_profiles', JSON.stringify(saved)); 
+                localStorage.setItem('swc_active_user', JSON.stringify(userProfile));
 
-                hide3DLoader(); navigate('page-home'); 
+                hide3DLoader(); 
+                navigate('page-home'); 
             }
         }).catch(() => { 
             hide3DLoader(); 
@@ -656,44 +728,78 @@
         });
     }
 
-    // --- Dashboard History ---
+    // --- 🔴 Dashboard History: ดึงข้อมูลจากทั้ง Server และ Firebase เพื่อให้แสดงคิวเสมอแม้ปิดหน้าต่างเข้าใหม่ ---
     function fetchDashboardHistory() {
         let card = document.getElementById('dash-history-card');
-        card.innerHTML = `<div class="flex items-center text-emerald-700 font-bold text-sm mb-3"><i class="fa-solid fa-spinner fa-spin mr-2"></i> กำลังตรวจสอบคิวนัดหมาย...</div>`;
-        fetch(FIREBASE_URL + "patientHistory/" + userProfile.id + ".json?t=" + new Date().getTime())
-        .then(r => r.json()).then(data => {
-            let active = null;
-            if (data && data.status === 'รอรับบริการ') active = data;
-            else if (Array.isArray(data)) active = data.find(x => x.status === 'รอรับบริการ');
-            
-            if (active) {
-                card.innerHTML = `
-                    <div class="flex justify-between items-center mb-2">
-                        <p class="text-emerald-700 font-bold text-sm"><i class="fa-solid fa-calendar-check"></i> คิวของคุณที่กำลังจะมาถึง</p>
-                        <span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-md text-[10px] font-bold animate-pulse">รอรับบริการ</span>
-                    </div>
-                    <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 flex items-center justify-between">
-                        <div><p class="font-bold text-gray-800 text-sm">${active.service}</p><p class="text-xs text-gray-500 mt-1"><i class="fa-regular fa-clock"></i> ${active.date} | ${active.time} น.</p></div>
-                    </div>
-                    <!-- 🔴 ปุ่มยกเลิกนัดหมายให้คนไข้กดยกเลิกได้ด้วยตัวเอง -->
-                    <button onclick="patientCancelBooking('${active.date}', '${active.sysDate}', '${active.time}', '${active.service}')" class="w-full mt-3 bg-red-50 text-red-500 border border-red-200 rounded-xl py-2 text-sm font-bold hover:bg-red-100 active:scale-95 transition-all"><i class="fa-solid fa-times-circle"></i> ยกเลิกนัดหมายนี้</button>
-                `;
+        card.innerHTML = `<div class="flex items-center text-emerald-700 font-bold text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i> กำลังตรวจสอบคิวนัดหมาย...</div>`;
+        
+        // เรียก API get_my_history เพื่อความแม่นยำ 100% จากฐานข้อมูล MySQL
+        fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'get_my_history', patientIdCard: userProfile.id }) })
+        .then(r => r.json()).then(res => {
+            if (res && res.status === 'success' && res.history) {
+                renderActiveHistoryCard(res.history);
             } else {
-                card.innerHTML = `<div class="flex items-center justify-between"><p class="text-emerald-700 font-bold text-sm"><i class="fa-solid fa-calendar-xmark"></i> ไม่มีคิวในเร็วๆ นี้</p><button class="bg-gray-100 text-gray-400 px-3 py-1.5 rounded-full text-xs font-bold border border-gray-200 cursor-not-allowed">ดูประวัติ</button></div>`;
+                // Fallback ไปดึงจาก Firebase
+                fetch(FIREBASE_URL + "patientHistory/" + userProfile.id + ".json?t=" + new Date().getTime())
+                .then(r2 => r2.json()).then(fbData => {
+                    renderActiveHistoryCard(fbData);
+                }).catch(() => renderActiveHistoryCard(null));
             }
-        }).catch(() => { card.innerHTML = `<p class="text-sm text-red-500">ตรวจสอบประวัติไม่สำเร็จ</p>`; });
+        }).catch(() => {
+            fetch(FIREBASE_URL + "patientHistory/" + userProfile.id + ".json?t=" + new Date().getTime())
+            .then(r2 => r2.json()).then(fbData => {
+                renderActiveHistoryCard(fbData);
+            }).catch(() => {
+                card.innerHTML = `<p class="text-sm text-red-500">ตรวจสอบประวัติไม่สำเร็จ</p>`;
+            });
+        });
     }
 
-    // 🔴 ฟังก์ชันยกเลิกนัดหมายโดยคนไข้ พร้อมบังคับส่งแชทเอง
+    function renderActiveHistoryCard(data) {
+        let card = document.getElementById('dash-history-card');
+        let list = Array.isArray(data) ? data : (data ? [data] : []);
+        let activeList = list.filter(x => x && x.status === 'รอรับบริการ');
+        
+        if (activeList.length > 0) {
+            let firstQ = activeList[0];
+            let itemsHtml = activeList.map(item => `
+                <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 flex items-center justify-between mb-2">
+                    <div>
+                        <p class="font-bold text-gray-800 text-sm">${item.service.split(' [')[0]}</p>
+                        <p class="text-xs text-emerald-700 font-semibold mt-1"><i class="fa-regular fa-clock"></i> วันที่ ${item.date} | เวลา ${item.time} น.</p>
+                    </div>
+                </div>
+            `).join('');
+
+            card.innerHTML = `
+                <div class="flex justify-between items-center mb-2">
+                    <p class="text-emerald-700 font-bold text-sm"><i class="fa-solid fa-calendar-check"></i> คิวของคุณที่กำลังจะมาถึง</p>
+                    <span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-md text-[10px] font-bold animate-pulse">รอรับบริการ (${activeList.length})</span>
+                </div>
+                ${itemsHtml}
+                <button onclick="patientCancelBooking('${firstQ.date}', '${firstQ.sysDate}', '${firstQ.time}', '${firstQ.service.split(' [')[0]}')" class="w-full mt-1 bg-red-50 text-red-500 border border-red-200 rounded-xl py-2.5 text-sm font-bold hover:bg-red-100 active:scale-95 transition-all">
+                    <i class="fa-solid fa-times-circle"></i> กดเพื่อยกเลิกคิวนัดหมายนี้
+                </button>
+            `;
+        } else {
+            card.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <p class="text-emerald-700 font-bold text-sm"><i class="fa-solid fa-calendar-xmark"></i> ไม่มีคิวนัดหมายที่รอรับบริการ</p>
+                    <span class="bg-gray-100 text-gray-500 px-3 py-1 rounded-full text-xs font-bold">ว่าง</span>
+                </div>`;
+        }
+    }
+
+    // 🔴 ฟังก์ชันยกเลิกนัดหมายโดยคนไข้ + ส่งข้อความจากแชทคนไข้เข้า LINE OA
     function patientCancelBooking(displayDate, sysDate, time, service) {
         Swal.fire({
-            title: 'ยกเลิกนัดหมาย?',
-            text: 'คุณต้องการยกเลิกคิวนี้ใช่หรือไม่?',
+            title: 'ยืนยันการยกเลิกนัด?',
+            text: 'คุณต้องการยกเลิกคิวนัดหมายนี้ใช่หรือไม่?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#cbd5e1',
-            confirmButtonText: 'ยืนยันยกเลิก',
+            confirmButtonText: 'ยอมรับและยกเลิกคิว',
             cancelButtonText: 'ปิด',
             customClass: { popup: 'swal-3d-popup', confirmButton: 'swal-3d-btn' }
         }).then((result) => {
@@ -714,34 +820,32 @@
                 .then(r => r.json()).then(res => {
                     hide3DLoader();
                     if(res.status === 'success' || res.status === 'error_but_done') {
+                        fetch(API_URL, {method:'POST', body:JSON.stringify({action:'background_sync', dept:sDept})}).catch(()=>{}); 
+
                         if (liff.isInClient()) {
-                            function maskString(str) {
-                                if(!str) return ""; let s = str.toString().trim();
-                                if(s.length <= 2) return s.substring(0, 1) + "***"; 
-                                if(s.length <= 4) return s.substring(0, 2) + "***";
-                                return s.substring(0, 3) + "***"; 
-                            }
-                            let mName = maskString(userProfile.fname) + " " + maskString(userProfile.lname);
+                            let mName = maskStringPDPA(userProfile.fname) + " " + maskStringPDPA(userProfile.lname);
                             let mTel = userProfile.phone.substring(0,3) + "-xxx-x" + userProfile.phone.substring(8);
 
-                            let msgText = `[ระบบอัตโนมัติ] แจ้งทำรายการยกเลิกนัดหมายสำเร็จ\n👤 ชื่อ: ${mName}\n📞 โทร: ${mTel}\n🩺 บริการ: ${service}\n📅 วันที่: ${displayDate}\n⏰ เวลา: ${time} น.`;
+                            let msgText = `[ระบบอัตโนมัติ] แจ้งทำรายการยกเลิกนัดหมาย ❌\n👤 ชื่อ: ${mName}\n📞 โทร: ${mTel}\n🩺 บริการ: ${service}\n📅 วันที่: ${displayDate}\n⏰ รอบเวลา: ${time} น.`;
                             
-                            Swal.fire({ title: 'ยกเลิกคิวสำเร็จ!', text: "กำลังส่งข้อความยืนยัน...", icon: 'success', showConfirmButton: false, allowOutsideClick: false, customClass:{popup:'swal-3d-popup'} });
-                            liff.sendMessages([{ type: 'text', text: msgText }]).then(() => { liff.closeWindow(); }).catch(() => { liff.closeWindow(); });
+                            Swal.fire({ title: 'ยกเลิกคิวสำเร็จ!', text: "กำลังส่งข้อความยืนยันในแชท...", icon: 'success', showConfirmButton: false, allowOutsideClick: false });
+                            liff.sendMessages([{ type: 'text', text: msgText }])
+                            .then(() => { liff.closeWindow(); })
+                            .catch((err) => { 
+                                Swal.fire({ title: 'ยกเลิกคิวสำเร็จ!', text: 'ดำเนินการยกเลิกเรียบร้อยแล้ว', icon: 'success' }).then(() => liff.closeWindow());
+                            });
                         } else {
                             Swal.fire('สำเร็จ', 'ยกเลิกคิวเรียบร้อยแล้ว', 'success');
                             fetchDashboardHistory();
                         }
-                        fetch(API_URL, {method:'POST', body:JSON.stringify({action:'background_sync', dept:sDept})}).catch(()=>{}); 
                     } else {
-                        Swal.fire('ข้อผิดพลาด', res.message, 'error');
+                        Swal.fire('ข้อผิดพลาด', res.message || 'ไม่สามารถยกเลิกได้', 'error');
                     }
                 }).catch(()=> { hide3DLoader(); Swal.fire('ขัดข้อง', 'ไม่สามารถเชื่อมต่อได้', 'error'); });
             }
         });
     }
 
-    // --- 3D Loader ---
     function show3DLoader(text) {
         document.getElementById('loader-text').innerText = text;
         document.getElementById('global-loader').classList.remove('hidden');
@@ -786,13 +890,12 @@
             selectedDateIdx = 0; selectedTimeStr = '';
             renderDates();
         }).catch(err => {
-            hide3DLoader(); Swal.fire({title: 'ขัดข้อง', text: 'ไม่สามารถโหลดข้อมูลได้', icon: 'error', customClass: {popup: 'swal-3d-popup'}}); navigate('page-home');
+            hide3DLoader(); Swal.fire({title: 'ขัดข้อง', text: 'ไม่สามารถโหลดข้อมูลได้', icon: 'error'}); navigate('page-home');
         });
     }
 
     function renderDates() {
         let html = '';
-        let daysThFull = ["วันอาทิตย์", "วันจันทร์", "วันอังคาร", "วันพุธ", "วันพฤหัสบดี", "วันศุกร์", "วันเสาร์"];
         fetchedData.forEach((day, i) => {
             let col = DAY_COLORS[day.dayOfWeek] || DAY_COLORS[0];
             let active = i === selectedDateIdx ? `${col.bg} ${col.border} border-2 shadow-md transform -translate-y-1` : `bg-white border-gray-200 text-gray-400 border`;
@@ -853,7 +956,7 @@
 
             uniqueStaff.forEach(st => {
                 let img = STAFF_IMAGES[st.name] || STAFF_IMAGES['DEFAULT'];
-                let nShort = st.name.replace(' J','').replace(' M','').replace(' B','').replace(' C','').replace(' F','').replace(' KW','').replace(' T','').replace(' W','');
+                let nShort = STAFF_NAME_MAP[st.name] || st.name.replace(' J','').replace(' M','').replace(' B','').replace(' C','').replace(' F','').replace(' KW','').replace(' T','').replace(' W','');
                 sHtml += `<div onclick='chooseStaff(this, ${JSON.stringify(st)})' class="flex flex-col items-center p-3 border-2 border-gray-100 bg-white rounded-2xl cursor-pointer staff-card transition-all">
                     <img src="${img}" class="w-12 h-12 rounded-full object-cover mb-2 shadow-sm border-2 border-white">
                     <span class="text-[10px] font-extrabold text-gray-700 text-center leading-tight">${nShort}</span>
@@ -1067,7 +1170,7 @@
         document.getElementById('sum-items-container').innerHTML = itemsHtml;
     }
 
-    // 🔴 3. ฟังก์ชันส่งจองคิว บังคับคนไข้ส่งแชทเอง 100%
+    // 🔴 3. ฟังก์ชันส่งจองคิว บังคับคนไข้ส่งแชทเข้า LINE OA เอง
     function submitBookingAPI() {
         let svc = document.getElementById('select-service').value;
         let day = fetchedData[selectedDateIdx];
@@ -1100,7 +1203,23 @@
             }
         }
 
-        let payload = { action: 'book_queue_cart', mainIdCard: userProfile.id, patientIdCard: userProfile.id, fname: userProfile.fname, lname: userProfile.lname, tel: userProfile.phone, right: userProfile.rightName, sysDate: day.sysDate, sheetName: day.sheetName, items: items, lineUid: userLineUid };
+        // ส่งทั้ง fname/lname/tel และ mainFname/mainLname/mainTel ให้ครบถ้วน
+        let payload = { 
+            action: 'book_queue_cart', 
+            mainIdCard: userProfile.id, 
+            patientIdCard: userProfile.id, 
+            mainFname: userProfile.fname,
+            mainLname: userProfile.lname,
+            mainTel: userProfile.phone,
+            fname: userProfile.fname, 
+            lname: userProfile.lname, 
+            tel: userProfile.phone, 
+            right: userProfile.rightName, 
+            sysDate: day.sysDate, 
+            sheetName: day.sheetName, 
+            items: items, 
+            lineUid: userLineUid 
+        };
 
         show3DLoader('กำลังลงบันทึกคิว...');
 
@@ -1108,22 +1227,16 @@
         .then(r => r.json()).then(res => {
             hide3DLoader();
             if(res.status === 'success') {
+                // ซิงค์ตารางเวรในพื้นหลังทันที
+                fetch(API_URL, {method:'POST', body:JSON.stringify({action:'background_sync', dept:currentDept})}).catch(()=>{});
+
                 if (liff.isInClient()) {
-                    
-                    function maskString(str) {
-                        if(!str) return ""; let s = str.toString().trim();
-                        if(s.length <= 2) return s.substring(0, 1) + "***"; 
-                        if(s.length <= 4) return s.substring(0, 2) + "***";
-                        return s.substring(0, 3) + "***"; 
-                    }
-                    let mName = maskString(userProfile.fname) + " " + maskString(userProfile.lname);
+                    let mName = maskStringPDPA(userProfile.fname) + " " + maskStringPDPA(userProfile.lname);
                     let mTel = userProfile.phone.substring(0,3) + "-xxx-x" + userProfile.phone.substring(8);
                     let displayNote = inputNote === "" ? "-" : inputNote;
                     
-                    let daysThFull = ["วันอาทิตย์", "วันจันทร์", "วันอังคาร", "วันพุธ", "วันพฤหัสบดี", "วันศุกร์", "วันเสาร์"];
-                    let dObj = new Date(day.sysDate);
-                    let mTh = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-                    let displayDateFull = `${daysThFull[dObj.getDay()]}ที่ ${dObj.getDate()} ${mTh[dObj.getMonth()]} ${dObj.getFullYear() + 543}`;
+                    let displayDateFull = day.fullLabel || day.displayDate;
+                    let displayStaff = STAFF_NAME_MAP[selectedStaffObj.name] || selectedStaffObj.name;
 
                     let displayTime = selectedTimeStr;
                     let lastItemTime = items[items.length - 1].time;
@@ -1131,29 +1244,36 @@
                     let totalMins = (parseInt(tParts[0]) * 60) + parseInt(tParts[1]) + (items[items.length - 1].dept === 'steam' ? 30 : 60);
                     let eH = Math.floor(totalMins / 60); let eM = totalMins % 60;
                     let endTimeStr = (eH < 10 ? '0' : '') + eH + ':' + (eM < 10 ? '0' : '') + eM;
-                    
                     let timeRange = `${displayTime} - ${endTimeStr}`;
 
-                    // ข้อความชุดที่ 1 (Format เป๊ะตามที่ขอ)
-                    let msgText1 = `[ระบบอัตโนมัติ] แจ้งทำรายการนัดหมายสำเร็จ\n👤 ชื่อ: ${mName}\n📞 โทร: ${mTel}\n🩺 บริการ: ${svc}\n📅 วันที่: ${displayDateFull}\n⏰ เวลา: ${timeRange} น.\n👨‍⚕️ ผู้ให้บริการ: ${selectedStaffObj.name}\n📝 หมายเหตุ: ${displayNote}\n💰 ยอดชำระ: ${totalFee} บาท`;
+                    let allSvcs = items.map(it => it.service).join(' + ');
+
+                    // ข้อความชุดที่ 1
+                    let msgText1 = `[ระบบอัตโนมัติ] แจ้งทำรายการนัดหมายสำเร็จ \n👤 ชื่อ: ${mName}\n📞 โทร: ${mTel}\n🩺 บริการ: ${allSvcs}\n📅 วันที่: ${displayDateFull}\n⏰ เวลา: ${timeRange} น.\n👨‍⚕️ ผู้ให้บริการ: ${displayStaff}\n📝 หมายเหตุ: ${displayNote}\n💰 ยอดชำระ: ${totalFee} บาท`;
                     
-                    // ข้อความชุดที่ 2 (Format เป๊ะตามที่ขอ)
+                    // ข้อความชุดที่ 2
                     let msgText2 = "🕰️ กรุณามาก่อนเวลานัดอย่างน้อย 15 นาที\n\n***‼️หากไม่มาติดต่อภายในเวลาที่กำหนด ถือว่าท่านสละสิทธิ์ให้คนไข้ท่านอื่น\n\n***‼️การเลื่อนนัดหรือยกเลิกนัด โปรดแจ้งล่วงหน้า อย่างน้อย 2 วัน\n\n😷โปรดสวมหน้ากากอนามัยตลอดเวลาเข้ารับบริการ\n📝 อย่าลืมนำบัตรประจำตัวประชาชนมาด้วยนะครับ";
                     
-                    Swal.fire({ title: 'จองคิวสำเร็จ!', text: "กำลังส่งใบเสร็จเข้าแชท...", icon: 'success', showConfirmButton: false, allowOutsideClick: false, customClass: { popup: 'swal-3d-popup' } });
+                    Swal.fire({ title: 'จองคิวสำเร็จ!', text: "กำลังส่งข้อความยืนยันในแชท...", icon: 'success', showConfirmButton: false, allowOutsideClick: false });
                     
                     liff.sendMessages([ { type: 'text', text: msgText1 }, { type: 'text', text: msgText2 } ])
                     .then(() => { liff.closeWindow(); })
-                    .catch(() => { liff.closeWindow(); });
+                    .catch((err) => { 
+                        Swal.fire({ 
+                            title: 'จองคิวสำเร็จ!', 
+                            html: `บันทึกคิวเรียบร้อยแล้ว<br><span class="text-xs text-red-500">(หมายเหตุ: ส่งข้อความอัตโนมัติไม่สำเร็จ กรุณาตรวจสอบว่าเปิด Scope: chat_message.write ใน LINE Developers แล้ว)</span>`, 
+                            icon: 'success', confirmButtonText: 'ตกลง' 
+                        }).then(() => navigate('page-home'));
+                    });
                 } else {
-                    Swal.fire({ title: 'จองคิวสำเร็จ!', html: `<p class="text-sm font-medium mt-2">บันทึกคิวเรียบร้อยแล้ว<br><b class="text-emerald-600 text-lg">${day.displayDate} | ${selectedTimeStr} น.</b></p>`, icon: 'success', confirmButtonColor: '#059669', customClass: {popup: 'swal-3d-popup', confirmButton: 'swal-3d-btn'} }).then(() => navigate('page-home'));
+                    Swal.fire({ title: 'จองคิวสำเร็จ!', html: `<p class="text-sm font-medium mt-2">บันทึกคิวเรียบร้อยแล้ว<br><b class="text-emerald-600 text-lg">${day.displayDate} | ${selectedTimeStr} น.</b></p>`, icon: 'success', confirmButtonColor: '#059669' }).then(() => navigate('page-home'));
                 }
             } else if (res.status === 'error_blocked') {
-                Swal.fire({ title: 'พบรายการจองซ้ำ', html: `คุณมีคิวที่แผนกนี้รอรับบริการอยู่แล้ว<br><b style="color:#10b981; font-size:1.1rem;">รอบวันที่ ${res.date} เวลา ${res.time} น.</b><br>กรุณารับบริการหรือยกเลิกคิวเดิมก่อนครับ`, icon: 'warning', customClass: {popup: 'swal-3d-popup'} }); openBookingFlow(currentDept);
+                Swal.fire({ title: 'พบรายการจองซ้ำ', html: `คุณมีคิวที่แผนกนี้รอรับบริการอยู่แล้ว<br><b style="color:#10b981; font-size:1.1rem;">รอบวันที่ ${res.date} เวลา ${res.time} น.</b><br>กรุณารับบริการหรือยกเลิกคิวเดิมก่อนครับ`, icon: 'warning' }); openBookingFlow(currentDept);
             } else {
-                Swal.fire({ title: 'คิวไม่ว่าง', text: res.message || 'คิวนี้ถูกจองตัดหน้าไปแล้วครับ', icon: 'info', customClass: {popup: 'swal-3d-popup'} }); openBookingFlow(currentDept);
+                Swal.fire({ title: 'คิวไม่ว่าง', text: res.message || 'คิวนี้ถูกจองตัดหน้าไปแล้วครับ', icon: 'info' }); openBookingFlow(currentDept);
             }
-        }).catch(() => { hide3DLoader(); Swal.fire({title: 'ขัดข้อง', text: 'เชื่อมต่อไม่สำเร็จ', icon: 'error', customClass: {popup: 'swal-3d-popup'}}); });
+        }).catch(() => { hide3DLoader(); Swal.fire({title: 'ขัดข้อง', text: 'เชื่อมต่อไม่สำเร็จ', icon: 'error'}); });
     }
 
     // ==========================================
@@ -1191,7 +1311,7 @@
             if(res.status === 'success') {
                 Swal.fire({icon:'success', title:'ยินดีต้อนรับ', text: res.message}).then(() => {
                     navigate('page-admin-dashboard');
-                    adminLoadBookings(); // โหลดคิวอัตโนมัติเมื่อเข้าหน้าแอดมิน
+                    adminLoadBookings();
                 });
             } else {
                 Swal.fire({icon:'error', title:'ผิดพลาด', text: res.message});
@@ -1246,7 +1366,7 @@
                     </div>
                     ${b.status === 'รอรับบริการ' ? `
                     <div class="flex justify-end">
-                        <button onclick="adminCancelQueue('\${b.idCard}', '${b.sysDate}', '${b.timeOnly}', '${b.dept}', '${b.name}')" class="text-xs bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg font-bold hover:bg-red-100 active:scale-95 transition-all"><i class="fa-solid fa-ban"></i> ยกเลิกนัด / แบน</button>
+                        <button onclick="adminCancelQueue('${b.idCard}', '${b.sysDate}', '${b.timeOnly}', '${b.dept}', '${b.name}')" class="text-xs bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg font-bold hover:bg-red-100 active:scale-95 transition-all"><i class="fa-solid fa-ban"></i> ยกเลิกนัด / แบน</button>
                     </div>` : ''}
                 </div>`;
             });
@@ -1265,8 +1385,7 @@
                 '7': '🔴 ยกเลิก และแบน 7 วัน',
                 '30': '⚫ ยกเลิก และแบน 30 วัน'
             },
-            showCancelButton: true, confirmButtonText: 'ยืนยัน', cancelButtonText: 'ปิด',
-            customClass: { popup: 'swal-3d-popup' }
+            showCancelButton: true, confirmButtonText: 'ยืนยัน', cancelButtonText: 'ปิด'
         }).then((result) => {
             if (result.isConfirmed) {
                 show3DLoader('กำลังประมวลผล...');
@@ -1282,7 +1401,7 @@
 
     function adminSearchPatientBtn() {
         let q = document.getElementById('admin-search-user').value.trim();
-        if(q.length < 3) { Swal.fire({icon:'warning', text:'กรุณาพิมพ์อย่างน้อย 3 ตัวอักษร', customClass:{popup:'swal-3d-popup'}}); return; }
+        if(q.length < 3) { Swal.fire({icon:'warning', text:'กรุณาพิมพ์อย่างน้อย 3 ตัวอักษร'}); return; }
         
         let listContainer = document.getElementById('admin-patient-list');
         listContainer.innerHTML = '<div class="text-center py-5 text-emerald-600"><i class="fa-solid fa-spinner fa-spin text-2xl"></i></div>';
@@ -1331,7 +1450,6 @@
                 <input id="swal-e-t" class="swal2-input !mt-0 !mb-3 !w-full" value="${tel}" maxlength="10">
             `,
             showCancelButton: true, confirmButtonText: 'บันทึก', cancelButtonText: 'ยกเลิก',
-            customClass: { popup: 'swal-3d-popup' },
             preConfirm: () => {
                 return {
                     oldId: id, idCard: document.getElementById('swal-e-id').value,
@@ -1362,8 +1480,7 @@
                 '365': '⚫ แบนถาวร (1 ปี)'
             },
             inputValue: isCurrentlyBanned ? 'CLEAR' : '7',
-            showCancelButton: true, confirmButtonText: 'ดำเนินการ', cancelButtonText: 'ยกเลิก',
-            customClass: { popup: 'swal-3d-popup' }
+            showCancelButton: true, confirmButtonText: 'ดำเนินการ', cancelButtonText: 'ยกเลิก'
         }).then((result) => {
             if(result.isConfirmed) {
                 show3DLoader('อัปเดตสถานะ...');
@@ -1397,7 +1514,7 @@
                 Swal.fire({
                     title: `ประวัติคุณ ${name}`,
                     html: histHtml,
-                    confirmButtonText: 'ปิด', customClass: { popup: 'swal-3d-popup' }
+                    confirmButtonText: 'ปิด'
                 });
             }
         }).catch(() => hide3DLoader());

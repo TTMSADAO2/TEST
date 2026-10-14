@@ -7,6 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- ติดตั้ง LINE LIFF SDK -->
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Prompt', sans-serif; background-color: #e5e7eb; display: flex; justify-content: center; margin: 0; }
@@ -410,6 +412,9 @@
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxdk0hCqf3AndmyvdYX-G3s-gmmODrQq2hYRkw_T4OCJg9ubI9tB3SlPsXx5Qk43j0/exec";
     const FIREBASE_URL = "https://sadao-queue-999c3-default-rtdb.asia-southeast1.firebasedatabase.app/";
+    const LIFF_ID = "2010086236-cSpA2YLB";
+    
+    let userLineUid = ""; // เก็บ UID ลับของคนที่เปิดแอป
 
     const DAY_COLORS = [
         { bg: 'bg-red-50', border: 'border-red-400', text: 'text-red-700', day: 'อา.' },
@@ -451,19 +456,41 @@
     let currentDept = ''; let fullFirebaseData = null; let fetchedData = []; 
     let selectedDateIdx = 0; let selectedTimeStr = ''; let selectedStaffObj = null; let totalFee = 0;
 
-    function navigate(pageId) {
-        document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
-        document.getElementById(pageId).classList.add('active');
-        if(pageId === 'page-home') {
-            document.getElementById('displayUserName').innerText = `คุณ${userProfile.fname}`;
-            fetchDashboardHistory();
-        } else if(pageId === 'page-summary') {
-            buildSummaryPage();
-        }
-    }
-
-    // --- PDPA & Load Profiles ---
+    // --- LIFF & INIT ---
     window.onload = () => {
+        show3DLoader('กำลังตรวจสอบการเข้าสู่ระบบ LINE...');
+        liff.init({ liffId: LIFF_ID }).then(() => {
+            if (!liff.isLoggedIn()) {
+                liff.login();
+            } else {
+                liff.getProfile().then(profile => {
+                    userLineUid = profile.userId;
+                    
+                    // ป้องกันความปลอดภัย: นำ UID ไปใส่ในช่อง Admin อัตโนมัติและล็อกห้ามแก้
+                    let adminUidInput = document.getElementById('admin-uid-input');
+                    if(adminUidInput) {
+                        adminUidInput.value = userLineUid;
+                        adminUidInput.readOnly = true; 
+                        adminUidInput.classList.add('bg-slate-100', 'text-slate-500', 'cursor-not-allowed', 'border-slate-300');
+                        adminUidInput.placeholder = "ดึงข้อมูลจาก LINE ปลอดภัย 100%";
+                    }
+
+                    hide3DLoader();
+                    loadLocalProfiles();
+                }).catch(err => {
+                    hide3DLoader();
+                    Swal.fire('ข้อผิดพลาด', 'ไม่สามารถดึงข้อมูล LINE ได้', 'error');
+                });
+            }
+        }).catch(err => {
+            hide3DLoader();
+            console.error('LIFF Init Error:', err);
+            // Fallback เผื่อทดสอบบนเบราว์เซอร์ปกติ
+            loadLocalProfiles(); 
+        });
+    };
+
+    function loadLocalProfiles() {
         let saved = JSON.parse(localStorage.getItem('swc_profiles') || '[]');
         if(saved.length > 0) {
             document.getElementById('saved-profiles-section').classList.remove('hidden');
@@ -477,7 +504,18 @@
             });
             document.getElementById('profile-list').innerHTML = phtml;
         }
-    };
+    }
+
+    function navigate(pageId) {
+        document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        if(pageId === 'page-home') {
+            document.getElementById('displayUserName').innerText = `คุณ${userProfile.fname}`;
+            fetchDashboardHistory();
+        } else if(pageId === 'page-summary') {
+            buildSummaryPage();
+        }
+    }
 
     let typingTimer;
     function checkIDCardFast(input) {
@@ -749,7 +787,7 @@
                     let sameStf = tcmNext.staffAvailable.find(st => st.name === selectedStaffObj.name);
                     if(sameStf) optionsHtml += createAddonRadio('2hr', 'ครอบแก้ว ชั่วโมงที่ 2 ('+nextTime+' น.)', '+ 150 บาท', 'fa-clock', 'text-emerald-500', 'bg-emerald-50', JSON.stringify(sameStf));
                 }
-                // ข้ามแผนกจาก ไทย -> จีน (แยกราคาชัดเจน)
+                // ข้ามแผนกจาก ไทย -> จีน
                 if(currentDept === 'ttm' && tcmFree) {
                      optionsHtml += createAddonRadio('cross_acu', 'ฝังเข็มแผนจีน ('+nextTime+' น.)', '+ 200 บาท', 'fa-yin-yang', 'text-amber-500', 'bg-amber-50', JSON.stringify(tcmStaff));
                      optionsHtml += createAddonRadio('cross_cup', 'ครอบแก้ว ('+nextTime+' น.)', '+ 150 บาท', 'fa-fire-burner', 'text-amber-500', 'bg-amber-50', JSON.stringify(tcmStaff));
@@ -944,7 +982,8 @@
             }
         }
 
-        let payload = { action: 'book_queue_cart', mainIdCard: userProfile.id, patientIdCard: userProfile.id, fname: userProfile.fname, lname: userProfile.lname, tel: userProfile.phone, right: userProfile.rightName, sysDate: day.sysDate, sheetName: day.sheetName, items: items, lineUid: '' };
+        // ใช้ userLineUid ที่ดึงมาจาก LIFF ในการบันทึก
+        let payload = { action: 'book_queue_cart', mainIdCard: userProfile.id, patientIdCard: userProfile.id, fname: userProfile.fname, lname: userProfile.lname, tel: userProfile.phone, right: userProfile.rightName, sysDate: day.sysDate, sheetName: day.sheetName, items: items, lineUid: userLineUid };
 
         show3DLoader('กำลังลงบันทึกคิว...');
 

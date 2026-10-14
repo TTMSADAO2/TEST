@@ -258,6 +258,12 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- ส่วนหมายเหตุ (อยู่ล่างสุด) -->
+            <div id="step-note" class="step-section hidden mt-4">
+                <h3 class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-emerald-500"></i> หมายเหตุ (ถ้ามี)</h3>
+                <input type="text" id="inp-note" class="w-full bg-white border-2 border-gray-200 rounded-xl p-3.5 font-medium text-sm focus:border-emerald-500 outline-none transition-all" placeholder="เช่น มีไข้, ประจำเดือน, ระบุอาการเบื้องต้น">
+            </div>
         </div>
 
         <div class="bottom-bar p-4">
@@ -414,7 +420,7 @@
     const FIREBASE_URL = "https://sadao-queue-999c3-default-rtdb.asia-southeast1.firebasedatabase.app/";
     const LIFF_ID = "2010086236-cSpA2YLB";
     
-    let userLineUid = ""; // เก็บ UID ลับของคนที่เปิดแอป
+    let userLineUid = ""; 
 
     const DAY_COLORS = [
         { bg: 'bg-red-50', border: 'border-red-400', text: 'text-red-700', day: 'อา.' },
@@ -466,7 +472,6 @@
                 liff.getProfile().then(profile => {
                     userLineUid = profile.userId;
                     
-                    // ป้องกันความปลอดภัย: นำ UID ไปใส่ในช่อง Admin อัตโนมัติและล็อกห้ามแก้
                     let adminUidInput = document.getElementById('admin-uid-input');
                     if(adminUidInput) {
                         adminUidInput.value = userLineUid;
@@ -485,7 +490,6 @@
         }).catch(err => {
             hide3DLoader();
             console.error('LIFF Init Error:', err);
-            // Fallback เผื่อทดสอบบนเบราว์เซอร์ปกติ
             loadLocalProfiles(); 
         });
     };
@@ -528,7 +532,6 @@
                     if(data && data.fname) {
                         stat.innerHTML = '<span class="text-emerald-500"><i class="fa-solid fa-check-circle"></i> พบประวัติเดิม</span>';
                         
-                        // PDPA: ซ่อนชื่อ-สกุล โชว์แค่ตัวแรกและตัวสุดท้าย
                         function maskString(str) {
                             if (!str || str === "-" || str === "***") return "***";
                             str = str.trim();
@@ -539,7 +542,7 @@
 
                         document.getElementById('inputFname').value = maskString(data.fname);
                         document.getElementById('inputLname').value = maskString(data.lname || "");
-                        document.getElementById('inputPhone').value = ""; // บังคับกรอกใหม่
+                        document.getElementById('inputPhone').value = ""; 
                         document.getElementById('inputFname').readOnly = true; 
                         document.getElementById('inputLname').readOnly = true;
                     } else {
@@ -571,7 +574,6 @@
         let rNames = { '1': 'บัตรทอง (ร่วมจ่าย 30 บาท)', '2': 'บัตรทอง (ยกเว้นร่วมจ่าย)', '3': 'ข้าราชการ / อปท.', '4': 'รัฐวิสาหกิจ', '5': 'ประกันสังคม / ชำระเงินเอง' };
         userProfile = { id: id, fname: f.replace(/\*/g,''), lname: document.getElementById('inputLname').value.trim().replace(/\*/g,''), phone: p, right: rVal, rightName: rNames[rVal] };
         
-        // Save Profile (ถ้าชื่อไม่ได้ถูก Mask)
         if(!userProfile.fname.includes('***') && userProfile.fname !== '') {
             let saved = JSON.parse(localStorage.getItem('swc_profiles') || '[]');
             if(!saved.find(x => x.id === id)) { saved.push({id: id, f: userProfile.fname, l: userProfile.lname, p: '', r: rVal}); localStorage.setItem('swc_profiles', JSON.stringify(saved)); }
@@ -581,7 +583,6 @@
         fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'check_user', patientIdCard: id, serviceCategory: 'ttm' }) }).then(r => r.json()).then(res => {
             if(res.isBanned) { Swal.fire({title:'ระงับการจอง', text:`บัญชีนี้ถูกระงับจนถึงวันที่ ${res.banUntil}`, icon:'error', customClass:{popup:'swal-3d-popup'}}); } 
             else { 
-                // ถ้าดึงประวัติได้ ใช้ชื่อจริงแทน Mask
                 if(res.user && res.user.fname) userProfile.fname = res.user.fname;
                 if(res.user && res.user.lname) userProfile.lname = res.user.lname;
                 hide3DLoader(); navigate('page-home'); 
@@ -607,11 +608,72 @@
                     </div>
                     <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 flex items-center justify-between">
                         <div><p class="font-bold text-gray-800 text-sm">${active.service}</p><p class="text-xs text-gray-500 mt-1"><i class="fa-regular fa-clock"></i> ${active.date} | ${active.time} น.</p></div>
-                    </div>`;
+                    </div>
+                    <!-- 🔴 เพิ่มปุ่มยกเลิกนัดหมายให้คนไข้กดยกเลิกได้ด้วยตัวเอง -->
+                    <button onclick="patientCancelBooking('${active.date}', '${active.sysDate}', '${active.time}', '${active.service}')" class="w-full mt-3 bg-red-50 text-red-500 border border-red-200 rounded-xl py-2 text-sm font-bold hover:bg-red-100 active:scale-95 transition-all"><i class="fa-solid fa-times-circle"></i> ยกเลิกนัดหมายนี้</button>
+                `;
             } else {
                 card.innerHTML = `<div class="flex items-center justify-between"><p class="text-emerald-700 font-bold text-sm"><i class="fa-solid fa-calendar-xmark"></i> ไม่มีคิวในเร็วๆ นี้</p><button class="bg-gray-100 text-gray-400 px-3 py-1.5 rounded-full text-xs font-bold border border-gray-200 cursor-not-allowed">ดูประวัติ</button></div>`;
             }
         }).catch(() => { card.innerHTML = `<p class="text-sm text-red-500">ตรวจสอบประวัติไม่สำเร็จ</p>`; });
+    }
+
+    // 🔴 ฟังก์ชันยกเลิกนัดหมายโดยคนไข้
+    function patientCancelBooking(displayDate, sysDate, time, service) {
+        Swal.fire({
+            title: 'ยกเลิกนัดหมาย?',
+            text: 'คุณต้องการยกเลิกคิวนี้ใช่หรือไม่?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#cbd5e1',
+            confirmButtonText: 'ยืนยันยกเลิก',
+            cancelButtonText: 'ปิด',
+            customClass: { popup: 'swal-3d-popup', confirmButton: 'swal-3d-btn' }
+        }).then((result) => {
+            if(result.isConfirmed) {
+                show3DLoader('กำลังยกเลิกคิว...');
+                
+                let sDept = 'ttm'; 
+                if(service.includes('ฝังเข็ม')||service.includes('ครอบแก้ว')||service.includes('ผักกาด')) sDept='tcm';
+                else if(service.includes('อบ')) sDept='steam';
+                else if(service.includes('หลังคลอด')) sDept='postpartum';
+                
+                let bParts = sysDate.split('-'); 
+                let sheetN = parseInt(bParts[2]) + "/" + parseInt(bParts[1]);
+                
+                let payload = { action: 'cancel_booking', idCard: userProfile.id, sysDate: sysDate, time: time, sheetName: sheetN, dept: sDept, service: service };
+                
+                fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+                .then(r => r.json()).then(res => {
+                    hide3DLoader();
+                    if(res.status === 'success' || res.status === 'error_but_done') {
+                        // 🔴 บังคับให้ส่งข้อความ LINE โดยใช้แชทของคนไข้
+                        if (liff.isInClient()) {
+                            function maskString(str) {
+                                if(!str) return ""; let s = str.toString().trim();
+                                if(s.length <= 2) return s.substring(0, 1) + "***"; 
+                                if(s.length <= 4) return s.substring(0, 2) + "***";
+                                return s.substring(0, 3) + "***"; 
+                            }
+                            let mName = maskString(userProfile.fname) + " " + maskString(userProfile.lname);
+                            let mTel = userProfile.phone.substring(0,3) + "-xxx-x" + userProfile.phone.substring(8);
+
+                            let msgText = `[ระบบอัตโนมัติ] แจ้งทำรายการยกเลิกนัดหมายสำเร็จ\n👤 ชื่อ: ${mName}\n📞 โทร: ${mTel}\n🩺 บริการ: ${service}\n📅 วันที่: ${displayDate}\n⏰ เวลา: ${time} น.`;
+                            
+                            Swal.fire({ title: 'ยกเลิกคิวสำเร็จ!', text: "กำลังส่งข้อความยืนยัน...", icon: 'success', showConfirmButton: false, allowOutsideClick: false, customClass:{popup:'swal-3d-popup'} });
+                            liff.sendMessages([{ type: 'text', text: msgText }]).then(() => { liff.closeWindow(); }).catch(() => { liff.closeWindow(); });
+                        } else {
+                            Swal.fire('สำเร็จ', 'ยกเลิกคิวเรียบร้อยแล้ว', 'success');
+                            fetchDashboardHistory();
+                        }
+                        fetch(API_URL, {method:'POST', body:JSON.stringify({action:'background_sync', dept:sDept})}).catch(()=>{}); 
+                    } else {
+                        Swal.fire('ข้อผิดพลาด', res.message, 'error');
+                    }
+                }).catch(()=> { hide3DLoader(); Swal.fire('ขัดข้อง', 'ไม่สามารถเชื่อมต่อได้', 'error'); });
+            }
+        });
     }
 
     // --- 3D Loader ---
@@ -623,10 +685,10 @@
         document.getElementById('global-loader').classList.add('hidden');
     }
 
-    // --- Reset Addons & Prices ---
     function resetAddonsAndPrice() {
         document.getElementById('step-addon').classList.remove('show');
         document.getElementById('addon-options-area').innerHTML = '';
+        document.getElementById('step-note').classList.add('hidden');
         totalFee = 0;
         document.getElementById('est-price').innerText = '-';
         document.getElementById('btn-submit-book').disabled = true;
@@ -665,6 +727,7 @@
 
     function renderDates() {
         let html = '';
+        let daysThFull = ["วันอาทิตย์", "วันจันทร์", "วันอังคาร", "วันพุธ", "วันพฤหัสบดี", "วันศุกร์", "วันเสาร์"];
         fetchedData.forEach((day, i) => {
             let col = DAY_COLORS[day.dayOfWeek] || DAY_COLORS[0];
             let active = i === selectedDateIdx ? `${col.bg} ${col.border} border-2 shadow-md transform -translate-y-1` : `bg-white border-gray-200 text-gray-400 border`;
@@ -746,7 +809,6 @@
         checkAddonsAndEnableSubmit();
     }
 
-    // --- 🛒 ระบบ Cross-selling ที่แม่นยำขึ้น ---
     function checkAddonsAndEnableSubmit() {
         try {
             resetAddonsAndPrice();
@@ -754,11 +816,9 @@
             let nextNextTime = nextTime ? ALLOWED_2HR_PAIRS[nextTime] : null; 
 
             let optionsHtml = '';
-            // ปุ่มเริ่มต้น
             optionsHtml += createAddonRadio('none', 'ไม่รับบริการเพิ่ม (เสร็จสิ้น)', '', 'fa-circle-xmark', 'text-gray-500', 'bg-gray-100', '{}', true);
 
             if (nextTime && fullFirebaseData) {
-                // แก้ Error undefined ในวันหยุด โดยใช้ fallback []
                 let ttmSlots = (fullFirebaseData.ttm && fullFirebaseData.ttm[selectedDateIdx]) ? fullFirebaseData.ttm[selectedDateIdx].slots || [] : [];
                 let tcmSlots = (fullFirebaseData.tcm && fullFirebaseData.tcm[selectedDateIdx]) ? fullFirebaseData.tcm[selectedDateIdx].slots || [] : [];
                 let steamSlots = (fullFirebaseData.steam && fullFirebaseData.steam[selectedDateIdx]) ? fullFirebaseData.steam[selectedDateIdx].slots || [] : [];
@@ -779,7 +839,6 @@
                 }
                 let tcmStaff = tcmFree ? tcmNext.staffAvailable[0] : null;
 
-                // 1. บริการเสริม 1 ชั่วโมง
                 if(currentDept === 'ttm' && ttmFree) {
                     optionsHtml += createAddonRadio('2hr', 'นวดแผนไทย ชั่วโมงที่ 2 ('+nextTime+' น.)', '+ 250 บาท', 'fa-clock', 'text-emerald-500', 'bg-emerald-50', JSON.stringify(ttmStaff));
                 }
@@ -787,12 +846,10 @@
                     let sameStf = tcmNext.staffAvailable.find(st => st.name === selectedStaffObj.name);
                     if(sameStf) optionsHtml += createAddonRadio('2hr', 'ครอบแก้ว ชั่วโมงที่ 2 ('+nextTime+' น.)', '+ 150 บาท', 'fa-clock', 'text-emerald-500', 'bg-emerald-50', JSON.stringify(sameStf));
                 }
-                // ข้ามแผนกจาก ไทย -> จีน
                 if(currentDept === 'ttm' && tcmFree) {
                      optionsHtml += createAddonRadio('cross_acu', 'ฝังเข็มแผนจีน ('+nextTime+' น.)', '+ 200 บาท', 'fa-yin-yang', 'text-amber-500', 'bg-amber-50', JSON.stringify(tcmStaff));
                      optionsHtml += createAddonRadio('cross_cup', 'ครอบแก้ว ('+nextTime+' น.)', '+ 150 บาท', 'fa-fire-burner', 'text-amber-500', 'bg-amber-50', JSON.stringify(tcmStaff));
                 }
-                // ข้ามแผนกจาก จีน -> ไทย
                 if(currentDept === 'tcm' && ttmFree) {
                      optionsHtml += createAddonRadio('cross_ttm', 'นวดแผนไทย ('+nextTime+' น.)', '+ 250 บาท', 'fa-leaf', 'text-amber-500', 'bg-amber-50', JSON.stringify(ttmStaff));
                 }
@@ -800,8 +857,6 @@
                      let steamPriceStr = (userProfile.right === '4' || userProfile.right === '5') ? '+ 100 บาท' : 'ฟรีตามสิทธิ';
                      optionsHtml += createAddonRadio('steam', 'อบไอน้ำสมุนไพร ('+nextTime+' น.)', steamPriceStr, 'fa-hot-tub-person', 'text-blue-500', 'bg-blue-50', '{}');
                 }
-
-                // 2. บริการเสริม 2 ชั่วโมงต่อเนื่อง (จองรอบ 13.00 น.)
                 if (nextNextTime) {
                     let steamNextNext = steamSlots.find(s => s.time === nextNextTime);
                     let steamNextNextFree = steamNextNext && !steamNextNext.val.includes('เต็ม');
@@ -825,9 +880,10 @@
 
             document.getElementById('addon-options-area').innerHTML = optionsHtml;
             document.getElementById('step-addon').classList.add('show');
+            document.getElementById('step-note').classList.remove('hidden'); // แสดงช่องหมายเหตุ
+            
             setTimeout(() => { document.getElementById('step-addon').scrollIntoView({behavior: "smooth", block: "end"}); }, 200);
 
-            // บังคับเปิดปุ่มตรวจสอบเสมอ แม้จะไม่มี Addon หรือมี
             document.getElementById('btn-submit-book').disabled = false;
             document.getElementById('btn-submit-book').classList.remove('opacity-50', 'cursor-not-allowed');
             calculatePrice();
@@ -836,7 +892,6 @@
             console.error(e);
             document.getElementById('btn-submit-book').disabled = false;
             document.getElementById('btn-submit-book').classList.remove('opacity-50', 'cursor-not-allowed');
-            
             let estPriceEl = document.getElementById('est-price');
             estPriceEl.classList.remove('text-xl', 'text-emerald-600');
             estPriceEl.classList.add('text-xs', 'text-red-500');
@@ -855,7 +910,6 @@
         </label>`;
     }
 
-    // --- คำนวณราคา ---
     function calculatePrice() {
         if(!selectedTimeStr) return;
         try {
@@ -880,7 +934,6 @@
             let addonChoice = document.querySelector('input[name="addon_choice"]:checked');
             let addonVal = addonChoice ? addonChoice.value : 'none';
 
-            // บวกราคา Addon ตรงไปตรงมา
             if(addonVal === '2hr') base += (currentDept === 'tcm' ? 150 : 250);
             if(addonVal === 'cross_acu') base += 200;
             if(addonVal === 'cross_cup') base += 150;
@@ -907,7 +960,6 @@
         }
     }
 
-    // --- 📋 หน้าสรุปบิล (Page Summary) ---
     function buildSummaryPage() {
         let svc = document.getElementById('select-service').value;
         let day = fetchedData[selectedDateIdx];
@@ -950,12 +1002,13 @@
         document.getElementById('sum-items-container').innerHTML = itemsHtml;
     }
 
-    // --- 🚀 ยิงเข้า API V45 ---
+    // 🔴 ฟังก์ชันส่งจองคิว และส่งข้อความ LINE แบบบังคับ
     function submitBookingAPI() {
         let svc = document.getElementById('select-service').value;
         let day = fetchedData[selectedDateIdx];
         let nextTime = ALLOWED_2HR_PAIRS[selectedTimeStr];
         let nextNextTime = nextTime ? ALLOWED_2HR_PAIRS[nextTime] : null;
+        let inputNote = document.getElementById('inp-note').value.trim(); // ดึงหมายเหตุ
         
         let items = [{ time: selectedTimeStr, dept: currentDept, service: svc, staff: selectedStaffObj.name, col: selectedStaffObj.col }];
         
@@ -982,7 +1035,6 @@
             }
         }
 
-        // ใช้ userLineUid ที่ดึงมาจาก LIFF ในการบันทึก
         let payload = { action: 'book_queue_cart', mainIdCard: userProfile.id, patientIdCard: userProfile.id, fname: userProfile.fname, lname: userProfile.lname, tel: userProfile.phone, right: userProfile.rightName, sysDate: day.sysDate, sheetName: day.sheetName, items: items, lineUid: userLineUid };
 
         show3DLoader('กำลังลงบันทึกคิว...');
@@ -991,9 +1043,52 @@
         .then(r => r.json()).then(res => {
             hide3DLoader();
             if(res.status === 'success') {
-                Swal.fire({ title: 'จองคิวสำเร็จ!', html: `<p class="text-sm font-medium mt-2">บันทึกคิวเรียบร้อยแล้ว<br><b class="text-emerald-600 text-lg">${day.displayDate} | ${selectedTimeStr} น.</b></p>`, icon: 'success', confirmButtonColor: '#059669', customClass: {popup: 'swal-3d-popup', confirmButton: 'swal-3d-btn'} }).then(() => navigate('page-home'));
+                // 🔴 บังคับให้ส่งข้อความ LINE โดยใช้แชทของคนไข้
+                if (liff.isInClient()) {
+                    
+                    // Masking ข้อมูลเพื่อความปลอดภัยในแชท
+                    function maskString(str) {
+                        if(!str) return ""; let s = str.toString().trim();
+                        if(s.length <= 2) return s.substring(0, 1) + "***"; 
+                        if(s.length <= 4) return s.substring(0, 2) + "***";
+                        return s.substring(0, 3) + "***"; 
+                    }
+                    let mName = maskString(userProfile.fname) + " " + maskString(userProfile.lname);
+                    let mTel = userProfile.phone.substring(0,3) + "-xxx-x" + userProfile.phone.substring(8);
+                    let displayNote = inputNote === "" ? "-" : inputNote;
+                    
+                    let daysThFull = ["วันอาทิตย์", "วันจันทร์", "วันอังคาร", "วันพุธ", "วันพฤหัสบดี", "วันศุกร์", "วันเสาร์"];
+                    let dObj = new Date(day.sysDate);
+                    let mTh = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+                    let displayDateFull = `${daysThFull[dObj.getDay()]}ที่ ${dObj.getDate()} ${mTh[dObj.getMonth()]} ${dObj.getFullYear() + 543}`;
+
+                    let displayTime = selectedTimeStr;
+                    let lastItemTime = items[items.length - 1].time;
+                    let tParts = lastItemTime.split(":");
+                    let totalMins = (parseInt(tParts[0]) * 60) + parseInt(tParts[1]) + (items[items.length - 1].dept === 'steam' ? 30 : 60);
+                    let eH = Math.floor(totalMins / 60); let eM = totalMins % 60;
+                    let endTimeStr = (eH < 10 ? '0' : '') + eH + ':' + (eM < 10 ? '0' : '') + eM;
+                    
+                    let timeRange = `${displayTime} - ${endTimeStr}`;
+
+                    // ข้อความชุดที่ 1
+                    let msgText1 = `[ระบบอัตโนมัติ] แจ้งทำรายการนัดหมายสำเร็จ\n👤 ชื่อ: ${mName}\n📞 โทร: ${mTel}\n🩺 บริการ: ${svc}\n📅 วันที่: ${displayDateFull}\n⏰ เวลา: ${timeRange} น.\n👨‍⚕️ ผู้ให้บริการ: ${selectedStaffObj.name}\n📝 หมายเหตุ: ${displayNote}\n💰 ยอดชำระ: ${totalFee} บาท`;
+                    
+                    // ข้อความชุดที่ 2
+                    let msgText2 = "🕰️ กรุณามาก่อนเวลานัดอย่างน้อย 15 นาที\n\n***‼️หากไม่มาติดต่อภายในเวลาที่กำหนด ถือว่าท่านสละสิทธิ์ให้คนไข้ท่านอื่น\n\n***‼️การเลื่อนนัดหรือยกเลิกนัด โปรดแจ้งล่วงหน้า อย่างน้อย 2 วัน\n\n😷โปรดสวมหน้ากากอนามัยตลอดเวลาเข้ารับบริการ\n📝 อย่าลืมนำบัตรประจำตัวประชาชนมาด้วยนะครับ";
+                    
+                    Swal.fire({ title: 'จองคิวสำเร็จ!', text: "กำลังส่งใบเสร็จเข้าแชท...", icon: 'success', showConfirmButton: false, allowOutsideClick: false, customClass: { popup: 'swal-3d-popup' } });
+                    
+                    liff.sendMessages([ { type: 'text', text: msgText1 }, { type: 'text', text: msgText2 } ])
+                    .then(() => { liff.closeWindow(); })
+                    .catch(() => { liff.closeWindow(); });
+                } else {
+                    Swal.fire({ title: 'จองคิวสำเร็จ!', html: `<p class="text-sm font-medium mt-2">บันทึกคิวเรียบร้อยแล้ว<br><b class="text-emerald-600 text-lg">${day.displayDate} | ${selectedTimeStr} น.</b></p>`, icon: 'success', confirmButtonColor: '#059669', customClass: {popup: 'swal-3d-popup', confirmButton: 'swal-3d-btn'} }).then(() => navigate('page-home'));
+                }
+            } else if (res.status === 'error_blocked') {
+                Swal.fire({ title: 'พบรายการจองซ้ำ', html: `คุณมีคิวที่แผนกนี้รอรับบริการอยู่แล้ว<br><b style="color:#10b981; font-size:1.1rem;">รอบวันที่ ${res.date} เวลา ${res.time} น.</b><br>กรุณารับบริการหรือยกเลิกคิวเดิมก่อนครับ`, icon: 'warning', customClass: {popup: 'swal-3d-popup'} }); openBookingFlow(currentDept);
             } else {
-                Swal.fire({ title: 'คิวไม่ว่าง', text: res.message || 'คิวนี้ถูกจองตัดหน้าไปแล้วครับ', icon: 'warning', customClass: {popup: 'swal-3d-popup'} }); openBookingFlow(currentDept);
+                Swal.fire({ title: 'คิวไม่ว่าง', text: res.message || 'คิวนี้ถูกจองตัดหน้าไปแล้วครับ', icon: 'info', customClass: {popup: 'swal-3d-popup'} }); openBookingFlow(currentDept);
             }
         }).catch(() => { hide3DLoader(); Swal.fire({title: 'ขัดข้อง', text: 'เชื่อมต่อไม่สำเร็จ', icon: 'error', customClass: {popup: 'swal-3d-popup'}}); });
     }
@@ -1055,7 +1150,6 @@
         document.getElementById('tab-btn-patients').className = tab === 'patients' ? 'flex-1 py-3 text-sm font-bold border-b-2 border-emerald-600 text-emerald-700 transition-colors' : 'flex-1 py-3 text-sm font-bold border-b-2 border-transparent text-slate-500 transition-colors';
     }
 
-    // --- 1. ระบบจัดการคิว (นัดหมาย) ---
     function adminLoadBookings() {
         let fDate = document.getElementById('admin-filter-date').value;
         let sType = document.getElementById('admin-filter-sort').value;
@@ -1123,7 +1217,6 @@
         });
     }
 
-    // --- 2. ระบบจัดการผู้รับบริการ (แก้ข้อมูล/แบน/ดูประวัติ) ---
     function adminSearchPatientBtn() {
         let q = document.getElementById('admin-search-user').value.trim();
         if(q.length < 3) { Swal.fire({icon:'warning', text:'กรุณาพิมพ์อย่างน้อย 3 ตัวอักษร', customClass:{popup:'swal-3d-popup'}}); return; }

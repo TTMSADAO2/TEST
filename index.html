@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sadao Wellness Clinic - จองคิวออนไลน์</title>
+    <title>Sadao Wellness Clinic - Online Booking</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -68,12 +68,18 @@
     <div id="page-splash" class="page active">
         <div class="page-content flex flex-col justify-center items-center p-6 bg-cover bg-center h-full relative" style="background-image: url('https://lh3.googleusercontent.com/d/1Jb91xkRQYkUlGKBQopCO4f_gfBPqpo5q');">
             <div class="absolute inset-0 bg-white/70 backdrop-blur-sm"></div>
+            
+            <!-- ปุ่มสลับภาษา หน้า Splash -->
+            <button onclick="toggleLanguage()" class="absolute top-5 right-5 z-20 bg-white/90 backdrop-blur-md text-emerald-800 px-3.5 py-1.5 rounded-full font-extrabold text-xs shadow-md border border-emerald-100 flex items-center gap-1.5 active:scale-95 transition-transform">
+                <i class="fa-solid fa-globe text-amber-500"></i> <span class="lang-btn-text">EN</span>
+            </button>
+
             <div class="relative z-10 flex flex-col items-center justify-center w-full">
                 <img src="https://lh3.googleusercontent.com/d/1sxp0wrhV7MKhr2_6nOLQsj-jVddMmnzR" class="w-40 h-40 object-contain mb-4 filter drop-shadow-xl">
                 <h1 class="text-2xl font-extrabold text-emerald-800 text-center">Sadao Wellness Clinic</h1>
-                <p class="text-sm text-emerald-700 font-bold text-center mt-2 mb-12">กลุ่มงานการแพทย์แผนไทย<br>และการแพทย์ทางเลือก โรงพยาบาลสะเดา</p>
+                <p id="t-splash-sub" class="text-sm text-emerald-700 font-bold text-center mt-2 mb-12">กลุ่มงานการแพทย์แผนไทย<br>และการแพทย์ทางเลือก โรงพยาบาลสะเดา</p>
                 <button onclick="enterAppFromSplash()" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-700 text-white rounded-full py-4 font-bold text-lg shadow-xl active:scale-95 transition-all flex justify-center items-center gap-2">
-                    เข้าสู่ระบบ / ลงทะเบียน <i class="fa-solid fa-arrow-right"></i>
+                    <span id="t-splash-btn">เข้าสู่ระบบ / ลงทะเบียน</span> <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </div>
             <!-- ปุ่มลับสำหรับเข้าหน้า Admin Login -->
@@ -86,26 +92,31 @@
     <!-- ==================== หน้า 2: ข้อมูลผู้ใช้งาน ==================== -->
     <div id="page-login" class="page">
         <div class="page-content p-5">
-            <div class="flex items-center mb-5 pt-2">
-                <button onclick="navigate('page-splash')" class="text-emerald-700 text-xl w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm"><i class="fa-solid fa-arrow-left"></i></button>
-                <h2 class="text-xl font-extrabold text-emerald-800 flex-1 ml-3">ข้อมูลผู้รับบริการ</h2>
+            <div class="flex items-center justify-between mb-5 pt-2">
+                <div class="flex items-center">
+                    <button onclick="navigate('page-splash')" class="text-emerald-700 text-xl w-8 h-8 flex items-center justify-center bg-white rounded-full shadow-sm"><i class="fa-solid fa-arrow-left"></i></button>
+                    <h2 id="t-login-title" class="text-xl font-extrabold text-emerald-800 ml-3">ข้อมูลผู้รับบริการ</h2>
+                </div>
+                <button onclick="toggleLanguage()" class="bg-white text-emerald-800 px-3 py-1.5 rounded-full font-extrabold text-xs shadow-sm border border-gray-200 flex items-center gap-1.5 active:scale-95 transition-transform">
+                    <i class="fa-solid fa-globe text-amber-500"></i> <span class="lang-btn-text">EN</span>
+                </button>
             </div>
 
             <!-- Profile ที่บันทึกไว้ -->
             <div id="saved-profiles-section" class="mb-6 hidden">
-                <p class="text-sm font-bold text-emerald-700 mb-2"><i class="fa-solid fa-users"></i> เลือกจากประวัติในเครื่อง</p>
+                <p id="t-saved-profiles" class="text-sm font-bold text-emerald-700 mb-2"><i class="fa-solid fa-users"></i> เลือกจากประวัติในเครื่อง</p>
                 <div class="flex gap-3 overflow-x-auto hide-scrollbar pb-2" id="profile-list"></div>
-                <div class="text-center text-xs text-gray-400 mt-2 font-medium">- หรือกรอกข้อมูลใหม่ด้านล่าง -</div>
+                <div id="t-or-new" class="text-center text-xs text-gray-400 mt-2 font-medium">- หรือกรอกข้อมูลใหม่ด้านล่าง -</div>
             </div>
 
             <!-- Form -->
             <div class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 relative overflow-hidden mb-5">
                 <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-400 to-blue-500"></div>
                 <div class="flex justify-between items-center mb-2 mt-2">
-                    <label class="text-gray-800 font-bold text-sm">เลขประจำตัวประชาชน <span class="text-red-500">*</span></label>
+                    <label id="t-lbl-idcard" class="text-gray-800 font-bold text-sm">เลขประจำตัวประชาชน <span class="text-red-500">*</span></label>
                     <span id="idcard-status" class="text-[10px] font-bold"></span>
                 </div>
-                <input type="tel" id="inputIdCard" class="w-full border-2 border-gray-200 rounded-xl p-3 mb-4 focus:border-emerald-500 focus:outline-none font-bold text-center tracking-widest text-lg transition-all" placeholder="X-XXXX-XXXXX-XX-X" maxlength="13" oninput="checkIDCardFast(this)">
+                <input type="text" id="inputIdCard" class="w-full border-2 border-gray-200 rounded-xl p-3 mb-4 focus:border-emerald-500 focus:outline-none font-bold text-center tracking-widest text-lg transition-all" placeholder="X-XXXX-XXXXX-XX-X" maxlength="13" oninput="checkIDCardFast(this)">
 
                 <!-- แสดงข้อมูลเมื่อพบประวัติเดิม -->
                 <div id="existing-user-card" class="hidden bg-emerald-50 border border-emerald-100 rounded-xl p-4 mb-4">
@@ -113,11 +124,11 @@
                         <div class="flex items-center gap-3">
                             <div class="w-10 h-10 bg-emerald-200 text-emerald-700 rounded-full flex items-center justify-center text-lg"><i class="fa-solid fa-user-check"></i></div>
                             <div>
-                                <p class="text-xs text-emerald-600 font-bold mb-0.5">พบประวัติผู้รับบริการ</p>
+                                <p id="t-found-profile" class="text-xs text-emerald-600 font-bold mb-0.5">พบประวัติผู้รับบริการ</p>
                                 <p class="text-sm font-extrabold text-slate-800" id="display-masked-name">-</p>
                             </div>
                         </div>
-                        <button onclick="clearLoginFormForNewUser()" class="text-[11px] bg-white border border-gray-200 text-gray-600 px-2.5 py-1 rounded-lg font-bold shadow-sm">เปลี่ยนคน</button>
+                        <button id="t-btn-change-user" onclick="clearLoginFormForNewUser()" class="text-[11px] bg-white border border-gray-200 text-gray-600 px-2.5 py-1 rounded-lg font-bold shadow-sm">เปลี่ยนคน</button>
                     </div>
                 </div>
 
@@ -125,56 +136,56 @@
                 <div id="new-user-form" class="block">
                     <div class="flex gap-3 mb-4">
                         <div class="flex-1">
-                            <label class="block text-gray-700 font-bold mb-1 text-xs">ชื่อ <span class="text-red-500">*</span></label>
+                            <label id="t-lbl-fname" class="block text-gray-700 font-bold mb-1 text-xs">ชื่อ <span class="text-red-500">*</span></label>
                             <input type="text" id="inputFname" class="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-emerald-500 focus:outline-none font-medium text-sm transition-all" placeholder="ชื่อจริง">
                         </div>
                         <div class="flex-1">
-                            <label class="block text-gray-700 font-bold mb-1 text-xs">นามสกุล</label>
+                            <label id="t-lbl-lname" class="block text-gray-700 font-bold mb-1 text-xs">นามสกุล</label>
                             <input type="text" id="inputLname" class="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-emerald-500 focus:outline-none font-medium text-sm transition-all" placeholder="นามสกุล">
                         </div>
                     </div>
                 </div>
 
-                <label class="block text-gray-700 font-bold mb-1 text-xs">เบอร์โทรศัพท์ติดต่อ <span class="text-red-500">*</span> <span class="text-[10px] text-emerald-600 font-normal">(แก้ไขได้หากเปลี่ยนเบอร์ใหม่)</span></label>
+                <label id="t-lbl-phone" class="block text-gray-700 font-bold mb-1 text-xs">เบอร์โทรศัพท์ติดต่อ <span class="text-red-500">*</span> <span class="text-[10px] text-emerald-600 font-normal">(แก้ไขได้หากเปลี่ยนเบอร์ใหม่)</span></label>
                 <input type="tel" id="inputPhone" class="w-full border-2 border-gray-200 rounded-xl p-3 focus:border-emerald-500 focus:outline-none font-bold text-sm text-emerald-800" placeholder="08XXXXXXXX" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                 
                 <div class="mt-4 flex flex-col items-center justify-center gap-1 bg-emerald-50 p-2 rounded-lg border border-emerald-100">
-                    <div class="flex items-center gap-2"><i class="fa-solid fa-shield-halved text-emerald-500"></i><span class="text-xs text-emerald-800 font-semibold">ระบบปกป้องข้อมูลส่วนบุคคล (PDPA)</span></div>
-                    <span class="text-[10px] text-gray-500">สามารถตรวจสอบหรือแก้ไขเบอร์โทรศัพท์ให้เป็นปัจจุบันก่อนกดยืนยัน</span>
+                    <div class="flex items-center gap-2"><i class="fa-solid fa-shield-halved text-emerald-500"></i><span id="t-pdpa-title" class="text-xs text-emerald-800 font-semibold">ระบบปกป้องข้อมูลส่วนบุคคล (PDPA)</span></div>
+                    <span id="t-pdpa-sub" class="text-[10px] text-gray-500 text-center">สามารถตรวจสอบหรือแก้ไขเบอร์โทรศัพท์ให้เป็นปัจจุบันก่อนกดยืนยัน</span>
                 </div>
             </div>
 
             <!-- สิทธิการรักษา -->
-            <h3 class="font-extrabold text-gray-800 mb-3 px-1">💳 สิทธิการรักษา <span class="text-red-500">*</span></h3>
+            <h3 id="t-right-header" class="font-extrabold text-gray-800 mb-3 px-1">💳 สิทธิการรักษา <span class="text-red-500">*</span></h3>
             <div class="flex flex-col gap-2 mb-4">
                 <div class="right-option border-2 border-emerald-500 bg-emerald-50 p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer shadow-sm transition-all" onclick="selectRightUI(this, '1')">
                     <input type="radio" name="patient_right" value="1" class="hidden" checked>
                     <div class="w-10 h-10 rounded-full bg-emerald-100 flex justify-center items-center text-emerald-600"><i class="fa-solid fa-id-card"></i></div>
-                    <div class="flex-1"><p class="font-bold text-emerald-800 text-sm leading-none mb-1">บัตรทอง (ร่วมจ่าย 30 บาท)</p><p class="text-[10px] text-gray-500 font-medium">อายุ 12-59 ปี</p></div>
+                    <div class="flex-1"><p id="t-r1-title" class="font-bold text-emerald-800 text-sm leading-none mb-1">บัตรทอง (ร่วมจ่าย 30 บาท)</p><p id="t-r1-desc" class="text-[10px] text-gray-500 font-medium">อายุ 12-59 ปี</p></div>
                     <i class="fa-solid fa-circle-check text-emerald-500 text-lg check-icon"></i>
                 </div>
                 <div class="right-option border-2 border-gray-200 bg-white p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer transition-all" onclick="selectRightUI(this, '2')">
                     <input type="radio" name="patient_right" value="2" class="hidden">
                     <div class="w-10 h-10 rounded-full bg-green-100 flex justify-center items-center text-green-600"><i class="fa-solid fa-id-card-clip"></i></div>
-                    <div class="flex-1"><p class="font-bold text-gray-800 text-sm leading-none mb-1">บัตรทอง (ยกเว้นร่วมจ่าย)</p><p class="text-[10px] text-gray-500 font-medium">ผู้สูงอายุ, ผู้มีรายได้น้อย, อสม.</p></div>
+                    <div class="flex-1"><p id="t-r2-title" class="font-bold text-gray-800 text-sm leading-none mb-1">บัตรทอง (ยกเว้นร่วมจ่าย)</p><p id="t-r2-desc" class="text-[10px] text-gray-500 font-medium">ผู้สูงอายุ, ผู้มีรายได้น้อย, อสม.</p></div>
                     <i class="fa-solid fa-circle-check text-gray-300 text-lg check-icon hidden"></i>
                 </div>
                 <div class="right-option border-2 border-gray-200 bg-white p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer transition-all" onclick="selectRightUI(this, '3')">
                     <input type="radio" name="patient_right" value="3" class="hidden">
                     <div class="w-10 h-10 rounded-full bg-blue-100 flex justify-center items-center text-blue-600"><i class="fa-solid fa-building-flag"></i></div>
-                    <div class="flex-1"><p class="font-bold text-gray-800 text-sm leading-none mb-1">ข้าราชการ / อปท.</p><p class="text-[10px] text-gray-500 font-medium">เบิกจ่ายตรง ไม่ต้องสำรองจ่าย</p></div>
+                    <div class="flex-1"><p id="t-r3-title" class="font-bold text-gray-800 text-sm leading-none mb-1">ข้าราชการ / อปท.</p><p id="t-r3-desc" class="text-[10px] text-gray-500 font-medium">เบิกจ่ายตรง ไม่ต้องสำรองจ่าย</p></div>
                     <i class="fa-solid fa-circle-check text-gray-300 text-lg check-icon hidden"></i>
                 </div>
                 <div class="right-option border-2 border-gray-200 bg-white p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer transition-all" onclick="selectRightUI(this, '4')">
                     <input type="radio" name="patient_right" value="4" class="hidden">
                     <div class="w-10 h-10 rounded-full bg-purple-100 flex justify-center items-center text-purple-600"><i class="fa-solid fa-landmark"></i></div>
-                    <div class="flex-1"><p class="font-bold text-gray-800 text-sm leading-none mb-1">รัฐวิสาหกิจ</p><p class="text-[10px] text-gray-500 font-medium">สำรองจ่าย เบิกต้นสังกัด</p></div>
+                    <div class="flex-1"><p id="t-r4-title" class="font-bold text-gray-800 text-sm leading-none mb-1">รัฐวิสาหกิจ</p><p id="t-r4-desc" class="text-[10px] text-gray-500 font-medium">สำรองจ่าย เบิกต้นสังกัด</p></div>
                     <i class="fa-solid fa-circle-check text-gray-300 text-lg check-icon hidden"></i>
                 </div>
                 <div class="right-option border-2 border-gray-200 bg-white p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer transition-all" onclick="selectRightUI(this, '5')">
                     <input type="radio" name="patient_right" value="5" class="hidden">
                     <div class="w-10 h-10 rounded-full bg-orange-100 flex justify-center items-center text-orange-600"><i class="fa-solid fa-wallet"></i></div>
-                    <div class="flex-1"><p class="font-bold text-gray-800 text-sm leading-none mb-1">ประกันสังคม / ชำระเงินเอง</p><p class="text-[10px] text-gray-500 font-medium">ชำระเงินสด / โอนสแกนจ่าย</p></div>
+                    <div class="flex-1"><p id="t-r5-title" class="font-bold text-gray-800 text-sm leading-none mb-1">ประกันสังคม / ชำระเงินเอง</p><p id="t-r5-desc" class="text-[10px] text-gray-500 font-medium">ชำระเงินสด / โอนสแกนจ่าย</p></div>
                     <i class="fa-solid fa-circle-check text-gray-300 text-lg check-icon hidden"></i>
                 </div>
             </div>
@@ -182,7 +193,7 @@
         </div>
         <div class="bottom-bar p-4">
             <button onclick="loginUser()" class="w-full bg-emerald-600 text-white rounded-full py-3.5 font-bold text-lg hover:bg-emerald-700 shadow-lg active:scale-95 transition-all">
-                ยืนยันข้อมูล <i class="fa-solid fa-arrow-right ml-1"></i>
+                <span id="t-btn-login-submit">ยืนยันข้อมูล</span> <i class="fa-solid fa-arrow-right ml-1"></i>
             </button>
         </div>
     </div>
@@ -192,14 +203,17 @@
         <div class="page-content">
             <div class="h-44 bg-cover bg-center rounded-b-[2rem] shadow-md relative" style="background-image: url('https://lh3.googleusercontent.com/d/1m2ZXlypNPLfMUPhmekjZ51WA0MEgEcOG');">
                 <div class="absolute inset-0 bg-gradient-to-b from-black/60 to-black/20 rounded-b-[2rem]"></div>
-                <div class="absolute top-8 left-6 right-6 flex justify-between items-center text-white">
+                <div class="absolute top-6 left-5 right-5 flex justify-between items-start text-white">
                     <div>
-                        <p class="text-sm font-medium opacity-90">ยินดีต้อนรับ</p>
-                        <h2 class="text-xl font-bold drop-shadow-md" id="displayUserName">คุณผู้รับบริการ</h2>
+                        <p id="t-welcome" class="text-xs font-medium opacity-90">ยินดีต้อนรับ</p>
+                        <h2 class="text-lg font-bold drop-shadow-md leading-tight mt-0.5" id="displayUserName">คุณผู้รับบริการ</h2>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="navigate('page-login')" class="bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/40 cursor-pointer shadow-lg active:scale-90 transition-transform text-xs font-bold flex items-center gap-1.5">
-                            <i class="fa-solid fa-user-pen"></i> สลับผู้ใช้/แก้เบอร์
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="navigate('page-login')" class="bg-white/20 backdrop-blur-md px-2.5 py-1.5 rounded-full border border-white/40 cursor-pointer shadow-lg active:scale-90 transition-transform text-[11px] font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-user-pen"></i> <span id="t-btn-switch-user">สลับผู้ใช้/แก้เบอร์</span>
+                        </button>
+                        <button onclick="toggleLanguage()" class="bg-white/90 text-emerald-900 px-2.5 py-1.5 rounded-full font-extrabold text-[11px] shadow-lg flex items-center gap-1 active:scale-90 transition-transform">
+                            <i class="fa-solid fa-globe text-amber-500"></i> <span class="lang-btn-text">EN</span>
                         </button>
                     </div>
                 </div>
@@ -211,23 +225,23 @@
                     <!-- จะถูกเติมด้วย JS -->
                 </div>
 
-                <h3 class="text-gray-800 font-extrabold mb-3 text-lg px-1 flex items-center gap-2"><i class="fa-solid fa-notes-medical text-emerald-500"></i> เลือกบริการที่ต้องการ</h3>
+                <h3 class="text-gray-800 font-extrabold mb-3 text-lg px-1 flex items-center gap-2"><i class="fa-solid fa-notes-medical text-emerald-500"></i> <span id="t-choose-dept">เลือกบริการที่ต้องการ</span></h3>
                 <div class="grid grid-cols-2 gap-3">
                     <button onclick="openBookingFlow('ttm')" class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-lg transition-all active:scale-95 group">
                         <img src="https://lh3.googleusercontent.com/d/1k-FNSpmwRok820gKcjIPkPwf-mwDljXM" class="w-14 h-14 object-contain mb-3 drop-shadow-md transform group-hover:scale-110 transition-transform">
-                        <span class="font-bold text-emerald-800 text-sm">แพทย์แผนไทย</span>
+                        <span id="t-dept-ttm" class="font-bold text-emerald-800 text-sm text-center">แพทย์แผนไทย</span>
                     </button>
                     <button onclick="openBookingFlow('tcm')" class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-lg transition-all active:scale-95 group">
                         <img src="https://lh3.googleusercontent.com/d/1d-4vkKOiB8O_R_kbJVIomSpUQUTjCTcD" class="w-14 h-14 object-contain mb-3 drop-shadow-md transform group-hover:scale-110 transition-transform">
-                        <span class="font-bold text-red-800 text-sm">แพทย์แผนจีน</span>
+                        <span id="t-dept-tcm" class="font-bold text-red-800 text-sm text-center">แพทย์แผนจีน</span>
                     </button>
                     <button onclick="openBookingFlow('postpartum')" class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-lg transition-all active:scale-95 group">
                         <img src="https://lh3.googleusercontent.com/d/1EGJP2nE7NbK5Fb0bMmQ5G1dCMS4QE7Ql" class="w-14 h-14 object-contain mb-3 drop-shadow-md transform group-hover:scale-110 transition-transform">
-                        <span class="font-bold text-pink-700 text-sm">หลังคลอด</span>
+                        <span id="t-dept-postpartum" class="font-bold text-pink-700 text-sm text-center">หลังคลอด</span>
                     </button>
                     <button onclick="openBookingFlow('steam')" class="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-lg transition-all active:scale-95 group">
                         <img src="https://lh3.googleusercontent.com/d/1drV8_zMkCqYi41Esp3c2dTstpzjqRf5Z" class="w-14 h-14 object-contain mb-3 drop-shadow-md transform group-hover:scale-110 transition-transform">
-                        <span class="font-bold text-blue-700 text-sm">อบไอน้ำสมุนไพร</span>
+                        <span id="t-dept-steam" class="font-bold text-blue-700 text-sm text-center">อบไอน้ำสมุนไพร</span>
                     </button>
                 </div>
             </div>
@@ -236,30 +250,32 @@
 
     <!-- ==================== หน้า 4: ระบบตะกร้าคิว (Step-by-Step) ==================== -->
     <div id="page-booking" class="page">
-        <div class="bg-white p-4 shadow-sm flex items-center sticky top-0 z-20">
+        <div class="bg-white p-4 shadow-sm flex items-center justify-between sticky top-0 z-20">
             <button onclick="navigate('page-home')" class="text-gray-500 hover:text-emerald-600 text-xl w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center transition-colors"><i class="fa-solid fa-arrow-left"></i></button>
-            <h2 class="text-lg font-extrabold text-gray-800 flex-1 text-center" id="booking-header-title">จองคิว</h2>
-            <div class="w-8"></div>
+            <h2 class="text-lg font-extrabold text-gray-800 text-center" id="booking-header-title">จองคิว</h2>
+            <button onclick="toggleLanguage()" class="bg-gray-100 text-emerald-800 px-2.5 py-1 rounded-full font-extrabold text-xs border border-gray-200 flex items-center gap-1 active:scale-95 transition-transform">
+                <i class="fa-solid fa-globe text-amber-500"></i> <span class="lang-btn-text">EN</span>
+            </button>
         </div>
 
         <div class="page-content p-4 pb-10">
             <!-- Step 1: เลือกวันที่ -->
             <div id="step-date" class="step-section show">
-                <h3 class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2"><i class="fa-regular fa-calendar text-emerald-500"></i> 1. เลือกวันที่</h3>
+                <h3 class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2"><i class="fa-regular fa-calendar text-emerald-500"></i> <span id="t-step1-date">1. เลือกวันที่</span></h3>
                 <div class="flex gap-3 overflow-x-auto hide-scrollbar mb-6 pb-2 px-1" id="date-scroller"></div>
             </div>
 
             <!-- Step 2: เลือกรอบเวลา -->
             <div id="step-time" class="step-section">
-                <h3 class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2"><i class="fa-regular fa-clock text-emerald-500"></i> 2. เลือกรอบเวลา</h3>
+                <h3 class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2"><i class="fa-regular fa-clock text-emerald-500"></i> <span id="t-step2-time">2. เลือกรอบเวลา</span></h3>
                 <div class="grid grid-cols-3 gap-3 mb-6" id="time-grid"></div>
             </div>
 
             <!-- Step 3: เลือกบริการ -->
             <div id="step-service" class="step-section">
-                <h3 class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2"><i class="fa-solid fa-hand-holding-medical text-emerald-500"></i> 3. เลือกบริการ</h3>
+                <h3 class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2"><i class="fa-solid fa-hand-holding-medical text-emerald-500"></i> <span id="t-step3-service">3. เลือกบริการ</span></h3>
                 <div class="relative mb-6">
-                    <select id="select-service" class="w-full bg-white border-2 border-gray-200 rounded-xl p-3.5 font-bold text-emerald-800 shadow-sm appearance-none focus:border-emerald-500 outline-none transition-all" onchange="stepServiceDone()">
+                    <select id="select-service" class="w-full bg-white border-2 border-gray-200 rounded-xl p-3.5 font-bold text-emerald-800 shadow-sm appearance-none focus:border-emerald-500 outline-none transition-all text-sm" onchange="stepServiceDone()">
                     </select>
                     <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                 </div>
@@ -267,42 +283,44 @@
 
             <!-- Step 4: เลือกหมอ -->
             <div id="step-staff" class="step-section">
-                <h3 class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2" id="lbl-staff"><i class="fa-solid fa-user-doctor text-emerald-500"></i> 4. เลือกผู้ให้บริการ</h3>
+                <h3 class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2" id="lbl-staff"><i class="fa-solid fa-user-doctor text-emerald-500"></i> <span id="t-step4-staff">4. เลือกผู้ให้บริการ</span></h3>
                 <div class="grid grid-cols-3 gap-3 mb-6" id="staff-grid"></div>
             </div>
 
             <!-- Step 5: ตะกร้าบริการเสริม (Dynamic) -->
             <div id="step-addon" class="step-section">
                 <div class="bg-gradient-to-br from-emerald-50 to-white border border-emerald-100 rounded-2xl p-4 mb-4 shadow-sm" id="addon-container">
-                    <h4 class="font-bold text-emerald-800 text-sm mb-3 flex items-center gap-2"><i class="fa-solid fa-cart-plus text-amber-500"></i> 5. รับบริการต่อเนื่องไหมครับ?</h4>
+                    <h4 class="font-bold text-emerald-800 text-sm mb-3 flex items-center gap-2"><i class="fa-solid fa-cart-plus text-amber-500"></i> <span id="t-step5-addon">5. รับบริการต่อเนื่องไหมครับ?</span></h4>
                     <div id="addon-options-area" class="flex flex-col gap-2"></div>
                 </div>
             </div>
             
             <!-- ส่วนหมายเหตุ -->
             <div id="step-note" class="step-section hidden mt-4">
-                <h3 class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-emerald-500"></i> หมายเหตุ (ถ้ามี)</h3>
+                <h3 class="font-bold text-gray-800 text-sm mb-2 flex items-center gap-2"><i class="fa-solid fa-pen-to-square text-emerald-500"></i> <span id="t-lbl-note">หมายเหตุ (ถ้ามี)</span></h3>
                 <input type="text" id="inp-note" class="w-full bg-white border-2 border-gray-200 rounded-xl p-3.5 font-medium text-sm focus:border-emerald-500 outline-none transition-all" placeholder="เช่น มีไข้, ประจำเดือน, ระบุอาการเบื้องต้น">
             </div>
         </div>
 
         <div class="bottom-bar p-4">
             <div class="flex justify-between items-center mb-2 px-2 bg-emerald-50 rounded-lg p-2 border border-emerald-100">
-                <span class="text-emerald-800 text-xs font-bold"><i class="fa-solid fa-receipt"></i> ยอดชำระโดยประมาณ</span>
+                <span class="text-emerald-800 text-xs font-bold"><i class="fa-solid fa-receipt"></i> <span id="t-est-price-lbl">ยอดชำระโดยประมาณ</span></span>
                 <span class="text-emerald-600 font-black text-xl" id="est-price">-</span>
             </div>
             <button onclick="navigate('page-summary')" id="btn-submit-book" class="w-full bg-gradient-to-r from-emerald-500 to-emerald-700 text-white rounded-full py-3.5 font-bold text-lg shadow-lg opacity-50 cursor-not-allowed transition-all" disabled>
-                ตรวจสอบข้อมูล
+                <span id="t-btn-review">ตรวจสอบข้อมูล</span>
             </button>
         </div>
     </div>
 
     <!-- ==================== หน้า 5: สรุปและยืนยันบิล (Summary) ==================== -->
     <div id="page-summary" class="page">
-        <div class="bg-white p-4 shadow-sm flex items-center sticky top-0 z-20">
+        <div class="bg-white p-4 shadow-sm flex items-center justify-between sticky top-0 z-20">
             <button onclick="navigate('page-booking')" class="text-gray-500 hover:text-emerald-600 text-xl w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center transition-colors"><i class="fa-solid fa-arrow-left"></i></button>
-            <h2 class="text-lg font-extrabold text-gray-800 flex-1 text-center">ยืนยันการนัดหมาย</h2>
-            <div class="w-8"></div>
+            <h2 id="t-sum-header" class="text-lg font-extrabold text-gray-800 text-center">ยืนยันการนัดหมาย</h2>
+            <button onclick="toggleLanguage()" class="bg-gray-100 text-emerald-800 px-2.5 py-1 rounded-full font-extrabold text-xs border border-gray-200 flex items-center gap-1 active:scale-95 transition-transform">
+                <i class="fa-solid fa-globe text-amber-500"></i> <span class="lang-btn-text">EN</span>
+            </button>
         </div>
 
         <div class="page-content p-5 pb-32">
@@ -310,7 +328,7 @@
                 <div class="text-center mb-4">
                     <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-2"><i class="fa-solid fa-calendar-check text-3xl text-emerald-600"></i></div>
                     <h3 class="font-extrabold text-xl text-gray-800" id="sum-date-time">-</h3>
-                    <p class="text-sm text-gray-500 font-medium">กรุณาตรวจสอบข้อมูลก่อนกดยืนยัน</p>
+                    <p id="t-sum-sub" class="text-sm text-gray-500 font-medium">กรุณาตรวจสอบข้อมูลก่อนกดยืนยัน</p>
                 </div>
 
                 <div class="bg-gray-50 rounded-xl p-3 mb-4 border border-gray-100 flex items-center gap-3">
@@ -326,17 +344,17 @@
                 <div class="dashed-line"></div>
 
                 <div class="flex justify-between items-end bg-emerald-50 p-3 rounded-xl border border-emerald-100">
-                    <span class="text-emerald-800 font-bold text-sm">ยอดชำระโดยประมาณ</span>
+                    <span id="t-sum-total-lbl" class="text-emerald-800 font-bold text-sm">ยอดชำระโดยประมาณ</span>
                     <span class="text-emerald-600 font-black text-2xl" id="sum-total-price">0.-</span>
                 </div>
             </div>
             
-            <p class="text-xs text-center text-gray-400 mt-4 px-4">กรุณามาก่อนเวลานัดหมาย 15 นาที เพื่อเตรียมตัวเข้ารับบริการ หากไม่มาตามเวลาคลินิกขอสงวนสิทธิ์ยกเลิกคิว</p>
+            <p id="t-sum-warn" class="text-xs text-center text-gray-400 mt-4 px-4">กรุณามาก่อนเวลานัดหมาย 15 นาที เพื่อเตรียมตัวเข้ารับบริการ หากไม่มาตามเวลาคลินิกขอสงวนสิทธิ์ยกเลิกคิว</p>
         </div>
 
         <div class="bottom-bar p-4">
             <button onclick="submitBookingAPI()" class="w-full bg-emerald-600 text-white rounded-full py-4 font-bold text-lg shadow-[0_8px_20px_rgba(5,150,105,0.3)] active:scale-95 transition-transform flex justify-center items-center gap-2">
-                <i class="fa-solid fa-check-circle"></i> ยืนยันรับบริการ
+                <i class="fa-solid fa-check-circle"></i> <span id="t-btn-confirm-final">ยืนยันรับบริการ</span>
             </button>
         </div>
     </div>
@@ -428,17 +446,238 @@
     const FIREBASE_URL = "https://sadao-queue-999c3-default-rtdb.asia-southeast1.firebasedatabase.app/";
     const LIFF_ID = "2010086236-cSpA2YLB";
     
+    let currentLang = localStorage.getItem('swc_lang') || 'th';
     let userLineUid = ""; 
-    let tempFoundUser = null; // เก็บชื่อ-นามสกุลจริงที่ดึงได้จากฐานข้อมูล
+    let tempFoundUser = null;
+
+    // 🌐 พจนานุกรม 2 ภาษา (TH / EN) ครบ 100%
+    const I18N = {
+        th: {
+            lang_btn: "EN",
+            splash_sub: "กลุ่มงานการแพทย์แผนไทย<br>และการแพทย์ทางเลือก โรงพยาบาลสะเดา",
+            splash_btn: "เข้าสู่ระบบ / ลงทะเบียน",
+            login_title: "ข้อมูลผู้รับบริการ",
+            saved_profiles: '<i class="fa-solid fa-users"></i> เลือกจากประวัติในเครื่อง',
+            or_new: "- หรือกรอกข้อมูลใหม่ด้านล่าง -",
+            lbl_idcard: 'เลขประจำตัวประชาชน / Passport <span class="text-red-500">*</span>',
+            found_profile: "พบประวัติผู้รับบริการ",
+            btn_change_user: "เปลี่ยนคน",
+            lbl_fname: 'ชื่อ <span class="text-red-500">*</span>',
+            plh_fname: "ชื่อจริง",
+            lbl_lname: "นามสกุล",
+            plh_lname: "นามสกุล",
+            lbl_phone: 'เบอร์โทรศัพท์ติดต่อ <span class="text-red-500">*</span> <span class="text-[10px] text-emerald-600 font-normal">(แก้ไขได้หากเปลี่ยนเบอร์ใหม่)</span>',
+            pdpa_title: "ระบบปกป้องข้อมูลส่วนบุคคล (PDPA)",
+            pdpa_sub: "สามารถตรวจสอบหรือแก้ไขเบอร์โทรศัพท์ให้เป็นปัจจุบันก่อนกดยืนยัน",
+            right_header: '💳 สิทธิการรักษา <span class="text-red-500">*</span>',
+            r1_title: "บัตรทอง (ร่วมจ่าย 30 บาท)", r1_desc: "อายุ 12-59 ปี",
+            r2_title: "บัตรทอง (ยกเว้นร่วมจ่าย)", r2_desc: "ผู้สูงอายุ, ผู้มีรายได้น้อย, อสม.",
+            r3_title: "ข้าราชการ / อปท.", r3_desc: "เบิกจ่ายตรง ไม่ต้องสำรองจ่าย",
+            r4_title: "รัฐวิสาหกิจ", r4_desc: "สำรองจ่าย เบิกต้นสังกัด",
+            r5_title: "ประกันสังคม / ชำระเงินเอง", r5_desc: "ชำระเงินสด / โอนสแกนจ่าย",
+            btn_login_submit: "ยืนยันข้อมูล",
+            welcome: "ยินดีต้อนรับ",
+            user_prefix: "คุณ",
+            btn_switch_user: "สลับผู้ใช้/แก้เบอร์",
+            choose_dept: "เลือกบริการที่ต้องการ",
+            dept_ttm: "แพทย์แผนไทย",
+            dept_tcm: "แพทย์แผนจีน",
+            dept_postpartum: "หลังคลอด",
+            dept_steam: "อบไอน้ำสมุนไพร",
+            step1_date: "1. เลือกวันที่",
+            step2_time: "2. เลือกรอบเวลา",
+            step3_service: "3. เลือกบริการ",
+            step4_staff: "4. เลือกผู้ให้บริการ",
+            step5_addon: "5. รับบริการต่อเนื่องไหมครับ?",
+            lbl_note: "หมายเหตุ (ถ้ามี)",
+            plh_note: "เช่น มีไข้, ประจำเดือน, ระบุอาการเบื้องต้น",
+            est_price_lbl: "ยอดชำระโดยประมาณ",
+            btn_review: "ตรวจสอบข้อมูล",
+            sum_header: "ยืนยันการนัดหมาย",
+            sum_sub: "กรุณาตรวจสอบข้อมูลก่อนกดยืนยัน",
+            sum_right_prefix: "สิทธิ: ",
+            sum_total_lbl: "ยอดชำระโดยประมาณ",
+            sum_warn: "กรุณามาก่อนเวลานัดหมาย 15 นาที เพื่อเตรียมตัวเข้ารับบริการ หากไม่มาตามเวลาคลินิกขอสงวนสิทธิ์ยกเลิกคิว",
+            btn_confirm_final: "ยืนยันรับบริการ",
+            checking: "ตรวจสอบ...",
+            found_old: "พบประวัติเดิม",
+            selected_hist: "เลือกจากประวัติ",
+            new_patient_ status: "ผู้รับบริการใหม่ กรุณากรอกชื่อ-สกุล",
+            incomplete_title: "ข้อมูลไม่ครบ",
+            incomplete_text: "กรุณากรอกข้อมูลให้ครบถ้วน (เบอร์โทร 10 หลัก)",
+            logging_in: "กำลังเข้าสู่ระบบและบันทึกข้อมูล...",
+            banned_title: "ระงับการจอง",
+            banned_text: "บัญชีนี้ถูกระงับจนถึงวันที่ ",
+            conn_err_title: "ขัดข้อง",
+            conn_err_text: "เชื่อมต่อระบบฐานข้อมูลไม่สำเร็จ กรุณาลองใหม่",
+            checking_queue: "กำลังตรวจสอบคิวนัดหมาย...",
+            upcoming_queue: "คิวของคุณที่กำลังจะมาถึง",
+            status_waiting: "รอรับบริการ",
+            date_prefix: "วันที่ ",
+            time_prefix: "เวลา ",
+            time_suffix: " น.",
+            btn_cancel_queue: "กดเพื่อยกเลิกคิวนัดหมายนี้",
+            no_upcoming_queue: "ไม่มีคิวนัดหมายที่รอรับบริการ",
+            status_free: "ว่าง",
+            slot_full: "เต็ม",
+            no_slots_today: "ไม่มีคิวว่างในวันนี้",
+            searching_slots: "กำลังค้นหาคิวว่างทั้งหมด...",
+            saving_booking: "กำลังลงบันทึกคิว...",
+            cancelling_queue: "กำลังยกเลิกคิว...",
+            confirm_cancel_title: "ยืนยันการยกเลิกนัด?",
+            confirm_cancel_text: "คุณต้องการยกเลิกคิวนัดหมายนี้ใช่หรือไม่?",
+            btn_yes_cancel: "ยอมรับและยกเลิกคิว",
+            btn_close: "ปิด",
+            cancel_success_title: "ยกเลิกคิวสำเร็จ!",
+            sending_chat: "กำลังส่งข้อความยืนยันในแชท...",
+            cancel_done_text: "ดำเนินการยกเลิกเรียบร้อยแล้ว",
+            book_success_title: "จองคิวสำเร็จ!",
+            book_saved_text: "บันทึกคิวเรียบร้อยแล้ว",
+            dup_title: "พบรายการจองซ้ำ",
+            dup_html_1: "คุณมีคิวที่แผนกนี้รอรับบริการอยู่แล้ว",
+            dup_html_2: "รอบวันที่ ",
+            dup_html_3: "กรุณารับบริการหรือยกเลิกคิวเดิมก่อนครับ",
+            slot_taken_title: "คิวไม่ว่าง",
+            slot_taken_text: "คิวนี้ถูกจองตัดหน้าไปแล้วครับ",
+            addon_none: "ไม่รับบริการเพิ่ม (เสร็จสิ้น)",
+            addon_2hr_ttm: "นวดแผนไทย ชั่วโมงที่ 2",
+            addon_2hr_tcm: "ครอบแก้ว ชั่วโมงที่ 2",
+            addon_cross_acu: "ฝังเข็มแผนจีน",
+            addon_cross_cup: "ครอบแก้ว",
+            addon_cross_ttm: "นวดแผนไทย",
+            addon_steam: "อบไอน้ำสมุนไพร",
+            addon_2hr_steam: "นวด 2 ชม. + อบไอน้ำ",
+            addon_cross_acu_steam: "ฝังเข็ม + อบไอน้ำ",
+            addon_cross_cup_steam: "ครอบแก้ว + อบไอน้ำ",
+            addon_cross_ttm_steam: "นวดแผนไทย + อบไอน้ำ",
+            sum_addon_2hr: "บริการต่อเนื่องชั่วโมงที่ 2",
+            sum_addon_acu: "ต่อด้วย ฝังเข็มแผนจีน",
+            sum_addon_cup: "ต่อด้วย ครอบแก้ว",
+            sum_addon_ttm: "ต่อด้วย นวดแผนไทย",
+            sum_addon_steam: "อบไอน้ำสมุนไพรต่อ",
+            free_by_right: "ฟรีตามสิทธิ",
+            baht: "บาท",
+            and_word: "และ"
+        },
+        en: {
+            lang_btn: "TH",
+            splash_sub: "Thai Traditional & Alternative Medicine<br>Sadao Hospital",
+            splash_btn: "Login / Register",
+            login_title: "Patient Information",
+            saved_profiles: '<i class="fa-solid fa-users"></i> Select from Saved Profiles',
+            or_new: "- Or enter new details below -",
+            lbl_idcard: 'National ID / Passport No. <span class="text-red-500">*</span>',
+            found_profile: "Patient Profile Found",
+            btn_change_user: "Switch",
+            lbl_fname: 'First Name <span class="text-red-500">*</span>',
+            plh_fname: "First Name",
+            lbl_lname: "Last Name",
+            plh_lname: "Last Name",
+            lbl_phone: 'Phone Number <span class="text-red-500">*</span> <span class="text-[10px] text-emerald-600 font-normal">(Editable if changed)</span>',
+            pdpa_title: "Personal Data Protection (PDPA)",
+            pdpa_sub: "You can verify or update your phone number before confirming",
+            right_header: '💳 Healthcare Coverage / Right <span class="text-red-500">*</span>',
+            r1_title: "Universal Coverage (30 THB Co-pay)", r1_desc: "Age 12-59 years",
+            r2_title: "Universal Coverage (Exempt)", r2_desc: "Elderly, Low-income, VHV",
+            r3_title: "Civil Servant / LGO", r3_desc: "Direct billing, no upfront pay",
+            r4_title: "State Enterprise", r4_desc: "Upfront pay, claimable",
+            r5_title: "Social Security / Self-Pay", r5_desc: "Cash / QR Scan payment",
+            btn_login_submit: "Confirm Details",
+            welcome: "Welcome",
+            user_prefix: "",
+            btn_switch_user: "Switch User / Edit Tel",
+            choose_dept: "Select Department",
+            dept_ttm: "Thai Traditional Med.",
+            dept_tcm: "Chinese Medicine",
+            dept_postpartum: "Postpartum Care",
+            dept_steam: "Herbal Steam",
+            step1_date: "1. Select Date",
+            step2_time: "2. Select Time Slot",
+            step3_service: "3. Select Service",
+            step4_staff: "4. Select Provider",
+            step5_addon: "5. Add Continuous Service?",
+            lbl_note: "Note / Symptoms (Optional)",
+            plh_note: "e.g. Fever, Period, Initial symptoms",
+            est_price_lbl: "Estimated Total",
+            btn_review: "Review Booking",
+            sum_header: "Confirm Appointment",
+            sum_sub: "Please review your details before confirming",
+            sum_right_prefix: "Coverage: ",
+            sum_total_lbl: "Estimated Total",
+            sum_warn: "Please arrive 15 minutes before your appointment time. Late arrivals may result in cancellation.",
+            btn_confirm_final: "Confirm Booking",
+            checking: "Checking...",
+            found_old: "Profile Found",
+            selected_hist: "Selected from device",
+            new_patient_status: "New Patient: Please enter your name",
+            incomplete_title: "Incomplete Data",
+            incomplete_text: "Please fill in all required fields (10-digit phone number)",
+            logging_in: "Logging in & saving data...",
+            banned_title: "Booking Restricted",
+            banned_text: "This account is suspended until ",
+            conn_err_title: "Connection Error",
+            conn_err_text: "Unable to connect to database. Please try again.",
+            checking_queue: "Checking your appointments...",
+            upcoming_queue: "Your Upcoming Appointment",
+            status_waiting: "Upcoming",
+            date_prefix: "Date: ",
+            time_prefix: "Time: ",
+            time_suffix: "",
+            btn_cancel_queue: "Cancel This Appointment",
+            no_upcoming_queue: "No upcoming appointments",
+            status_free: "Available",
+            slot_full: "Full",
+            no_slots_today: "No available slots on this date",
+            searching_slots: "Searching available slots...",
+            saving_booking: "Recording your appointment...",
+            cancelling_queue: "Cancelling appointment...",
+            confirm_cancel_title: "Cancel Appointment?",
+            confirm_cancel_text: "Are you sure you want to cancel this appointment?",
+            btn_yes_cancel: "Yes, Cancel Now",
+            btn_close: "Close",
+            cancel_success_title: "Cancelled!",
+            sending_chat: "Sending confirmation to chat...",
+            cancel_done_text: "Your appointment has been cancelled.",
+            book_success_title: "Booking Confirmed!",
+            book_saved_text: "Your appointment has been recorded.",
+            dup_title: "Duplicate Booking",
+            dup_html_1: "You already have a pending appointment in this department",
+            dup_html_2: "Date: ",
+            dup_html_3: "Please complete or cancel your existing appointment first.",
+            slot_taken_title: "Slot Unavailable",
+            slot_taken_text: "This slot was just taken. Please select another time.",
+            addon_none: "No additional service (Finish)",
+            addon_2hr_ttm: "2nd Hour Thai Massage",
+            addon_2hr_tcm: "2nd Hour Cupping Therapy",
+            addon_cross_acu: "Acupuncture (TCM)",
+            addon_cross_cup: "Cupping Therapy (TCM)",
+            addon_cross_ttm: "Thai Traditional Massage",
+            addon_steam: "Herbal Steam Therapy",
+            addon_2hr_steam: "2 Hrs Massage + Herbal Steam",
+            addon_cross_acu_steam: "Acupuncture + Herbal Steam",
+            addon_cross_cup_steam: "Cupping + Herbal Steam",
+            addon_cross_ttm_steam: "Thai Massage + Herbal Steam",
+            sum_addon_2hr: "Continuous 2nd Hour Session",
+            sum_addon_acu: "Followed by Acupuncture (TCM)",
+            sum_addon_cup: "Followed by Cupping Therapy",
+            sum_addon_ttm: "Followed by Thai Massage",
+            sum_addon_steam: "Followed by Herbal Steam",
+            free_by_right: "Free by coverage",
+            baht: "THB",
+            and_word: "&"
+        }
+    };
+
+    function _t(key) { return I18N[currentLang][key] !== undefined ? I18N[currentLang][key] : key; }
 
     const DAY_COLORS = [
-        { bg: 'bg-red-50', border: 'border-red-400', text: 'text-red-700', day: 'อา.' },
-        { bg: 'bg-yellow-50', border: 'border-yellow-400', text: 'text-yellow-700', day: 'จ.' },
-        { bg: 'bg-pink-50', border: 'border-pink-400', text: 'text-pink-700', day: 'อ.' },
-        { bg: 'bg-green-50', border: 'border-green-400', text: 'text-green-700', day: 'พ.' },
-        { bg: 'bg-orange-50', border: 'border-orange-400', text: 'text-orange-700', day: 'พฤ.' },
-        { bg: 'bg-blue-50', border: 'border-blue-400', text: 'text-blue-700', day: 'ศ.' },
-        { bg: 'bg-purple-50', border: 'border-purple-400', text: 'text-purple-700', day: 'ส.' }
+        { bg: 'bg-red-50', border: 'border-red-400', text: 'text-red-700', dayTh: 'อา.', dayEn: 'Sun' },
+        { bg: 'bg-yellow-50', border: 'border-yellow-400', text: 'text-yellow-700', dayTh: 'จ.', dayEn: 'Mon' },
+        { bg: 'bg-pink-50', border: 'border-pink-400', text: 'text-pink-700', dayTh: 'อ.', dayEn: 'Tue' },
+        { bg: 'bg-green-50', border: 'border-green-400', text: 'text-green-700', dayTh: 'พ.', dayEn: 'Wed' },
+        { bg: 'bg-orange-50', border: 'border-orange-400', text: 'text-orange-700', dayTh: 'พฤ.', dayEn: 'Thu' },
+        { bg: 'bg-blue-50', border: 'border-blue-400', text: 'text-blue-700', dayTh: 'ศ.', dayEn: 'Fri' },
+        { bg: 'bg-purple-50', border: 'border-purple-400', text: 'text-purple-700', dayTh: 'ส.', dayEn: 'Sat' }
     ];
 
     const STAFF_IMAGES = {
@@ -458,7 +697,8 @@
         "DEFAULT": "https://lh3.googleusercontent.com/d/1sxp0wrhV7MKhr2_6nOLQsj-jVddMmnzR"
     };
 
-    const STAFF_NAME_MAP = { 
+    // รายชื่อผู้ให้บริการ ภาษาไทย และ ภาษาอังกฤษ ตามรูปแบบที่กำหนด
+    const STAFF_NAME_MAP_TH = { 
         "จินดา J": "จินดา (เจี๊ยบ)", 
         "รจนา M": "รจนา (แหม่ม)", 
         "อรรถพล B": "อรรถพล (บ่าว)", 
@@ -467,21 +707,212 @@
         "รัตน์ชนก KW": "รัตน์ชนก (กวาง)", 
         "นิกษ์นิภา T": "นิกษ์นิภา (การ์ตูน)", 
         "ณิชาภัทร W": "ณิชาภัทร (วาวา)", 
-        "แพทย์แผนจีน": "แพทย์แผนจีน" 
+        "แพทย์แผนจีน": "แพทย์แผนจีน",
+        "พจ.พรเพชร": "พจ.พรเพชร",
+        "นศ.พท.มุนินทร์": "นศ.พท.มุนินทร์",
+        "นศ.พท.อภินันท์": "นศ.พท.อภินันท์",
+        "นศ.พท.นัชติกา": "นศ.พท.นัชติกา",
+        "ไม่ระบุ": "ไม่ระบุ"
     };
 
-    const SERVICES = {
-        "ttm": ["นวดและประคบเพื่อการรักษา", "นวดตัวส่งเสริมสุขภาพ(ชำระเงินเอง)", "นวดเท้าส่งเสริมสุขภาพ(ชำระเงินเอง)"],
-        "tcm": ["ฝังเข็มเพื่อการรักษา", "ครอบแก้ว", "ฝังเข็มใบหน้า", "เม็ดผักกาดแปะหู", "ปรึกษาแพทย์แผนจีน"],
-        "postpartum": ["บริการดูแลมารดาหลังคลอด (2 ชม.)"],
-        "steam": ["อบไอน้ำสมุนไพร"]
+    const STAFF_NAME_MAP_EN = { 
+        "จินดา J": "Jinda (Jeab)", 
+        "รจนา M": "Rotjana (Maam)", 
+        "อรรถพล B": "Attapon (Bao)", 
+        "ศินารัตน์ C": "Sinarat (C)", 
+        "จุฑามาศ F": "Jutamat (Fon)", 
+        "รัตน์ชนก KW": "Ratchanok (Kwang)", 
+        "นิกษ์นิภา T": "Niknipha (Kartoon)", 
+        "ณิชาภัทร W": "Nichapat (Wawa)", 
+        "แพทย์แผนจีน": "TCM Doctor",
+        "พจ.พรเพชร": "TCM Dr. Pornphet",
+        "นศ.พท.มุนินทร์": "TTM Student Munin",
+        "นศ.พท.อภินันท์": "TTM Student Apinan",
+        "นศ.พท.นัชติกา": "TTM Student Nattika",
+        "ไม่ระบุ": "Not Specified"
     };
+
+    function getStaffDisplayName(rawName) {
+        if (!rawName) return currentLang === 'en' ? "Not Specified" : "ไม่ระบุ";
+        if (currentLang === 'en') {
+            return STAFF_NAME_MAP_EN[rawName] || rawName;
+        }
+        return STAFF_NAME_MAP_TH[rawName] || rawName;
+    }
+
+    // รายการบริการ 2 ภาษา (เก็บค่า value เป็นภาษาไทยเพื่อส่งให้ Backend ทำงานต่อได้ทันที)
+    const SERVICES_I18N = {
+        "ttm": [
+            { th: "นวดและประคบเพื่อการรักษา", en: "Therapeutic Massage and Herbal Compress" },
+            { th: "นวดตัวส่งเสริมสุขภาพ(ชำระเงินเอง)", en: "Health Promotion Body Massage (Self-pay)" },
+            { th: "นวดเท้าส่งเสริมสุขภาพ(ชำระเงินเอง)", en: "Health Promotion Foot Massage (Self-pay)" }
+        ],
+        "tcm": [
+            { th: "ฝังเข็มเพื่อการรักษา", en: "Therapeutic Acupuncture" },
+            { th: "ครอบแก้ว", en: "Cupping Therapy" },
+            { th: "ฝังเข็มใบหน้า", en: "Facial Cosmetic Acupuncture" },
+            { th: "เม็ดผักกาดแปะหู", en: "Ear Seed Acupressure" },
+            { th: "ปรึกษาแพทย์แผนจีน", en: "TCM Doctor Consultation" }
+        ],
+        "postpartum": [
+            { th: "บริการดูแลมารดาหลังคลอด (2 ชม.)", en: "Postpartum Care Program (2 Hrs)" }
+        ],
+        "steam": [
+            { th: "อบไอน้ำสมุนไพร", en: "Herbal Steam Therapy" }
+        ]
+    };
+
+    function getServiceDisplayName(thServiceName) {
+        if (!thServiceName) return "";
+        let cleanName = thServiceName.split(' [')[0].trim();
+        if (currentLang === 'th') return cleanName;
+        for (let dept in SERVICES_I18N) {
+            let found = SERVICES_I18N[dept].find(s => s.th === cleanName);
+            if (found) return found.en;
+        }
+        if (cleanName.includes("นวดและประคบ")) return "Therapeutic Massage and Herbal Compress";
+        if (cleanName.includes("นวดตัวส่งเสริม")) return "Health Promotion Body Massage (Self-pay)";
+        if (cleanName.includes("นวดเท้าส่งเสริม")) return "Health Promotion Foot Massage (Self-pay)";
+        if (cleanName.includes("ฝังเข็มเพื่อการรักษา")) return "Therapeutic Acupuncture";
+        if (cleanName.includes("ครอบแก้ว")) return "Cupping Therapy";
+        if (cleanName.includes("ฝังเข็มใบหน้า")) return "Facial Cosmetic Acupuncture";
+        if (cleanName.includes("เม็ดผักกาด")) return "Ear Seed Acupressure";
+        if (cleanName.includes("ปรึกษาแพทย์แผนจีน")) return "TCM Doctor Consultation";
+        if (cleanName.includes("หลังคลอด")) return "Postpartum Care Program (2 Hrs)";
+        if (cleanName.includes("อบไอน้ำ")) return "Herbal Steam Therapy";
+        return cleanName;
+    }
+
+    function getRightDisplayName(rightCode) {
+        let mapTh = { '1': 'บัตรทอง (ร่วมจ่าย 30 บาท)', '2': 'บัตรทอง (ยกเว้นร่วมจ่าย)', '3': 'ข้าราชการ / อปท.', '4': 'รัฐวิสาหกิจ', '5': 'ประกันสังคม / ชำระเงินเอง' };
+        let mapEn = { '1': 'Universal Coverage (30 THB Co-pay)', '2': 'Universal Coverage (Exempt)', '3': 'Civil Servant / LGO', '4': 'State Enterprise', '5': 'Social Security / Self-Pay' };
+        return currentLang === 'en' ? (mapEn[rightCode] || mapEn['1']) : (mapTh[rightCode] || mapTh['1']);
+    }
+
+    function formatSysDateLabel(sysDate, fallbackTh, isFull = false) {
+        if (!sysDate) return fallbackTh || "-";
+        let parts = sysDate.split("-");
+        if (parts.length < 3) return fallbackTh;
+        let dObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        if (currentLang === 'en') {
+            let mEn = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            let dEnFull = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            if (isFull) return `${dEnFull[dObj.getDay()]}, ${dObj.getDate()} ${mEn[dObj.getMonth()]} ${dObj.getFullYear()}`;
+            return `${dObj.getDate()} ${mEn[dObj.getMonth()]}`;
+        } else {
+            let mTh = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+            let dThFull = ["วันอาทิตย์", "วันจันทร์", "วันอังคาร", "วันพุธ", "วันพฤหัสบดี", "วันศุกร์", "วันเสาร์"];
+            if (isFull) return `${dThFull[dObj.getDay()]}ที่ ${dObj.getDate()} ${mTh[dObj.getMonth()]} ${dObj.getFullYear() + 543}`;
+            return fallbackTh || `${dObj.getDate()} ${mTh[dObj.getMonth()]}`;
+        }
+    }
 
     const ALLOWED_2HR_PAIRS = { "08:30": "09:30", "09:30": "10:30", "13:00": "14:00", "14:00": "15:00", "17:00": "18:00" };
 
     let userProfile = { id: '', fname: '', lname: '', phone: '', right: '1', rightName: 'บัตรทอง (ร่วมจ่าย 30 บาท)' };
     let currentDept = ''; let fullFirebaseData = null; let fetchedData = []; 
     let selectedDateIdx = 0; let selectedTimeStr = ''; let selectedStaffObj = null; let totalFee = 0;
+    let lastHistoryData = null;
+
+    // 🌐 ฟังก์ชันสลับภาษาและอัปเดตทุกหน้าจอทันที
+    function toggleLanguage() {
+        currentLang = (currentLang === 'th') ? 'en' : 'th';
+        localStorage.setItem('swc_lang', currentLang);
+        applyLanguageUI();
+    }
+
+    function applyLanguageUI() {
+        document.querySelectorAll('.lang-btn-text').forEach(el => el.innerText = _t('lang_btn'));
+        
+        const setHtml = (id, key) => { let el = document.getElementById(id); if (el) el.innerHTML = _t(key); };
+        const setText = (id, key) => { let el = document.getElementById(id); if (el) el.innerText = _t(key); };
+
+        setHtml('t-splash-sub', 'splash_sub');
+        setText('t-splash-btn', 'splash_btn');
+        setText('t-login-title', 'login_title');
+        setHtml('t-saved-profiles', 'saved_profiles');
+        setText('t-or-new', 'or_new');
+        setHtml('t-lbl-idcard', 'lbl_idcard');
+        setText('t-found-profile', 'found_profile');
+        setText('t-btn-change-user', 'btn_change_user');
+        setHtml('t-lbl-fname', 'lbl_fname');
+        setHtml('t-lbl-lname', 'lbl_lname');
+        setHtml('t-lbl-phone', 'lbl_phone');
+        setText('t-pdpa-title', 'pdpa_title');
+        setText('t-pdpa-sub', 'pdpa_sub');
+        setHtml('t-right-header', 'right_header');
+        setText('t-r1-title', 'r1_title'); setText('t-r1-desc', 'r1_desc');
+        setText('t-r2-title', 'r2_title'); setText('t-r2-desc', 'r2_desc');
+        setText('t-r3-title', 'r3_title'); setText('t-r3-desc', 'r3_desc');
+        setText('t-r4-title', 'r4_title'); setText('t-r4-desc', 'r4_desc');
+        setText('t-r5-title', 'r5_title'); setText('t-r5-desc', 'r5_desc');
+        setText('t-btn-login-submit', 'btn_login_submit');
+
+        let fInp = document.getElementById('inputFname'); if(fInp) fInp.placeholder = _t('plh_fname');
+        let lInp = document.getElementById('inputLname'); if(lInp) lInp.placeholder = _t('plh_lname');
+        let nInp = document.getElementById('inp-note'); if(nInp) nInp.placeholder = _t('plh_note');
+
+        setText('t-welcome', 'welcome');
+        setText('t-btn-switch-user', 'btn_switch_user');
+        setText('t-choose-dept', 'choose_dept');
+        setText('t-dept-ttm', 'dept_ttm');
+        setText('t-dept-tcm', 'dept_tcm');
+        setText('t-dept-postpartum', 'dept_postpartum');
+        setText('t-dept-steam', 'dept_steam');
+
+        setText('t-step1-date', 'step1_date');
+        setText('t-step2-time', 'step2_time');
+        setText('t-step3-service', 'step3_service');
+        setText('t-step4-staff', 'step4_staff');
+        setText('t-step5-addon', 'step5_addon');
+        setText('t-lbl-note', 'lbl_note');
+        setText('t-est-price-lbl', 'est_price_lbl');
+        setText('t-btn-review', 'btn_review');
+
+        setText('t-sum-header', 'sum_header');
+        setText('t-sum-sub', 'sum_sub');
+        setText('t-sum-total-lbl', 'sum_total_lbl');
+        setText('t-sum-warn', 'sum_warn');
+        setText('t-btn-confirm-final', 'btn_confirm_final');
+
+        if (userProfile && userProfile.fname) {
+            document.getElementById('displayUserName').innerText = `${_t('user_prefix')}${userProfile.fname}`;
+        }
+
+        if (lastHistoryData !== null && document.getElementById('page-home').classList.contains('active')) {
+            renderActiveHistoryCard(lastHistoryData);
+        }
+
+        if (currentDept) {
+            let deptTitleKey = currentDept === 'ttm' ? 'dept_ttm' : currentDept === 'tcm' ? 'dept_tcm' : currentDept === 'postpartum' ? 'dept_postpartum' : 'dept_steam';
+            document.getElementById('booking-header-title').innerText = _t(deptTitleKey);
+        }
+
+        // อัปเดตหน้าจองคิวหากเปิดค้างอยู่
+        if (document.getElementById('page-booking').classList.contains('active') && fetchedData.length > 0) {
+            let prevTime = selectedTimeStr;
+            let prevStaff = selectedStaffObj;
+            let prevSvc = document.getElementById('select-service').value;
+            let prevAddonEl = document.querySelector('input[name="addon_choice"]:checked');
+            let prevAddonVal = prevAddonEl ? prevAddonEl.value : 'none';
+
+            renderDates();
+            if (prevTime) {
+                selectedTimeStr = prevTime;
+                renderTimes();
+                populateServiceDropdown(prevSvc);
+                if (prevStaff) {
+                    renderStaffCards(prevStaff.name);
+                    selectedStaffObj = prevStaff;
+                    checkAddonsAndEnableSubmit(prevAddonVal);
+                }
+            }
+        }
+
+        if (document.getElementById('page-summary').classList.contains('active') && selectedTimeStr) {
+            buildSummaryPage();
+        }
+    }
 
     function maskStringPDPA(str) {
         if(!str || str === "-" || str === "***") return "";
@@ -493,7 +924,8 @@
 
     // --- LIFF & INIT ---
     window.onload = () => {
-        show3DLoader('กำลังตรวจสอบการเข้าสู่ระบบ LINE...');
+        applyLanguageUI();
+        show3DLoader(_t('checking'));
         liff.init({ liffId: LIFF_ID }).then(() => {
             if (!liff.isLoggedIn()) {
                 liff.login();
@@ -519,7 +951,6 @@
         });
     };
 
-    // 🔴 หากผู้ใช้เคยล็อกอินไว้แล้ว เมื่อกดปุ่มจากหน้าแรก ให้พาเข้าหน้าคิว (page-home) ทันทีโดยไม่ต้องกรอกใหม่!
     function enterAppFromSplash() {
         let lastActive = localStorage.getItem('swc_active_user');
         if (lastActive) {
@@ -549,7 +980,6 @@
             });
             document.getElementById('profile-list').innerHTML = phtml;
             
-            // เลือกโปรไฟล์ล่าสุดให้อัตโนมัติในหน้า Login
             let lastUser = saved[saved.length - 1];
             fillProfile(lastUser.id, lastUser.f, lastUser.l || '', lastUser.p || '', lastUser.r || '1');
         }
@@ -559,7 +989,7 @@
         document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
         document.getElementById(pageId).classList.add('active');
         if(pageId === 'page-home') {
-            document.getElementById('displayUserName').innerText = `คุณ${userProfile.fname}`;
+            document.getElementById('displayUserName').innerText = `${_t('user_prefix')}${userProfile.fname}`;
             fetchDashboardHistory();
         } else if(pageId === 'page-login') {
             loadLocalProfiles();
@@ -583,14 +1013,12 @@
     let typingTimer;
     function checkIDCardFast(input) {
         clearTimeout(typingTimer); 
-        let id = input.value.replace(/[^0-9]/g, ''); 
-        input.value = id;
+        let id = input.value.trim(); 
         let stat = document.getElementById('idcard-status');
         
-        if (id.length === 13) {
-            stat.innerHTML = '<span class="text-amber-500"><i class="fa-solid fa-spinner fa-spin"></i> ตรวจสอบ...</span>';
+        if (id.length >= 6) {
+            stat.innerHTML = `<span class="text-amber-500"><i class="fa-solid fa-spinner fa-spin"></i> ${_t('checking')}</span>`;
             
-            // เช็คในเครื่องก่อน
             let saved = JSON.parse(localStorage.getItem('swc_profiles') || '[]');
             let localMatch = saved.find(x => x.id === id);
             if (localMatch && localMatch.f) {
@@ -604,13 +1032,12 @@
                 fetch(FIREBASE_URL + "patientRegistry/" + id + ".json")
                 .then(r => r.json()).then(data => {
                     if(data && data.fname) {
-                        stat.innerHTML = '<span class="text-emerald-500"><i class="fa-solid fa-check-circle"></i> พบประวัติเดิม</span>';
+                        stat.innerHTML = `<span class="text-emerald-500"><i class="fa-solid fa-check-circle"></i> ${_t('found_old')}</span>`;
                         
                         tempFoundUser = { fname: data.fname, lname: data.lname || "", tel: (data.tel || "").replace(/[^0-9]/g, '') };
                         document.getElementById('inputFname').value = data.fname;
                         document.getElementById('inputLname').value = data.lname || "";
                         
-                        // 🔴 แสดงเบอร์โทรที่ลงทะเบียนไว้ขึ้นมาอัตโนมัติ และแก้ไขได้
                         if (tempFoundUser.tel) {
                             document.getElementById('inputPhone').value = tempFoundUser.tel;
                         }
@@ -620,7 +1047,7 @@
                         document.getElementById('new-user-form').classList.add('hidden');
                     } else if (!localMatch) {
                         tempFoundUser = null;
-                        stat.innerHTML = '<span class="text-blue-500">ผู้รับบริการใหม่ กรุณากรอกชื่อ-สกุล</span>';
+                        stat.innerHTML = `<span class="text-blue-500">${_t('new_patient_status')}</span>`;
                         document.getElementById('existing-user-card').classList.add('hidden');
                         document.getElementById('new-user-form').classList.remove('hidden');
                         document.getElementById('inputFname').value = ''; 
@@ -657,9 +1084,8 @@
         document.getElementById('display-masked-name').innerText = maskStringPDPA(f) + " " + maskStringPDPA(l || "");
         document.getElementById('existing-user-card').classList.remove('hidden');
         document.getElementById('new-user-form').classList.add('hidden');
-        document.getElementById('idcard-status').innerHTML = '<span class="text-emerald-500"><i class="fa-solid fa-check-circle"></i> เลือกจากประวัติ</span>';
+        document.getElementById('idcard-status').innerHTML = `<span class="text-emerald-500"><i class="fa-solid fa-check-circle"></i> ${_t('selected_hist')}</span>`;
 
-        // ดึงเบอร์โทรล่าสุดจาก Firebase มาเสริมเผื่อในเครื่องไม่มี
         if (!p) {
             fetch(FIREBASE_URL + "patientRegistry/" + id + ".json")
             .then(res => res.json()).then(data => {
@@ -685,30 +1111,28 @@
         let l = (tempFoundUser && tempFoundUser.lname !== undefined) ? tempFoundUser.lname : document.getElementById('inputLname').value.trim();
 
         let isNewUser = !document.getElementById('new-user-form').classList.contains('hidden');
-        if(id.length < 13 || p.length < 10 || (isNewUser && f === '')) { 
-            Swal.fire({ icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณากรอกข้อมูลให้ครบถ้วน (เบอร์โทร 10 หลัก)', customClass: {popup: 'swal-3d-popup'} }); 
+        if(id.length < 6 || p.length < 10 || (isNewUser && f === '')) { 
+            Swal.fire({ icon: 'warning', title: _t('incomplete_title'), text: _t('incomplete_text') }); 
             return; 
         }
         
-        let rNames = { '1': 'บัตรทอง (ร่วมจ่าย 30 บาท)', '2': 'บัตรทอง (ยกเว้นร่วมจ่าย)', '3': 'ข้าราชการ / อปท.', '4': 'รัฐวิสาหกิจ', '5': 'ประกันสังคม / ชำระเงินเอง' };
+        let rNamesTh = { '1': 'บัตรทอง (ร่วมจ่าย 30 บาท)', '2': 'บัตรทอง (ยกเว้นร่วมจ่าย)', '3': 'ข้าราชการ / อปท.', '4': 'รัฐวิสาหกิจ', '5': 'ประกันสังคม / ชำระเงินเอง' };
         
-        show3DLoader('กำลังเข้าสู่ระบบและบันทึกข้อมูล...');
+        show3DLoader(_t('logging_in'));
         
-        // ส่งเบอร์โทรและชื่อไปอัปเดตที่ Server ทันที
         fetch(API_URL, { 
             method: 'POST', 
             body: JSON.stringify({ action: 'check_user', patientIdCard: id, serviceCategory: 'ttm', tel: p, fname: f, lname: l, lineUid: userLineUid }) 
         }).then(r => r.json()).then(res => {
             if(res.isBanned) { 
                 hide3DLoader();
-                Swal.fire({title:'ระงับการจอง', text:`บัญชีนี้ถูกระงับจนถึงวันที่ ${res.banUntil}`, icon:'error', customClass:{popup:'swal-3d-popup'}}); 
+                Swal.fire({title: _t('banned_title'), text: `${_t('banned_text')}${res.banUntil}`, icon:'error'}); 
             } else { 
                 let finalFname = (res.user && res.user.fname) ? res.user.fname : f;
                 let finalLname = (res.user && res.user.lname) ? res.user.lname : l;
 
-                userProfile = { id: id, fname: finalFname, lname: finalLname, phone: p, right: rVal, rightName: rNames[rVal] };
+                userProfile = { id: id, fname: finalFname, lname: finalLname, phone: p, right: rVal, rightName: rNamesTh[rVal] };
 
-                // 🔴 บันทึกหรืออัปเดตเบอร์โทรใหม่ลงในเครื่อง (Local Storage) ทันที
                 let saved = JSON.parse(localStorage.getItem('swc_profiles') || '[]');
                 let existIdx = saved.findIndex(x => x.id === id);
                 if(existIdx > -1) {
@@ -724,33 +1148,34 @@
             }
         }).catch(() => { 
             hide3DLoader(); 
-            Swal.fire('ขัดข้อง', 'เชื่อมต่อระบบฐานข้อมูลไม่สำเร็จ กรุณาลองใหม่', 'error');
+            Swal.fire(_t('conn_err_title'), _t('conn_err_text'), 'error');
         });
     }
 
-    // --- 🔴 Dashboard History: ดึงข้อมูลจากทั้ง Server และ Firebase เพื่อให้แสดงคิวเสมอแม้ปิดหน้าต่างเข้าใหม่ ---
+    // --- Dashboard History ---
     function fetchDashboardHistory() {
         let card = document.getElementById('dash-history-card');
-        card.innerHTML = `<div class="flex items-center text-emerald-700 font-bold text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i> กำลังตรวจสอบคิวนัดหมาย...</div>`;
+        card.innerHTML = `<div class="flex items-center text-emerald-700 font-bold text-sm"><i class="fa-solid fa-spinner fa-spin mr-2"></i> ${_t('checking_queue')}</div>`;
         
-        // เรียก API get_my_history เพื่อความแม่นยำ 100% จากฐานข้อมูล MySQL
         fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'get_my_history', patientIdCard: userProfile.id }) })
         .then(r => r.json()).then(res => {
             if (res && res.status === 'success' && res.history) {
+                lastHistoryData = res.history;
                 renderActiveHistoryCard(res.history);
             } else {
-                // Fallback ไปดึงจาก Firebase
                 fetch(FIREBASE_URL + "patientHistory/" + userProfile.id + ".json?t=" + new Date().getTime())
                 .then(r2 => r2.json()).then(fbData => {
+                    lastHistoryData = fbData;
                     renderActiveHistoryCard(fbData);
                 }).catch(() => renderActiveHistoryCard(null));
             }
         }).catch(() => {
             fetch(FIREBASE_URL + "patientHistory/" + userProfile.id + ".json?t=" + new Date().getTime())
             .then(r2 => r2.json()).then(fbData => {
+                lastHistoryData = fbData;
                 renderActiveHistoryCard(fbData);
             }).catch(() => {
-                card.innerHTML = `<p class="text-sm text-red-500">ตรวจสอบประวัติไม่สำเร็จ</p>`;
+                card.innerHTML = `<p class="text-sm text-red-500">${_t('conn_err_text')}</p>`;
             });
         });
     }
@@ -762,49 +1187,51 @@
         
         if (activeList.length > 0) {
             let firstQ = activeList[0];
-            let itemsHtml = activeList.map(item => `
+            let itemsHtml = activeList.map(item => {
+                let rawSvc = item.service.split(' [')[0];
+                let dispSvc = getServiceDisplayName(rawSvc);
+                let dispDate = formatSysDateLabel(item.sysDate, item.date, false);
+                return `
                 <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 flex items-center justify-between mb-2">
                     <div>
-                        <p class="font-bold text-gray-800 text-sm">${item.service.split(' [')[0]}</p>
-                        <p class="text-xs text-emerald-700 font-semibold mt-1"><i class="fa-regular fa-clock"></i> วันที่ ${item.date} | เวลา ${item.time} น.</p>
+                        <p class="font-bold text-gray-800 text-sm">${dispSvc}</p>
+                        <p class="text-xs text-emerald-700 font-semibold mt-1"><i class="fa-regular fa-clock"></i> ${_t('date_prefix')}${dispDate} | ${_t('time_prefix')}${item.time}${_t('time_suffix')}</p>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
 
             card.innerHTML = `
                 <div class="flex justify-between items-center mb-2">
-                    <p class="text-emerald-700 font-bold text-sm"><i class="fa-solid fa-calendar-check"></i> คิวของคุณที่กำลังจะมาถึง</p>
-                    <span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-md text-[10px] font-bold animate-pulse">รอรับบริการ (${activeList.length})</span>
+                    <p class="text-emerald-700 font-bold text-sm"><i class="fa-solid fa-calendar-check"></i> ${_t('upcoming_queue')}</p>
+                    <span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-md text-[10px] font-bold animate-pulse">${_t('status_waiting')} (${activeList.length})</span>
                 </div>
                 ${itemsHtml}
                 <button onclick="patientCancelBooking('${firstQ.date}', '${firstQ.sysDate}', '${firstQ.time}', '${firstQ.service.split(' [')[0]}')" class="w-full mt-1 bg-red-50 text-red-500 border border-red-200 rounded-xl py-2.5 text-sm font-bold hover:bg-red-100 active:scale-95 transition-all">
-                    <i class="fa-solid fa-times-circle"></i> กดเพื่อยกเลิกคิวนัดหมายนี้
+                    <i class="fa-solid fa-times-circle"></i> ${_t('btn_cancel_queue')}
                 </button>
             `;
         } else {
             card.innerHTML = `
                 <div class="flex items-center justify-between">
-                    <p class="text-emerald-700 font-bold text-sm"><i class="fa-solid fa-calendar-xmark"></i> ไม่มีคิวนัดหมายที่รอรับบริการ</p>
-                    <span class="bg-gray-100 text-gray-500 px-3 py-1 rounded-full text-xs font-bold">ว่าง</span>
+                    <p class="text-emerald-700 font-bold text-sm"><i class="fa-solid fa-calendar-xmark"></i> ${_t('no_upcoming_queue')}</p>
+                    <span class="bg-gray-100 text-gray-500 px-3 py-1 rounded-full text-xs font-bold">${_t('status_free')}</span>
                 </div>`;
         }
     }
 
-    // 🔴 ฟังก์ชันยกเลิกนัดหมายโดยคนไข้ + ส่งข้อความจากแชทคนไข้เข้า LINE OA
     function patientCancelBooking(displayDate, sysDate, time, service) {
         Swal.fire({
-            title: 'ยืนยันการยกเลิกนัด?',
-            text: 'คุณต้องการยกเลิกคิวนัดหมายนี้ใช่หรือไม่?',
+            title: _t('confirm_cancel_title'),
+            text: _t('confirm_cancel_text'),
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#cbd5e1',
-            confirmButtonText: 'ยอมรับและยกเลิกคิว',
-            cancelButtonText: 'ปิด',
-            customClass: { popup: 'swal-3d-popup', confirmButton: 'swal-3d-btn' }
+            confirmButtonText: _t('btn_yes_cancel'),
+            cancelButtonText: _t('btn_close')
         }).then((result) => {
             if(result.isConfirmed) {
-                show3DLoader('กำลังยกเลิกคิว...');
+                show3DLoader(_t('cancelling_queue'));
                 
                 let sDept = 'ttm'; 
                 if(service.includes('ฝังเข็ม')||service.includes('ครอบแก้ว')||service.includes('ผักกาด')) sDept='tcm';
@@ -825,23 +1252,27 @@
                         if (liff.isInClient()) {
                             let mName = maskStringPDPA(userProfile.fname) + " " + maskStringPDPA(userProfile.lname);
                             let mTel = userProfile.phone.substring(0,3) + "-xxx-x" + userProfile.phone.substring(8);
+                            let dispSvc = getServiceDisplayName(service);
+                            let dispDate = formatSysDateLabel(sysDate, displayDate, true);
 
-                            let msgText = `[ระบบอัตโนมัติ] แจ้งทำรายการยกเลิกนัดหมาย ❌\n👤 ชื่อ: ${mName}\n📞 โทร: ${mTel}\n🩺 บริการ: ${service}\n📅 วันที่: ${displayDate}\n⏰ รอบเวลา: ${time} น.`;
+                            let msgText = currentLang === 'en'
+                                ? `[Automated System] Appointment Cancelled ❌\n👤 Name: ${mName}\n📞 Tel: ${mTel}\n🩺 Service: ${dispSvc}\n📅 Date: ${dispDate}\n⏰ Time: ${time}`
+                                : `[ระบบอัตโนมัติ] แจ้งทำรายการยกเลิกนัดหมาย ❌\n👤 ชื่อ: ${mName}\n📞 โทร: ${mTel}\n🩺 บริการ: ${service}\n📅 วันที่: ${dispDate}\n⏰ รอบเวลา: ${time} น.`;
                             
-                            Swal.fire({ title: 'ยกเลิกคิวสำเร็จ!', text: "กำลังส่งข้อความยืนยันในแชท...", icon: 'success', showConfirmButton: false, allowOutsideClick: false });
+                            Swal.fire({ title: _t('cancel_success_title'), text: _t('sending_chat'), icon: 'success', showConfirmButton: false, allowOutsideClick: false });
                             liff.sendMessages([{ type: 'text', text: msgText }])
                             .then(() => { liff.closeWindow(); })
-                            .catch((err) => { 
-                                Swal.fire({ title: 'ยกเลิกคิวสำเร็จ!', text: 'ดำเนินการยกเลิกเรียบร้อยแล้ว', icon: 'success' }).then(() => liff.closeWindow());
+                            .catch(() => { 
+                                Swal.fire({ title: _t('cancel_success_title'), text: _t('cancel_done_text'), icon: 'success' }).then(() => liff.closeWindow());
                             });
                         } else {
-                            Swal.fire('สำเร็จ', 'ยกเลิกคิวเรียบร้อยแล้ว', 'success');
+                            Swal.fire(_t('cancel_success_title'), _t('cancel_done_text'), 'success');
                             fetchDashboardHistory();
                         }
                     } else {
-                        Swal.fire('ข้อผิดพลาด', res.message || 'ไม่สามารถยกเลิกได้', 'error');
+                        Swal.fire(_t('conn_err_title'), res.message || 'Error', 'error');
                     }
-                }).catch(()=> { hide3DLoader(); Swal.fire('ขัดข้อง', 'ไม่สามารถเชื่อมต่อได้', 'error'); });
+                }).catch(()=> { hide3DLoader(); Swal.fire(_t('conn_err_title'), _t('conn_err_text'), 'error'); });
             }
         });
     }
@@ -874,14 +1305,14 @@
 
     function openBookingFlow(dept) {
         currentDept = dept;
-        let t = dept === 'ttm' ? 'แพทย์แผนไทย' : dept === 'tcm' ? 'แพทย์แผนจีน' : dept === 'postpartum' ? 'หลังคลอด' : 'อบไอน้ำสมุนไพร';
-        document.getElementById('booking-header-title').innerText = t;
+        let deptTitleKey = dept === 'ttm' ? 'dept_ttm' : dept === 'tcm' ? 'dept_tcm' : dept === 'postpartum' ? 'dept_postpartum' : 'dept_steam';
+        document.getElementById('booking-header-title').innerText = _t(deptTitleKey);
         navigate('page-booking');
         
         hideStepsAfter('step-time');
         document.getElementById('date-scroller').innerHTML = '';
         
-        show3DLoader('กำลังค้นหาคิวว่างทั้งหมด...');
+        show3DLoader(_t('searching_slots'));
         
         fetch(FIREBASE_URL + "sadaoData.json?t=" + new Date().getTime())
         .then(r => r.json()).then(data => {
@@ -890,7 +1321,7 @@
             selectedDateIdx = 0; selectedTimeStr = '';
             renderDates();
         }).catch(err => {
-            hide3DLoader(); Swal.fire({title: 'ขัดข้อง', text: 'ไม่สามารถโหลดข้อมูลได้', icon: 'error'}); navigate('page-home');
+            hide3DLoader(); Swal.fire({title: _t('conn_err_title'), text: _t('conn_err_text'), icon: 'error'}); navigate('page-home');
         });
     }
 
@@ -900,9 +1331,10 @@
             let col = DAY_COLORS[day.dayOfWeek] || DAY_COLORS[0];
             let active = i === selectedDateIdx ? `${col.bg} ${col.border} border-2 shadow-md transform -translate-y-1` : `bg-white border-gray-200 text-gray-400 border`;
             let txtCol = i === selectedDateIdx ? col.text : 'text-gray-400';
-            let dTxt = (day.displayDate || "ไม่ระบุ").split(" ")[0];
+            let dayName = currentLang === 'en' ? col.dayEn : col.dayTh;
+            let dTxt = (day.displayDate || "-").split(" ")[0];
             html += `<div onclick="selectDate(${i})" class="rounded-2xl p-3 min-w-[75px] text-center cursor-pointer transition-all ${active}">
-                <p class="text-[10px] font-bold ${txtCol}">${col.day}</p>
+                <p class="text-[10px] font-bold ${txtCol}">${dayName}</p>
                 <p class="font-black text-xl leading-tight ${txtCol}">${dTxt}</p>
             </div>`;
         });
@@ -915,7 +1347,7 @@
     function renderTimes() {
         document.getElementById('step-time').classList.add('show');
         let day = fetchedData[selectedDateIdx];
-        if(!day || !day.slots || day.slots.length === 0) { document.getElementById('time-grid').innerHTML = `<p class="col-span-3 text-center text-sm text-red-500 font-bold py-4 bg-red-50 rounded-xl">ไม่มีคิวว่างในวันนี้</p>`; return; }
+        if(!day || !day.slots || day.slots.length === 0) { document.getElementById('time-grid').innerHTML = `<p class="col-span-3 text-center text-sm text-red-500 font-bold py-4 bg-red-50 rounded-xl">${_t('no_slots_today')}</p>`; return; }
 
         let html = '';
         day.slots.forEach(slot => {
@@ -925,49 +1357,65 @@
             let act = isFull ? '' : `onclick="selectTime('${slot.time}')"`;
             html += `<div ${act} class="border-2 rounded-2xl p-3 text-center transition-all ${c}">
                 <p class="font-black text-lg">${slot.time}</p>
-                <p class="text-[10px] font-bold mt-1 bg-white/50 rounded-full inline-block px-2">${isFull ? 'เต็ม' : 'ว่าง'}</p>
+                <p class="text-[10px] font-bold mt-1 bg-white/50 rounded-full inline-block px-2">${isFull ? _t('slot_full') : _t('status_free')}</p>
             </div>`;
         });
         document.getElementById('time-grid').innerHTML = html;
     }
 
+    function populateServiceDropdown(selectedVal = null) {
+        let sel = document.getElementById('select-service');
+        sel.innerHTML = '';
+        if (SERVICES_I18N[currentDept]) {
+            SERVICES_I18N[currentDept].forEach(s => {
+                let label = (currentLang === 'en') ? s.en : s.th;
+                let isSel = (selectedVal && selectedVal === s.th) ? 'selected' : '';
+                sel.innerHTML += `<option value="${s.th}" ${isSel}>${label}</option>`;
+            });
+        }
+    }
+
     function selectTime(time) {
         selectedTimeStr = time; selectedStaffObj = null; hideStepsAfter('step-service'); renderTimes();
         document.getElementById('step-service').classList.add('show');
-        
-        let sel = document.getElementById('select-service'); sel.innerHTML = '';
-        if(SERVICES[currentDept]) {
-            SERVICES[currentDept].forEach(s => { sel.innerHTML += `<option value="${s}">${s}</option>`; });
-        }
-        
+        populateServiceDropdown();
         setTimeout(() => { document.getElementById('step-service').scrollIntoView({behavior: "smooth", block: "center"}); }, 100);
         stepServiceDone();
     }
 
-    function stepServiceDone() {
-        hideStepsAfter('step-staff'); resetAddonsAndPrice();
-        document.getElementById('step-staff').classList.add('show');
-        let day = fetchedData[selectedDateIdx]; let slot = day.slots.find(s => s.time === selectedTimeStr);
+    function renderStaffCards(activeStaffName = null) {
+        let day = fetchedData[selectedDateIdx];
+        let slot = day.slots.find(s => s.time === selectedTimeStr);
+        if (!slot) return;
 
         if(currentDept === 'ttm' || currentDept === 'tcm') {
-            document.getElementById('lbl-staff').style.display = 'flex'; document.getElementById('staff-grid').style.display = 'grid';
+            document.getElementById('lbl-staff').style.display = 'flex';
+            document.getElementById('staff-grid').style.display = 'grid';
             let sHtml = ''; let uniqueStaff = []; let map = {};
             (slot.staffAvailable || []).forEach(s => { if(!map[s.name]) { map[s.name]=s; uniqueStaff.push(s); }});
 
             uniqueStaff.forEach(st => {
                 let img = STAFF_IMAGES[st.name] || STAFF_IMAGES['DEFAULT'];
-                let nShort = STAFF_NAME_MAP[st.name] || st.name.replace(' J','').replace(' M','').replace(' B','').replace(' C','').replace(' F','').replace(' KW','').replace(' T','').replace(' W','');
-                sHtml += `<div onclick='chooseStaff(this, ${JSON.stringify(st)})' class="flex flex-col items-center p-3 border-2 border-gray-100 bg-white rounded-2xl cursor-pointer staff-card transition-all">
+                let dispName = getStaffDisplayName(st.name);
+                let isAct = (activeStaffName && activeStaffName === st.name) ? 'active border-emerald-500' : 'border-gray-100';
+                sHtml += `<div onclick='chooseStaff(this, ${JSON.stringify(st)})' class="flex flex-col items-center p-3 border-2 ${isAct} bg-white rounded-2xl cursor-pointer staff-card transition-all">
                     <img src="${img}" class="w-12 h-12 rounded-full object-cover mb-2 shadow-sm border-2 border-white">
-                    <span class="text-[10px] font-extrabold text-gray-700 text-center leading-tight">${nShort}</span>
+                    <span class="text-[10px] font-extrabold text-gray-700 text-center leading-tight">${dispName}</span>
                 </div>`;
             });
             document.getElementById('staff-grid').innerHTML = sHtml;
         } else {
-            document.getElementById('lbl-staff').style.display = 'none'; document.getElementById('staff-grid').style.display = 'none';
+            document.getElementById('lbl-staff').style.display = 'none';
+            document.getElementById('staff-grid').style.display = 'none';
             selectedStaffObj = { name: "ไม่ระบุ", col: 0, dept: currentDept };
             checkAddonsAndEnableSubmit();
         }
+    }
+
+    function stepServiceDone() {
+        hideStepsAfter('step-staff'); resetAddonsAndPrice();
+        document.getElementById('step-staff').classList.add('show');
+        renderStaffCards();
     }
 
     function chooseStaff(el, stData) {
@@ -977,14 +1425,16 @@
         checkAddonsAndEnableSubmit();
     }
 
-    function checkAddonsAndEnableSubmit() {
+    function checkAddonsAndEnableSubmit(preselectedAddon = 'none') {
         try {
             resetAddonsAndPrice();
             let nextTime = ALLOWED_2HR_PAIRS[selectedTimeStr];
             let nextNextTime = nextTime ? ALLOWED_2HR_PAIRS[nextTime] : null; 
+            let cur = _t('baht');
+            let timeSuf = _t('time_suffix');
 
             let optionsHtml = '';
-            optionsHtml += createAddonRadio('none', 'ไม่รับบริการเพิ่ม (เสร็จสิ้น)', '', 'fa-circle-xmark', 'text-gray-500', 'bg-gray-100', '{}', true);
+            optionsHtml += createAddonRadio('none', _t('addon_none'), '', 'fa-circle-xmark', 'text-gray-500', 'bg-gray-100', '{}', preselectedAddon === 'none');
 
             if (nextTime && fullFirebaseData) {
                 let ttmSlots = (fullFirebaseData.ttm && fullFirebaseData.ttm[selectedDateIdx]) ? fullFirebaseData.ttm[selectedDateIdx].slots || [] : [];
@@ -1008,22 +1458,22 @@
                 let tcmStaff = tcmFree ? tcmNext.staffAvailable[0] : null;
 
                 if(currentDept === 'ttm' && ttmFree) {
-                    optionsHtml += createAddonRadio('2hr', 'นวดแผนไทย ชั่วโมงที่ 2 ('+nextTime+' น.)', '+ 250 บาท', 'fa-clock', 'text-emerald-500', 'bg-emerald-50', JSON.stringify(ttmStaff));
+                    optionsHtml += createAddonRadio('2hr', `${_t('addon_2hr_ttm')} (${nextTime}${timeSuf})`, `+ 250 ${cur}`, 'fa-clock', 'text-emerald-500', 'bg-emerald-50', JSON.stringify(ttmStaff), preselectedAddon === '2hr');
                 }
                 if(currentDept === 'tcm' && tcmFree && selectedStaffObj) {
                     let sameStf = tcmNext.staffAvailable.find(st => st.name === selectedStaffObj.name);
-                    if(sameStf) optionsHtml += createAddonRadio('2hr', 'ครอบแก้ว ชั่วโมงที่ 2 ('+nextTime+' น.)', '+ 150 บาท', 'fa-clock', 'text-emerald-500', 'bg-emerald-50', JSON.stringify(sameStf));
+                    if(sameStf) optionsHtml += createAddonRadio('2hr', `${_t('addon_2hr_tcm')} (${nextTime}${timeSuf})`, `+ 150 ${cur}`, 'fa-clock', 'text-emerald-500', 'bg-emerald-50', JSON.stringify(sameStf), preselectedAddon === '2hr');
                 }
                 if(currentDept === 'ttm' && tcmFree) {
-                     optionsHtml += createAddonRadio('cross_acu', 'ฝังเข็มแผนจีน ('+nextTime+' น.)', '+ 200 บาท', 'fa-yin-yang', 'text-amber-500', 'bg-amber-50', JSON.stringify(tcmStaff));
-                     optionsHtml += createAddonRadio('cross_cup', 'ครอบแก้ว ('+nextTime+' น.)', '+ 150 บาท', 'fa-fire-burner', 'text-amber-500', 'bg-amber-50', JSON.stringify(tcmStaff));
+                     optionsHtml += createAddonRadio('cross_acu', `${_t('addon_cross_acu')} (${nextTime}${timeSuf})`, `+ 200 ${cur}`, 'fa-yin-yang', 'text-amber-500', 'bg-amber-50', JSON.stringify(tcmStaff), preselectedAddon === 'cross_acu');
+                     optionsHtml += createAddonRadio('cross_cup', `${_t('addon_cross_cup')} (${nextTime}${timeSuf})`, `+ 150 ${cur}`, 'fa-fire-burner', 'text-amber-500', 'bg-amber-50', JSON.stringify(tcmStaff), preselectedAddon === 'cross_cup');
                 }
                 if(currentDept === 'tcm' && ttmFree) {
-                     optionsHtml += createAddonRadio('cross_ttm', 'นวดแผนไทย ('+nextTime+' น.)', '+ 250 บาท', 'fa-leaf', 'text-amber-500', 'bg-amber-50', JSON.stringify(ttmStaff));
+                     optionsHtml += createAddonRadio('cross_ttm', `${_t('addon_cross_ttm')} (${nextTime}${timeSuf})`, `+ 250 ${cur}`, 'fa-leaf', 'text-amber-500', 'bg-amber-50', JSON.stringify(ttmStaff), preselectedAddon === 'cross_ttm');
                 }
                 if(steamFree) {
-                     let steamPriceStr = (userProfile.right === '4' || userProfile.right === '5') ? '+ 100 บาท' : 'ฟรีตามสิทธิ';
-                     optionsHtml += createAddonRadio('steam', 'อบไอน้ำสมุนไพร ('+nextTime+' น.)', steamPriceStr, 'fa-hot-tub-person', 'text-blue-500', 'bg-blue-50', '{}');
+                     let steamPriceStr = (userProfile.right === '4' || userProfile.right === '5') ? `+ 100 ${cur}` : _t('free_by_right');
+                     optionsHtml += createAddonRadio('steam', `${_t('addon_steam')} (${nextTime}${timeSuf})`, steamPriceStr, 'fa-hot-tub-person', 'text-blue-500', 'bg-blue-50', '{}', preselectedAddon === 'steam');
                 }
                 if (nextNextTime) {
                     let steamNextNext = steamSlots.find(s => s.time === nextNextTime);
@@ -1031,17 +1481,17 @@
                     
                     if (currentDept === 'ttm' && ttmFree && steamNextNextFree) {
                         let p = 250 + ((userProfile.right === '4' || userProfile.right === '5') ? 100 : 0);
-                        optionsHtml += createAddonRadio('2hr_steam', 'นวด 2 ชม. + อบไอน้ำ ('+nextTime+' และ '+nextNextTime+' น.)', '+ '+p+' บาท', 'fa-layer-group', 'text-purple-500', 'bg-purple-50', JSON.stringify(ttmStaff));
+                        optionsHtml += createAddonRadio('2hr_steam', `${_t('addon_2hr_steam')} (${nextTime} ${_t('and_word')} ${nextNextTime}${timeSuf})`, `+ ${p} ${cur}`, 'fa-layer-group', 'text-purple-500', 'bg-purple-50', JSON.stringify(ttmStaff), preselectedAddon === '2hr_steam');
                     }
                     if (currentDept === 'ttm' && tcmFree && steamNextNextFree) {
                         let p_acu = 200 + ((userProfile.right === '4' || userProfile.right === '5') ? 100 : 0);
                         let p_cup = 150 + ((userProfile.right === '4' || userProfile.right === '5') ? 100 : 0);
-                        optionsHtml += createAddonRadio('cross_acu_steam', 'ฝังเข็ม + อบไอน้ำ ('+nextTime+' และ '+nextNextTime+' น.)', '+ '+p_acu+' บาท', 'fa-layer-group', 'text-indigo-500', 'bg-indigo-50', JSON.stringify(tcmStaff));
-                        optionsHtml += createAddonRadio('cross_cup_steam', 'ครอบแก้ว + อบไอน้ำ ('+nextTime+' และ '+nextNextTime+' น.)', '+ '+p_cup+' บาท', 'fa-layer-group', 'text-indigo-500', 'bg-indigo-50', JSON.stringify(tcmStaff));
+                        optionsHtml += createAddonRadio('cross_acu_steam', `${_t('addon_cross_acu_steam')} (${nextTime} ${_t('and_word')} ${nextNextTime}${timeSuf})`, `+ ${p_acu} ${cur}`, 'fa-layer-group', 'text-indigo-500', 'bg-indigo-50', JSON.stringify(tcmStaff), preselectedAddon === 'cross_acu_steam');
+                        optionsHtml += createAddonRadio('cross_cup_steam', `${_t('addon_cross_cup_steam')} (${nextTime} ${_t('and_word')} ${nextNextTime}${timeSuf})`, `+ ${p_cup} ${cur}`, 'fa-layer-group', 'text-indigo-500', 'bg-indigo-50', JSON.stringify(tcmStaff), preselectedAddon === 'cross_cup_steam');
                     }
                     if (currentDept === 'tcm' && ttmFree && steamNextNextFree) {
                         let p_ttm = 250 + ((userProfile.right === '4' || userProfile.right === '5') ? 100 : 0);
-                        optionsHtml += createAddonRadio('cross_ttm_steam', 'นวดแผนไทย + อบไอน้ำ ('+nextTime+' และ '+nextNextTime+' น.)', '+ '+p_ttm+' บาท', 'fa-layer-group', 'text-indigo-500', 'bg-indigo-50', JSON.stringify(ttmStaff));
+                        optionsHtml += createAddonRadio('cross_ttm_steam', `${_t('addon_cross_ttm_steam')} (${nextTime} ${_t('and_word')} ${nextNextTime}${timeSuf})`, `+ ${p_ttm} ${cur}`, 'fa-layer-group', 'text-indigo-500', 'bg-indigo-50', JSON.stringify(ttmStaff), preselectedAddon === 'cross_ttm_steam');
                     }
                 }
             }
@@ -1117,7 +1567,7 @@
             let estPriceEl = document.getElementById('est-price');
             estPriceEl.classList.remove('text-xs', 'text-red-500');
             estPriceEl.classList.add('text-xl', 'text-emerald-600');
-            estPriceEl.innerText = totalFee + ".-";
+            estPriceEl.innerText = `${totalFee} ${_t('baht')}`;
 
         } catch(err) {
             console.error("Price Error:", err);
@@ -1130,16 +1580,24 @@
 
     function buildSummaryPage() {
         let svc = document.getElementById('select-service').value;
+        let dispSvc = getServiceDisplayName(svc);
         let day = fetchedData[selectedDateIdx];
+        let dispDate = formatSysDateLabel(day.sysDate, day.displayDate, false);
         
-        document.getElementById('sum-date-time').innerText = `${day.displayDate} | ${selectedTimeStr} น.`;
-        document.getElementById('sum-name').innerText = `คุณ${userProfile.fname} ${userProfile.lname}`;
-        document.getElementById('sum-right').innerText = `สิทธิ: ${userProfile.rightName}`;
-        document.getElementById('sum-total-price').innerText = `${totalFee}.-`;
+        document.getElementById('sum-date-time').innerText = `${dispDate} | ${selectedTimeStr}${_t('time_suffix')}`;
+        document.getElementById('sum-name').innerText = `${_t('user_prefix')}${userProfile.fname} ${userProfile.lname}`;
+        document.getElementById('sum-right').innerText = `${_t('sum_right_prefix')}${getRightDisplayName(userProfile.right)}`;
+        document.getElementById('sum-total-price').innerText = `${totalFee} ${_t('baht')}`;
+
+        let dispStaff = selectedStaffObj ? getStaffDisplayName(selectedStaffObj.name) : "";
+        let staffLine = (currentDept === 'ttm' || currentDept === 'tcm') ? `<p class="text-xs text-gray-500 mt-0.5"><i class="fa-solid fa-user-doctor text-emerald-500"></i> ${dispStaff}</p>` : '';
 
         let itemsHtml = `
             <div class="flex justify-between items-center mb-2">
-                <span class="text-sm font-bold text-gray-700">${svc}</span>
+                <div>
+                    <span class="text-sm font-bold text-gray-700">${dispSvc}</span>
+                    ${staffLine}
+                </div>
                 <span class="text-emerald-500"><i class="fa-solid fa-circle-check"></i></span>
             </div>`;
         
@@ -1148,29 +1606,28 @@
 
         if(val.includes('2hr')) {
             itemsHtml += `<div class="flex justify-between items-center mb-2 text-emerald-600">
-                <span class="text-sm font-bold"><i class="fa-solid fa-clock"></i> บริการต่อเนื่องชั่วโมงที่ 2</span><span><i class="fa-solid fa-circle-check"></i></span></div>`;
+                <span class="text-sm font-bold"><i class="fa-solid fa-clock"></i> ${_t('sum_addon_2hr')}</span><span><i class="fa-solid fa-circle-check"></i></span></div>`;
         }
         if(val.includes('cross_acu')) {
             itemsHtml += `<div class="flex justify-between items-center mb-2 text-amber-500">
-                <span class="text-sm font-bold"><i class="fa-solid fa-yin-yang"></i> ต่อด้วย ฝังเข็มแผนจีน</span><span><i class="fa-solid fa-circle-check"></i></span></div>`;
+                <span class="text-sm font-bold"><i class="fa-solid fa-yin-yang"></i> ${_t('sum_addon_acu')}</span><span><i class="fa-solid fa-circle-check"></i></span></div>`;
         }
         if(val.includes('cross_cup')) {
             itemsHtml += `<div class="flex justify-between items-center mb-2 text-amber-500">
-                <span class="text-sm font-bold"><i class="fa-solid fa-fire-burner"></i> ต่อด้วย ครอบแก้ว</span><span><i class="fa-solid fa-circle-check"></i></span></div>`;
+                <span class="text-sm font-bold"><i class="fa-solid fa-fire-burner"></i> ${_t('sum_addon_cup')}</span><span><i class="fa-solid fa-circle-check"></i></span></div>`;
         }
         if(val.includes('cross_ttm')) {
             itemsHtml += `<div class="flex justify-between items-center mb-2 text-amber-500">
-                <span class="text-sm font-bold"><i class="fa-solid fa-leaf"></i> ต่อด้วย นวดแผนไทย</span><span><i class="fa-solid fa-circle-check"></i></span></div>`;
+                <span class="text-sm font-bold"><i class="fa-solid fa-leaf"></i> ${_t('sum_addon_ttm')}</span><span><i class="fa-solid fa-circle-check"></i></span></div>`;
         }
         if(val.includes('steam')) {
             itemsHtml += `<div class="flex justify-between items-center mb-2 text-blue-500">
-                <span class="text-sm font-bold"><i class="fa-solid fa-hot-tub-person"></i> อบไอน้ำสมุนไพรต่อ</span><span><i class="fa-solid fa-circle-check"></i></span></div>`;
+                <span class="text-sm font-bold"><i class="fa-solid fa-hot-tub-person"></i> ${_t('sum_addon_steam')}</span><span><i class="fa-solid fa-circle-check"></i></span></div>`;
         }
         
         document.getElementById('sum-items-container').innerHTML = itemsHtml;
     }
 
-    // 🔴 3. ฟังก์ชันส่งจองคิว บังคับคนไข้ส่งแชทเข้า LINE OA เอง
     function submitBookingAPI() {
         let svc = document.getElementById('select-service').value;
         let day = fetchedData[selectedDateIdx];
@@ -1203,7 +1660,6 @@
             }
         }
 
-        // ส่งทั้ง fname/lname/tel และ mainFname/mainLname/mainTel ให้ครบถ้วน
         let payload = { 
             action: 'book_queue_cart', 
             mainIdCard: userProfile.id, 
@@ -1221,13 +1677,12 @@
             lineUid: userLineUid 
         };
 
-        show3DLoader('กำลังลงบันทึกคิว...');
+        show3DLoader(_t('saving_booking'));
 
         fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
         .then(r => r.json()).then(res => {
             hide3DLoader();
             if(res.status === 'success') {
-                // ซิงค์ตารางเวรในพื้นหลังทันที
                 fetch(API_URL, {method:'POST', body:JSON.stringify({action:'background_sync', dept:currentDept})}).catch(()=>{});
 
                 if (liff.isInClient()) {
@@ -1235,8 +1690,8 @@
                     let mTel = userProfile.phone.substring(0,3) + "-xxx-x" + userProfile.phone.substring(8);
                     let displayNote = inputNote === "" ? "-" : inputNote;
                     
-                    let displayDateFull = day.fullLabel || day.displayDate;
-                    let displayStaff = STAFF_NAME_MAP[selectedStaffObj.name] || selectedStaffObj.name;
+                    let displayDateFull = formatSysDateLabel(day.sysDate, day.fullLabel || day.displayDate, true);
+                    let displayStaff = getStaffDisplayName(selectedStaffObj.name);
 
                     let displayTime = selectedTimeStr;
                     let lastItemTime = items[items.length - 1].time;
@@ -1246,34 +1701,39 @@
                     let endTimeStr = (eH < 10 ? '0' : '') + eH + ':' + (eM < 10 ? '0' : '') + eM;
                     let timeRange = `${displayTime} - ${endTimeStr}`;
 
-                    let allSvcs = items.map(it => it.service).join(' + ');
+                    let allSvcs = items.map(it => getServiceDisplayName(it.service)).join(' + ');
 
-                    // ข้อความชุดที่ 1
-                    let msgText1 = `[ระบบอัตโนมัติ] แจ้งทำรายการนัดหมายสำเร็จ \n👤 ชื่อ: ${mName}\n📞 โทร: ${mTel}\n🩺 บริการ: ${allSvcs}\n📅 วันที่: ${displayDateFull}\n⏰ เวลา: ${timeRange} น.\n👨‍⚕️ ผู้ให้บริการ: ${displayStaff}\n📝 หมายเหตุ: ${displayNote}\n💰 ยอดชำระ: ${totalFee} บาท`;
+                    let msgText1 = "";
+                    let msgText2 = "";
+
+                    if (currentLang === 'en') {
+                        msgText1 = `[Automated System] Booking Confirmed ✅\n👤 Name: ${mName}\n📞 Tel: ${mTel}\n🩺 Service: ${allSvcs}\n📅 Date: ${displayDateFull}\n⏰ Time: ${timeRange}\n👨‍⚕️ Provider: ${displayStaff}\n📝 Note: ${displayNote}\n💰 Est. Fee: ${totalFee} THB`;
+                        msgText2 = "🕰️ Please arrive at least 15 minutes before your appointment.\n\n***‼️ Late arrivals may result in forfeiting your queue to other patients.\n\n***‼️ To reschedule or cancel, please notify us at least 2 days in advance.\n\n😷 Please wear a face mask at all times during your visit.\n📝 Don't forget to bring your National ID / Passport.";
+                    } else {
+                        msgText1 = `[ระบบอัตโนมัติ] แจ้งทำรายการนัดหมายสำเร็จ \n👤 ชื่อ: ${mName}\n📞 โทร: ${mTel}\n🩺 บริการ: ${allSvcs}\n📅 วันที่: ${displayDateFull}\n⏰ เวลา: ${timeRange} น.\n👨‍⚕️ ผู้ให้บริการ: ${displayStaff}\n📝 หมายเหตุ: ${displayNote}\n💰 ยอดชำระ: ${totalFee} บาท`;
+                        msgText2 = "🕰️ กรุณามาก่อนเวลานัดอย่างน้อย 15 นาที\n\n***‼️หากไม่มาติดต่อภายในเวลาที่กำหนด ถือว่าท่านสละสิทธิ์ให้คนไข้ท่านอื่น\n\n***‼️การเลื่อนนัดหรือยกเลิกนัด โปรดแจ้งล่วงหน้า อย่างน้อย 2 วัน\n\n😷โปรดสวมหน้ากากอนามัยตลอดเวลาเข้ารับบริการ\n📝 อย่าลืมนำบัตรประจำตัวประชาชนมาด้วยนะครับ";
+                    }
                     
-                    // ข้อความชุดที่ 2
-                    let msgText2 = "🕰️ กรุณามาก่อนเวลานัดอย่างน้อย 15 นาที\n\n***‼️หากไม่มาติดต่อภายในเวลาที่กำหนด ถือว่าท่านสละสิทธิ์ให้คนไข้ท่านอื่น\n\n***‼️การเลื่อนนัดหรือยกเลิกนัด โปรดแจ้งล่วงหน้า อย่างน้อย 2 วัน\n\n😷โปรดสวมหน้ากากอนามัยตลอดเวลาเข้ารับบริการ\n📝 อย่าลืมนำบัตรประจำตัวประชาชนมาด้วยนะครับ";
-                    
-                    Swal.fire({ title: 'จองคิวสำเร็จ!', text: "กำลังส่งข้อความยืนยันในแชท...", icon: 'success', showConfirmButton: false, allowOutsideClick: false });
+                    Swal.fire({ title: _t('book_success_title'), text: _t('sending_chat'), icon: 'success', showConfirmButton: false, allowOutsideClick: false });
                     
                     liff.sendMessages([ { type: 'text', text: msgText1 }, { type: 'text', text: msgText2 } ])
                     .then(() => { liff.closeWindow(); })
-                    .catch((err) => { 
+                    .catch(() => { 
                         Swal.fire({ 
-                            title: 'จองคิวสำเร็จ!', 
-                            html: `บันทึกคิวเรียบร้อยแล้ว<br><span class="text-xs text-red-500">(หมายเหตุ: ส่งข้อความอัตโนมัติไม่สำเร็จ กรุณาตรวจสอบว่าเปิด Scope: chat_message.write ใน LINE Developers แล้ว)</span>`, 
-                            icon: 'success', confirmButtonText: 'ตกลง' 
+                            title: _t('book_success_title'), 
+                            html: `${_t('book_saved_text')}<br><b class="text-emerald-600 text-lg">${displayDateFull} | ${selectedTimeStr}</b>`, 
+                            icon: 'success', confirmButtonText: 'OK' 
                         }).then(() => navigate('page-home'));
                     });
                 } else {
-                    Swal.fire({ title: 'จองคิวสำเร็จ!', html: `<p class="text-sm font-medium mt-2">บันทึกคิวเรียบร้อยแล้ว<br><b class="text-emerald-600 text-lg">${day.displayDate} | ${selectedTimeStr} น.</b></p>`, icon: 'success', confirmButtonColor: '#059669' }).then(() => navigate('page-home'));
+                    Swal.fire({ title: _t('book_success_title'), html: `<p class="text-sm font-medium mt-2">${_t('book_saved_text')}<br><b class="text-emerald-600 text-lg">${formatSysDateLabel(day.sysDate, day.displayDate, false)} | ${selectedTimeStr}</b></p>`, icon: 'success', confirmButtonColor: '#059669' }).then(() => navigate('page-home'));
                 }
             } else if (res.status === 'error_blocked') {
-                Swal.fire({ title: 'พบรายการจองซ้ำ', html: `คุณมีคิวที่แผนกนี้รอรับบริการอยู่แล้ว<br><b style="color:#10b981; font-size:1.1rem;">รอบวันที่ ${res.date} เวลา ${res.time} น.</b><br>กรุณารับบริการหรือยกเลิกคิวเดิมก่อนครับ`, icon: 'warning' }); openBookingFlow(currentDept);
+                Swal.fire({ title: _t('dup_title'), html: `${_t('dup_html_1')}<br><b style="color:#10b981; font-size:1.1rem;">${_t('dup_html_2')}${res.date} | ${res.time}</b><br>${_t('dup_html_3')}`, icon: 'warning' }); openBookingFlow(currentDept);
             } else {
-                Swal.fire({ title: 'คิวไม่ว่าง', text: res.message || 'คิวนี้ถูกจองตัดหน้าไปแล้วครับ', icon: 'info' }); openBookingFlow(currentDept);
+                Swal.fire({ title: _t('slot_taken_title'), text: res.message || _t('slot_taken_text'), icon: 'info' }); openBookingFlow(currentDept);
             }
-        }).catch(() => { hide3DLoader(); Swal.fire({title: 'ขัดข้อง', text: 'เชื่อมต่อไม่สำเร็จ', icon: 'error'}); });
+        }).catch(() => { hide3DLoader(); Swal.fire({title: _t('conn_err_title'), text: _t('conn_err_text'), icon: 'error'}); });
     }
 
     // ==========================================
@@ -1366,7 +1826,7 @@
                     </div>
                     ${b.status === 'รอรับบริการ' ? `
                     <div class="flex justify-end">
-                        <button onclick="adminCancelQueue('${b.idCard}', '${b.sysDate}', '${b.timeOnly}', '${b.dept}', '${b.name}')" class="text-xs bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg font-bold hover:bg-red-100 active:scale-95 transition-all"><i class="fa-solid fa-ban"></i> ยกเลิกนัด / แบน</button>
+                        <button onclick="adminCancelQueue('\${b.idCard}', '${b.sysDate}', '${b.timeOnly}', '${b.dept}', '${b.name}')" class="text-xs bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg font-bold hover:bg-red-100 active:scale-95 transition-all"><i class="fa-solid fa-ban"></i> ยกเลิกนัด / แบน</button>
                     </div>` : ''}
                 </div>`;
             });

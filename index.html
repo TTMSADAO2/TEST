@@ -144,41 +144,41 @@
                 </div>
             </div>
 
-            <!-- สิทธิการรักษา -->
-            <h3 class="font-extrabold text-gray-800 mb-3 px-1">💳 สิทธิการรักษา <span class="text-red-500">*</span></h3>
-            <div class="flex flex-col gap-2 mb-4">
-                <div class="right-option border-2 border-emerald-500 bg-emerald-50 p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer shadow-sm transition-all" onclick="selectRightUI(this, '1')">
-                    <input type="radio" name="patient_right" value="1" class="hidden" checked>
+            <!-- สิทธิการรักษา (จุดที่ 1: เอาค่าเริ่มต้นออก ให้เป็นพื้นหลังสีขาวทั้งหมด) -->
+            <h3 id="rights-section-title" class="font-extrabold text-gray-800 mb-3 px-1">💳 สิทธิการรักษา <span class="text-red-500">*</span> <span class="text-xs font-normal text-emerald-600">(กรุณากดเลือกสิทธิของท่าน)</span></h3>
+            <div class="flex flex-col gap-2 mb-4" id="rights-list-container">
+                <div class="right-option border-2 border-gray-200 bg-white p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer transition-all" onclick="selectRightUI(this, '1')">
+                    <input type="radio" name="patient_right" value="1" class="hidden">
                     <div class="w-10 h-10 rounded-full bg-emerald-100 flex justify-center items-center text-emerald-600"><i class="fa-solid fa-id-card"></i></div>
-                    <div class="flex-1"><p class="font-bold text-emerald-800 text-sm leading-none mb-1">บัตรทอง (ร่วมจ่าย 30 บาท)</p><p class="text-[10px] text-gray-500 font-medium">อายุ 12-59 ปี</p></div>
-                    <i class="fa-solid fa-circle-check text-emerald-500 text-lg check-icon"></i>
+                    <div class="flex-1"><p class="font-bold text-gray-800 text-sm leading-none mb-1 right-title-text">บัตรทอง (ร่วมจ่าย 30 บาท)</p><p class="text-[10px] text-gray-500 font-medium">อายุ 12-59 ปี</p></div>
+                    <i class="fa-solid fa-circle-check text-gray-300 text-lg check-icon hidden"></i>
                 </div>
                 <div class="right-option border-2 border-gray-200 bg-white p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer transition-all" onclick="selectRightUI(this, '2')">
                     <input type="radio" name="patient_right" value="2" class="hidden">
                     <div class="w-10 h-10 rounded-full bg-green-100 flex justify-center items-center text-green-600"><i class="fa-solid fa-id-card-clip"></i></div>
-                    <div class="flex-1"><p class="font-bold text-gray-800 text-sm leading-none mb-1">บัตรทอง (ยกเว้นร่วมจ่าย)</p><p class="text-[10px] text-gray-500 font-medium">ผู้สูงอายุ, ผู้มีรายได้น้อย, อสม.</p></div>
+                    <div class="flex-1"><p class="font-bold text-gray-800 text-sm leading-none mb-1 right-title-text">บัตรทอง (ยกเว้นร่วมจ่าย)</p><p class="text-[10px] text-gray-500 font-medium">ผู้สูงอายุ, ผู้มีรายได้น้อย, อสม.</p></div>
                     <i class="fa-solid fa-circle-check text-gray-300 text-lg check-icon hidden"></i>
                 </div>
                 <div class="right-option border-2 border-gray-200 bg-white p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer transition-all" onclick="selectRightUI(this, '3')">
                     <input type="radio" name="patient_right" value="3" class="hidden">
                     <div class="w-10 h-10 rounded-full bg-blue-100 flex justify-center items-center text-blue-600"><i class="fa-solid fa-building-flag"></i></div>
-                    <div class="flex-1"><p class="font-bold text-gray-800 text-sm leading-none mb-1">ข้าราชการ / อปท.</p><p class="text-[10px] text-gray-500 font-medium">เบิกจ่ายตรง ไม่ต้องสำรองจ่าย</p></div>
+                    <div class="flex-1"><p class="font-bold text-gray-800 text-sm leading-none mb-1 right-title-text">ข้าราชการ / อปท.</p><p class="text-[10px] text-gray-500 font-medium">เบิกจ่ายตรง ไม่ต้องสำรองจ่าย</p></div>
                     <i class="fa-solid fa-circle-check text-gray-300 text-lg check-icon hidden"></i>
                 </div>
                 <div class="right-option border-2 border-gray-200 bg-white p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer transition-all" onclick="selectRightUI(this, '4')">
                     <input type="radio" name="patient_right" value="4" class="hidden">
                     <div class="w-10 h-10 rounded-full bg-purple-100 flex justify-center items-center text-purple-600"><i class="fa-solid fa-landmark"></i></div>
-                    <div class="flex-1"><p class="font-bold text-gray-800 text-sm leading-none mb-1">รัฐวิสาหกิจ</p><p class="text-[10px] text-gray-500 font-medium">สำรองจ่าย เบิกต้นสังกัด</p></div>
+                    <div class="flex-1"><p class="font-bold text-gray-800 text-sm leading-none mb-1 right-title-text">รัฐวิสาหกิจ</p><p class="text-[10px] text-gray-500 font-medium">สำรองจ่าย เบิกต้นสังกัด</p></div>
                     <i class="fa-solid fa-circle-check text-gray-300 text-lg check-icon hidden"></i>
                 </div>
                 <div class="right-option border-2 border-gray-200 bg-white p-3.5 rounded-2xl flex items-center gap-3 cursor-pointer transition-all" onclick="selectRightUI(this, '5')">
                     <input type="radio" name="patient_right" value="5" class="hidden">
                     <div class="w-10 h-10 rounded-full bg-orange-100 flex justify-center items-center text-orange-600"><i class="fa-solid fa-wallet"></i></div>
-                    <div class="flex-1"><p class="font-bold text-gray-800 text-sm leading-none mb-1">ประกันสังคม / ชำระเงินเอง</p><p class="text-[10px] text-gray-500 font-medium">ชำระเงินสด / โอนสแกนจ่าย</p></div>
+                    <div class="flex-1"><p class="font-bold text-gray-800 text-sm leading-none mb-1 right-title-text">ประกันสังคม / ชำระเงินเอง</p><p class="text-[10px] text-gray-500 font-medium">ชำระเงินสด / โอนสแกนจ่าย</p></div>
                     <i class="fa-solid fa-circle-check text-gray-300 text-lg check-icon hidden"></i>
                 </div>
             </div>
-            <input type="hidden" id="selected-right-val" value="1">
+            <input type="hidden" id="selected-right-val" value="">
         </div>
         <div class="bottom-bar p-4">
             <button onclick="loginUser()" class="w-full bg-emerald-600 text-white rounded-full py-3.5 font-bold text-lg hover:bg-emerald-700 shadow-lg active:scale-95 transition-all">
@@ -431,6 +431,22 @@
     let userLineUid = ""; 
     let tempFoundUser = null; // เก็บชื่อ-นามสกุลจริงที่ดึงได้จากฐานข้อมูล
 
+    const RIGHT_NAMES = {
+        '1': 'บัตรทอง (ร่วมจ่าย 30 บาท)',
+        '2': 'บัตรทอง (ยกเว้นร่วมจ่าย)',
+        '3': 'ข้าราชการ / อปท.',
+        '4': 'รัฐวิสาหกิจ',
+        '5': 'ประกันสังคม / ชำระเงินเอง'
+    };
+
+    const RIGHT_SHORT_NAMES = {
+        '1': 'บัตรทอง 30฿',
+        '2': 'บัตรทอง (ฟรี)',
+        '3': 'ข้าราชการ',
+        '4': 'รัฐวิสาหกิจ',
+        '5': 'ปสค./เงินสด'
+    };
+
     const DAY_COLORS = [
         { bg: 'bg-red-50', border: 'border-red-400', text: 'text-red-700', day: 'อา.' },
         { bg: 'bg-yellow-50', border: 'border-yellow-400', text: 'text-yellow-700', day: 'จ.' },
@@ -479,7 +495,7 @@
 
     const ALLOWED_2HR_PAIRS = { "08:30": "09:30", "09:30": "10:30", "13:00": "14:00", "14:00": "15:00", "17:00": "18:00" };
 
-    let userProfile = { id: '', fname: '', lname: '', phone: '', right: '1', rightName: 'บัตรทอง (ร่วมจ่าย 30 บาท)' };
+    let userProfile = { id: '', fname: '', lname: '', phone: '', right: '', rightName: '', r_verified: false };
     let currentDept = ''; let fullFirebaseData = null; let fetchedData = []; 
     let selectedDateIdx = 0; let selectedTimeStr = ''; let selectedStaffObj = null; let totalFee = 0;
 
@@ -519,13 +535,14 @@
         });
     };
 
-    // 🔴 หากผู้ใช้เคยล็อกอินไว้แล้ว เมื่อกดปุ่มจากหน้าแรก ให้พาเข้าหน้าคิว (page-home) ทันทีโดยไม่ต้องกรอกใหม่!
+    // 🔴 หากผู้ใช้เคยล็อกอินและยืนยันสิทธิ (r_verified) ไว้แล้ว ให้พาเข้าหน้าคิว (page-home) ทันที
+    // แต่ถ้าเป็นการ์ดรุ่นเก่าที่ยังไม่เคยกดเลือกสิทธิใหม่ จะพาไปหน้า page-login เพื่อเลือกสิทธิ 1 ครั้ง
     function enterAppFromSplash() {
         let lastActive = localStorage.getItem('swc_active_user');
         if (lastActive) {
             try {
                 let parsed = JSON.parse(lastActive);
-                if (parsed && parsed.id && parsed.fname && parsed.phone) {
+                if (parsed && parsed.id && parsed.fname && parsed.phone && parsed.right && parsed.r_verified) {
                     userProfile = parsed;
                     navigate('page-home');
                     return;
@@ -535,23 +552,33 @@
         navigate('page-login');
     }
 
+    // 🔴 จุดที่ 3: โหลดการ์ดโปรไฟล์ โดยเช็ค r_verified (หากเป็นการ์ดเก่าจะปล่อยสิทธิให้ว่างเพื่อให้เลือกใหม่ 1 ครั้ง)
     function loadLocalProfiles() {
         let saved = JSON.parse(localStorage.getItem('swc_profiles') || '[]');
         if(saved.length > 0) {
             document.getElementById('saved-profiles-section').classList.remove('hidden');
             let phtml = '';
             saved.forEach(p => {
-                phtml += `<div class="flex flex-col items-center bg-white border border-emerald-100 p-2 rounded-xl min-w-[75px] shadow-sm cursor-pointer hover:bg-emerald-50" 
-                            onclick="fillProfile('${p.id}', '${p.f}', '${p.l || ''}', '${p.p || ''}', '${p.r || '1'}')">
+                let verifiedRight = p.r_verified ? (p.r || '') : '';
+                let rightBadge = (verifiedRight && RIGHT_SHORT_NAMES[verifiedRight])
+                    ? `<span class="text-[9px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded-full font-semibold mt-0.5 truncate max-w-full">${RIGHT_SHORT_NAMES[verifiedRight]}</span>`
+                    : `<span class="text-[9px] bg-amber-50 text-amber-600 border border-amber-200 px-1.5 py-0.5 rounded-full font-semibold mt-0.5">เลือกสิทธิใหม่</span>`;
+
+                phtml += `<div class="flex flex-col items-center bg-white border border-emerald-100 p-2 rounded-xl min-w-[85px] shadow-sm cursor-pointer hover:bg-emerald-50" 
+                            onclick="fillProfile('${p.id}', '${p.f}', '${p.l || ''}', '${p.p || ''}', '${verifiedRight}')">
                     <div class="w-11 h-11 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center font-black text-lg mb-1">${p.f.charAt(0)}</div>
                     <span class="text-[10px] font-bold text-gray-700 truncate w-full text-center">${p.f}</span>
+                    ${rightBadge}
                 </div>`;
             });
             document.getElementById('profile-list').innerHTML = phtml;
             
             // เลือกโปรไฟล์ล่าสุดให้อัตโนมัติในหน้า Login
             let lastUser = saved[saved.length - 1];
-            fillProfile(lastUser.id, lastUser.f, lastUser.l || '', lastUser.p || '', lastUser.r || '1');
+            let lastVerifiedRight = lastUser.r_verified ? (lastUser.r || '') : '';
+            fillProfile(lastUser.id, lastUser.f, lastUser.l || '', lastUser.p || '', lastVerifiedRight);
+        } else {
+            resetRightUI();
         }
     }
 
@@ -577,6 +604,7 @@
         document.getElementById('idcard-status').innerHTML = '';
         document.getElementById('existing-user-card').classList.add('hidden');
         document.getElementById('new-user-form').classList.remove('hidden');
+        resetRightUI();
         document.getElementById('inputIdCard').focus();
     }
 
@@ -598,6 +626,15 @@
                 document.getElementById('inputFname').value = tempFoundUser.fname;
                 document.getElementById('inputLname').value = tempFoundUser.lname;
                 if (tempFoundUser.tel) document.getElementById('inputPhone').value = tempFoundUser.tel;
+                if (localMatch.r_verified && localMatch.r) {
+                    document.querySelectorAll('input[name="patient_right"]').forEach(radio => { 
+                        if(radio.value === localMatch.r) { selectRightUI(radio.parentElement, localMatch.r); } 
+                    });
+                } else {
+                    resetRightUI();
+                }
+            } else {
+                resetRightUI();
             }
 
             typingTimer = setTimeout(() => {
@@ -626,6 +663,7 @@
                         document.getElementById('inputFname').value = ''; 
                         document.getElementById('inputLname').value = ''; 
                         document.getElementById('inputPhone').value = '';
+                        resetRightUI();
                     }
                 }).catch(() => { stat.innerHTML = ''; });
             }, 400);
@@ -637,13 +675,43 @@
         }
     }
 
-    function selectRightUI(el, val) {
+    // 🔴 ฟังก์ชันเคลียร์ตัวเลือกสิทธิทั้งหมดให้กลับเป็นสีขาว (ไม่ติ๊กเลือก)
+    function resetRightUI() {
         document.querySelectorAll('.right-option').forEach(c => {
-            c.classList.remove('border-emerald-500', 'bg-emerald-50'); c.classList.add('border-gray-200', 'bg-white');
-            c.querySelector('.check-icon').classList.add('hidden'); c.querySelector('.check-icon').classList.remove('text-emerald-500'); c.querySelector('.check-icon').classList.add('text-gray-300');
+            c.classList.remove('border-emerald-500', 'bg-emerald-50', 'shadow-sm');
+            c.classList.add('border-gray-200', 'bg-white');
+            let titleText = c.querySelector('.right-title-text');
+            if (titleText) {
+                titleText.classList.remove('text-emerald-800');
+                titleText.classList.add('text-gray-800');
+            }
+            let icon = c.querySelector('.check-icon');
+            if (icon) {
+                icon.classList.add('hidden', 'text-gray-300');
+                icon.classList.remove('text-emerald-500');
+            }
+            let radio = c.querySelector('input[name="patient_right"]');
+            if (radio) radio.checked = false;
         });
-        el.classList.remove('border-gray-200', 'bg-white'); el.classList.add('border-emerald-500', 'bg-emerald-50');
-        el.querySelector('.check-icon').classList.remove('hidden', 'text-gray-300'); el.querySelector('.check-icon').classList.add('text-emerald-500');
+        document.getElementById('selected-right-val').value = '';
+    }
+
+    function selectRightUI(el, val) {
+        resetRightUI();
+        el.classList.remove('border-gray-200', 'bg-white');
+        el.classList.add('border-emerald-500', 'bg-emerald-50', 'shadow-sm');
+        let titleText = el.querySelector('.right-title-text');
+        if (titleText) {
+            titleText.classList.remove('text-gray-800');
+            titleText.classList.add('text-emerald-800');
+        }
+        let icon = el.querySelector('.check-icon');
+        if (icon) {
+            icon.classList.remove('hidden', 'text-gray-300');
+            icon.classList.add('text-emerald-500');
+        }
+        let radio = el.querySelector('input[name="patient_right"]');
+        if (radio) radio.checked = true;
         document.getElementById('selected-right-val').value = val;
     }
 
@@ -671,9 +739,14 @@
             }).catch(() => {});
         }
 
-        document.querySelectorAll('input[name="patient_right"]').forEach(radio => { 
-            if(radio.value === r) { selectRightUI(radio.parentElement, r); } 
-        }); 
+        // 🔴 จุดที่ 3: หากการ์ดมีสิทธิที่ยืนยันแล้ว (r มีค่า) จึงจะติ๊กเลือกให้ แต่ถ้าเป็นการ์ดรุ่นเก่า (r ว่าง) ให้ปล่อยว่างไว้
+        if (r) {
+            document.querySelectorAll('input[name="patient_right"]').forEach(radio => { 
+                if(radio.value === r) { selectRightUI(radio.parentElement, r); } 
+            });
+        } else {
+            resetRightUI();
+        }
     }
 
     function loginUser() {
@@ -689,8 +762,27 @@
             Swal.fire({ icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณากรอกข้อมูลให้ครบถ้วน (เบอร์โทร 10 หลัก)', customClass: {popup: 'swal-3d-popup'} }); 
             return; 
         }
-        
-        let rNames = { '1': 'บัตรทอง (ร่วมจ่าย 30 บาท)', '2': 'บัตรทอง (ยกเว้นร่วมจ่าย)', '3': 'ข้าราชการ / อปท.', '4': 'รัฐวิสาหกิจ', '5': 'ประกันสังคม / ชำระเงินเอง' };
+
+        // 🔴 จุดที่ 2: ดักจับก่อนกดยืนยัน หากยังไม่เลือกสิทธิการรักษา ให้แจ้งเตือนและเลื่อนหน้าจอลงมาที่หัวข้อสิทธิการรักษาอัตโนมัติ
+        if (!rVal) {
+            const rightsTitleEl = document.getElementById('rights-section-title');
+            if (rightsTitleEl) {
+                rightsTitleEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            Swal.fire({ 
+                icon: 'warning', 
+                title: 'กรุณาเลือกสิทธิการรักษา', 
+                text: 'โปรดแตะเลือกสิทธิการรักษาของท่านก่อนกดยืนยันข้อมูล', 
+                confirmButtonText: 'ตกลง',
+                confirmButtonColor: '#059669',
+                customClass: {popup: 'swal-3d-popup'} 
+            }).then(() => {
+                if (rightsTitleEl) {
+                    rightsTitleEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+            return;
+        }
         
         show3DLoader('กำลังเข้าสู่ระบบและบันทึกข้อมูล...');
         
@@ -706,15 +798,23 @@
                 let finalFname = (res.user && res.user.fname) ? res.user.fname : f;
                 let finalLname = (res.user && res.user.lname) ? res.user.lname : l;
 
-                userProfile = { id: id, fname: finalFname, lname: finalLname, phone: p, right: rVal, rightName: rNames[rVal] };
+                userProfile = { 
+                    id: id, 
+                    fname: finalFname, 
+                    lname: finalLname, 
+                    phone: p, 
+                    right: rVal, 
+                    rightName: RIGHT_NAMES[rVal],
+                    r_verified: true 
+                };
 
-                // 🔴 บันทึกหรืออัปเดตเบอร์โทรใหม่ลงในเครื่อง (Local Storage) ทันที
+                // 🔴 บันทึกหรืออัปเดตเบอร์โทรใหม่ พร้อมสถานะยืนยันสิทธิ (r_verified: true) ลงในเครื่องทันที
                 let saved = JSON.parse(localStorage.getItem('swc_profiles') || '[]');
                 let existIdx = saved.findIndex(x => x.id === id);
                 if(existIdx > -1) {
-                    saved[existIdx] = { id: id, f: finalFname, l: finalLname, p: p, r: rVal };
+                    saved[existIdx] = { id: id, f: finalFname, l: finalLname, p: p, r: rVal, r_verified: true };
                 } else {
-                    saved.push({ id: id, f: finalFname, l: finalLname, p: p, r: rVal });
+                    saved.push({ id: id, f: finalFname, l: finalLname, p: p, r: rVal, r_verified: true });
                 }
                 localStorage.setItem('swc_profiles', JSON.stringify(saved)); 
                 localStorage.setItem('swc_active_user', JSON.stringify(userProfile));
@@ -1366,7 +1466,7 @@
                     </div>
                     ${b.status === 'รอรับบริการ' ? `
                     <div class="flex justify-end">
-                        <button onclick="adminCancelQueue('${b.idCard}', '${b.sysDate}', '${b.timeOnly}', '${b.dept}', '${b.name}')" class="text-xs bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg font-bold hover:bg-red-100 active:scale-95 transition-all"><i class="fa-solid fa-ban"></i> ยกเลิกนัด / แบน</button>
+                        <button onclick="adminCancelQueue('\${b.idCard}', '${b.sysDate}', '${b.timeOnly}', '${b.dept}', '${b.name}')" class="text-xs bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg font-bold hover:bg-red-100 active:scale-95 transition-all"><i class="fa-solid fa-ban"></i> ยกเลิกนัด / แบน</button>
                     </div>` : ''}
                 </div>`;
             });
